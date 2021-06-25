@@ -36,7 +36,7 @@ public struct Connection: Identifiable {
 }
 
 
-public struct Edge: Identifiable {
+public struct Edge: Identifiable, Codable {
 
     public var id: String
 

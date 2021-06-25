@@ -1,6 +1,6 @@
 //
 //  EdgeView.swift
-//  
+//
 //
 //  Created by nori on 2021/06/22.
 //
@@ -39,9 +39,9 @@ struct EdgeView: View {
 
     var edge: Edge
 
-    var start: CGPoint { context.portPosition(at: edge.source) ?? .zero }
+    var start: CGPoint { context.sourcePosition(address: edge.source) ?? .zero }
 
-    var end: CGPoint { context.portPosition(at: edge.target) ?? .zero }
+    var end: CGPoint { context.targetPosition(address: edge.target) ?? .zero }
 
     var body: some View {
         Path { path in

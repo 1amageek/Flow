@@ -19,8 +19,8 @@ public struct CanvasView: View {
 
     @ObservedObject public var canvasContext: CanvasContext = CanvasContext(
         nodes: [
-            Node(id: "0", title: "0", inputs: [Port(id: "0", title: "Input")], outputs: [Port(id: "1", title: "Output")]),
-            Node(id: "1", title: "1", inputs: [Port(id: "0", title: "Input")], outputs: [Port(id: "1", title: "Output")]),
+            Node(id: "0", title: "0", position: CGPoint(x: 100, y: 100), inputs: [InputPort(id: "0", title: "Input")], outputs: [OutputPort(id: "1", title: "Output")]),
+            Node(id: "1", title: "1", position: CGPoint(x: 100, y: 200), inputs: [InputPort(id: "0", title: "Input")], outputs: [OutputPort(id: "1", title: "Output")])
         ],
         edges: [
             Edge(id: "0", source: Address(nodeID: "0", portID: "0"), target: Address(nodeID: "1", portID: "1"))
