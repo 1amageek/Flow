@@ -10,16 +10,20 @@ import CoreGraphics
 
 public protocol Port: Identifiable, GeomertryProperties where ID == String {
 
+    associatedtype RawValue
+
     var id: ID { get }
 
     var title: String { get }
 
     var value: String { get }
+
+    var data: RawValue { get }
 }
 
 public extension Port {
 
-    var value: String { " " }
+    var value: String { String("\(data)") }
 }
 
 public struct InputPort<RawValue>: Port {

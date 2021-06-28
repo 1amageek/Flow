@@ -17,6 +17,17 @@ public class Graph<NodeElement: Node>: ObservableObject {
 
     @Published var connecting: Connection?
 
+    public subscript(nodeID: String) -> NodeElement {
+        get {
+            let index = self.nodes.firstIndex(where: { $0.id == nodeID })!
+            return nodes[index]
+        }
+        set {
+            let index = self.nodes.firstIndex(where: { $0.id == nodeID })!
+            nodes[index] = newValue
+        }
+    }
+
     public init(nodes: [NodeElement] = [], edges: [Edge] = []) {
         self._nodes = Published(initialValue: nodes)
         self._edges = Published(initialValue: edges)

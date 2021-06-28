@@ -62,23 +62,3 @@ public struct Edge: Identifiable {
         self.target = target
     }
 }
-
-
-//public struct Edge: Identifiable, Codable {
-//
-//    public var id: String
-//
-//    public var source: Address
-//
-//    public var target: Address
-//
-//    public init(
-//        id: String,
-//        source: Address,
-//        target: Address
-//    ) {
-//        self.id = id
-//        self.source = source
-//        self.target = target
-//    }
-//}
