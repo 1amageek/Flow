@@ -8,7 +8,7 @@
 import Foundation
 import CoreGraphics
 
-public protocol GeomertryProperties: Codable {
+public protocol GeomertryProperties {
 
     var position: CGPoint { get set }
 

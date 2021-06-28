@@ -9,8 +9,6 @@ import SwiftUI
 
 struct ConnectionView: View {
 
-    @EnvironmentObject var context: CanvasContext
-
     var connection: Connection
 
     var start: CGPoint { connection.start }
@@ -27,13 +25,13 @@ struct ConnectionView: View {
                           control1: CGPoint(x: center.x, y: start.y),
                           control2: CGPoint(x: center.x, y: end.y))
         }
-        .stroke(Color.black.opacity(0.4), lineWidth: 2)
+        .stroke(Color.black.opacity(0.2), lineWidth: 2)
     }
 }
 
-struct EdgeView: View {
+struct EdgeView<NodeElement: Node>: View {
 
-    @EnvironmentObject var context: CanvasContext
+    @EnvironmentObject var context: Graph<NodeElement>
 
     var edge: Edge
 
@@ -51,6 +49,6 @@ struct EdgeView: View {
                           control1: CGPoint(x: center.x, y: start.y),
                           control2: CGPoint(x: center.x, y: end.y))
         }
-        .stroke(lineWidth: 2)
+        .stroke(Color.black.opacity(0.4), lineWidth: 2)
     }
 }

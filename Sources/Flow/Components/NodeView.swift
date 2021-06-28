@@ -7,13 +7,13 @@
 
 import SwiftUI
 
-public struct NodeView<Content: View>: View {
+public struct NodeView<NodeElement: Node, Content: View>: View {
 
     @Environment(\.canvasCoordinateSpace) var canvasCoordinateSpace: String
 
-    @EnvironmentObject var context: CanvasContext
+    @EnvironmentObject var context: Graph<NodeElement>
 
-    var node: Node
+    var node: NodeElement
 
     var cornerRadius: CGFloat = 12
 
@@ -36,9 +36,9 @@ public struct NodeView<Content: View>: View {
             }
     }
 
-    var content: ([InputPort], [OutputPort]) -> Content
+    var content: ([NodeElement.Input], [NodeElement.Output]) -> Content
 
-    public init(node: Node, content: @escaping ([InputPort], [OutputPort]) -> Content) {
+    public init(node: NodeElement, content: @escaping ([NodeElement.Input], [NodeElement.Output]) -> Content) {
         self.node = node
         self.content = content
     }
@@ -58,29 +58,3 @@ public struct NodeView<Content: View>: View {
     }
 }
 
-struct NodeView_Previews: PreviewProvider {
-
-    static let node = Node(id: "0", title: "Function", position: .zero)
-
-    static var previews: some View {
-        NodeView(node: node) { inputs, outputs in
-            HStack(spacing: 8) {
-                VStack {
-                    ForEach(inputs) { port in
-                        InputPortView(node: node, port: port, value: "\(0)") {
-                            Circle()
-                        }
-                    }
-                }
-                VStack {
-                    ForEach(outputs) { port in
-                        OutputPortView(node: node, port: port, value: "\(0)") {
-                            Circle()
-                        }
-                    }
-                }
-            }.padding(8)
-        }
-            .environmentObject(CanvasContext())
-    }
-}

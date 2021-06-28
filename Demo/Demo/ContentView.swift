@@ -9,16 +9,23 @@ import SwiftUI
 import Flow
 
 struct ContentView: View {
+
+    @ObservedObject public var graph: Graph = Graph(
+        nodes: [
+            IONode(id: "0", title: "0", position: CGPoint(x: 100, y: 100),
+                   inputs: [InputPort(id: "0", title: "Input", data: 0)],
+                   outputs: [OutputPort(id: "1", title: "Output", data: 0)]) { inputs in inputs },
+            IONode(id: "1", title: "0", position: CGPoint(x: 200, y: 200),
+                   inputs: [InputPort(id: "0", title: "Input", data: 0)],
+                   outputs: [OutputPort(id: "1", title: "Output", data: 0)]) { inputs in inputs }
+        ],
+        edges: [
+            Edge(id: "0", source: Address(nodeID: "0", portID: "0"), target: Address(nodeID: "1", portID: "1"))
+        ]
+    )
+
     var body: some View {
-        CanvasView(
-            nodes: [
-                Node(id: "0", title: "0", position: CGPoint(x: 100, y: 100), inputs: [InputPort(id: "0", title: "Input")], outputs: [OutputPort(id: "1", title: "Output")]),
-                Node(id: "1", title: "1", position: CGPoint(x: 100, y: 200), inputs: [InputPort(id: "0", title: "Input")], outputs: [OutputPort(id: "1", title: "Output")])
-            ],
-            edges: [
-                Edge(id: "0", source: Address(nodeID: "0", portID: "0"), target: Address(nodeID: "1", portID: "1"))
-            ]
-        ) { node in
+        CanvasView(graph) { node in
             NodeView(node: node) { inputs, outputs in
                 VStack {
                     HStack(spacing: 8) {

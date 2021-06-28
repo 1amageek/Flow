@@ -9,6 +9,8 @@ import SwiftUI
 
 public protocol PortView: View {
 
+    associatedtype Node
+
     associatedtype Port
 
     var node: Node { get }
@@ -16,21 +18,21 @@ public protocol PortView: View {
     var port: Port { get }
 }
 
-public struct InputPortView<Content: View>: PortView {
+public struct InputPortView<NodeElement: Node, Content: View>: PortView {
 
     @Environment(\.canvasCoordinateSpace) var canvasCoordinateSpace: String
 
-    @EnvironmentObject var context: CanvasContext
+    @EnvironmentObject var context: Graph<NodeElement>
 
-    public var node: Node
+    public var node: NodeElement
 
-    public var port: InputPort
+    public var port: NodeElement.Input
 
     var value: String
 
     var content: () -> Content
 
-    public init(node: Node, port: InputPort, value: String, content: @escaping () -> Content) {
+    public init(node: NodeElement, port: NodeElement.Input, value: String, content: @escaping () -> Content) {
         self.node = node
         self.port = port
         self.value = value
@@ -70,21 +72,21 @@ public struct InputPortView<Content: View>: PortView {
     }
 }
 
-public struct OutputPortView<Content: View>: PortView {
+public struct OutputPortView<NodeElement: Node, Content: View>: PortView {
 
     @Environment(\.canvasCoordinateSpace) var canvasCoordinateSpace: String
 
-    @EnvironmentObject var context: CanvasContext
+    @EnvironmentObject var context: Graph<NodeElement>
 
-    public var node: Node
+    public var node: NodeElement
 
-    public var port: OutputPort
+    public var port: NodeElement.Output
 
     var value: String
 
     var content: () -> Content
 
-    public init(node: Node, port: OutputPort, value: String, content: @escaping () -> Content) {
+    public init(node: NodeElement, port: NodeElement.Output, value: String, content: @escaping () -> Content) {
         self.node = node
         self.port = port
         self.value = value
@@ -124,66 +126,13 @@ public struct OutputPortView<Content: View>: PortView {
     }
 }
 
-struct Jack<T: Port, Content: View>: View {
+struct JackModifier<NodeElement: Node, T: Port>: ViewModifier {
 
     @Environment(\.canvasCoordinateSpace) var canvasCoordinateSpace: String
 
-    @EnvironmentObject var context: CanvasContext
+    @EnvironmentObject var context: Graph<NodeElement>
 
-    @State var isHover: Bool = false
-
-    var node: Node
-
-    var port: T
-
-    var content: () -> Content
-
-    var onConnectingHandler: (DragGesture.Value) -> Void
-
-    var onConnectedHandler: (DragGesture.Value) -> Void
-
-    init(
-        node: Node,
-        port: T,
-        content: @escaping () -> Content,
-        onConnecting: @escaping (DragGesture.Value) -> Void,
-        onConnected: @escaping (DragGesture.Value) -> Void
-    ) {
-        self.node = node
-        self.port = port
-        self.content = content
-        self.onConnectingHandler = onConnecting
-        self.onConnectedHandler = onConnected
-    }
-
-    var gesture: some Gesture {
-        DragGesture(coordinateSpace: .named(canvasCoordinateSpace))
-            .onChanged { value in
-                if context.connecting != nil {
-                    context.connecting?.end = value.location
-                } else {
-                    onConnectingHandler(value)
-                }
-            }
-            .onEnded { value in
-                onConnectedHandler(value)
-                context.connecting = nil
-            }
-    }
-
-    var body: some View {
-        content()
-        .gesture(gesture)
-    }
-}
-
-struct JackModifier<T: Port>: ViewModifier {
-
-    @Environment(\.canvasCoordinateSpace) var canvasCoordinateSpace: String
-
-    @EnvironmentObject var context: CanvasContext
-
-    var node: Node
+    var node: NodeElement
 
     var port: T
 
@@ -192,7 +141,7 @@ struct JackModifier<T: Port>: ViewModifier {
     var onConnectedHandler: (DragGesture.Value) -> Void
 
     init(
-        node: Node,
+        node: NodeElement,
         port: T,
         onConnecting: @escaping (DragGesture.Value) -> Void,
         onConnected: @escaping (DragGesture.Value) -> Void
@@ -218,51 +167,51 @@ struct JackModifier<T: Port>: ViewModifier {
             }
     }
 
-    func body(content:  Content) -> some View {
+    func body(content: Content) -> some View {
         content.gesture(gesture)
     }
 }
 
 
-struct InputPortModifier: ViewModifier {
+struct InputPortModifier<NodeElement: Node>: ViewModifier {
 
-    var node: Node
+    var node: NodeElement
 
-    var port: InputPort
+    var port: NodeElement.Input
 
-    init(node: Node, port: InputPort) {
+    init(node: NodeElement, port: NodeElement.Input) {
         self.node = node
         self.port = port
     }
 
-    func body(content:  Content) -> some View {
-        InputPortView(node: node, port: port, value: "") { content }
+    func body(content: Content) -> some View {
+        InputPortView<NodeElement, Content>(node: node, port: port, value: "") { content }
     }
 }
 
-struct OutputPortModifier: ViewModifier {
+struct OutputPortModifier<NodeElement: Node>: ViewModifier {
 
-    var node: Node
+    var node: NodeElement
 
-    var port: OutputPort
+    var port: NodeElement.Output
 
-    init(node: Node, port: OutputPort) {
+    init(node: NodeElement, port: NodeElement.Output) {
         self.node = node
         self.port = port
     }
 
-    func body(content:  Content) -> some View {
-        OutputPortView(node: node, port: port, value: "") { content }
+    func body(content: Content) -> some View {
+        OutputPortView<NodeElement, Content>(node: node, port: port, value: "") { content }
     }
 }
 
 extension View {
 
-    public func inputPort(node: Node, port: InputPort) -> some View {
+    public func inputPort<NodeElement: Node>(node: NodeElement, port: NodeElement.Input) -> some View {
         return self.modifier(InputPortModifier(node: node, port: port))
     }
 
-    public func outputPort(node: Node, port: OutputPort) -> some View {
+    public func outputPort<NodeElement: Node>(node: NodeElement, port: NodeElement.Output) -> some View {
         return self.modifier(OutputPortModifier(node: node, port: port))
     }
 }

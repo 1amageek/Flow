@@ -35,8 +35,16 @@ public struct Connection: Identifiable {
     }
 }
 
+//public protocol Edge: Identifiable, Codable {
+//
+//    var id: String { get }
+//
+//    var source: Address { get }
+//
+//    var target: Address { get }
+//}
 
-public struct Edge: Identifiable, Codable {
+public struct Edge: Identifiable {
 
     public var id: String
 
@@ -54,3 +62,23 @@ public struct Edge: Identifiable, Codable {
         self.target = target
     }
 }
+
+
+//public struct Edge: Identifiable, Codable {
+//
+//    public var id: String
+//
+//    public var source: Address
+//
+//    public var target: Address
+//
+//    public init(
+//        id: String,
+//        source: Address,
+//        target: Address
+//    ) {
+//        self.id = id
+//        self.source = source
+//        self.target = target
+//    }
+//}

@@ -1,5 +1,5 @@
 //
-//  CanvasContext.swift
+//  Graph.swift
 //  
 //
 //  Created by nori on 2021/06/21.
@@ -7,23 +7,22 @@
 
 import SwiftUI
 
-public class CanvasContext: ObservableObject {
+public class Graph<NodeElement: Node>: ObservableObject {
 
-    @Published var nodes: [Node] = []
+    @Published var nodes: [NodeElement] = []
 
     @Published var edges: [Edge] = []
 
-    @Published var focusNode: Node?
+    @Published var focusNode: NodeElement?
 
     @Published var connecting: Connection?
 
-
-    public init(nodes: [Node] = [], edges: [Edge] = []) {
+    public init(nodes: [NodeElement] = [], edges: [Edge] = []) {
         self._nodes = Published(initialValue: nodes)
         self._edges = Published(initialValue: edges)
     }
 
-    public func position(at node: Node, port: InputPort) -> CGPoint? {
+    public func position<Element: Node>(at node: Element, port: Element.Input) -> CGPoint? {
         guard let position = node.inputs[port.id]?.position else { return nil }
         return CGPoint(
             x: node.position.x + node.offset.width - node.size.width / 2 + position.x,
@@ -31,7 +30,7 @@ public class CanvasContext: ObservableObject {
         )
     }
 
-    public func position(at node: Node, port: OutputPort) -> CGPoint? {
+    public func position<Element: Node>(at node: Element, port: Element.Output) -> CGPoint? {
         guard let position = node.outputs[port.id]?.position else { return nil }
         return CGPoint(
             x: node.position.x + node.offset.width - node.size.width / 2 + position.x,
@@ -39,7 +38,7 @@ public class CanvasContext: ObservableObject {
         )
     }
 
-    public func sourcePosition(address: Address) -> CGPoint? {
+    public func sourcePosition(address: Address) -> CGPoint? where NodeElement.ID == String, NodeElement.Output.ID == String {
         guard let node = nodes[address.nodeID] else { return nil }
         guard let position = node.outputs[address.portID]?.position else { return nil }
         return CGPoint(
@@ -48,7 +47,7 @@ public class CanvasContext: ObservableObject {
         )
     }
 
-    public func targetPosition(address: Address) -> CGPoint? {
+    public func targetPosition(address: Address) -> CGPoint? where NodeElement.ID == String, NodeElement.Input.ID == String {
         guard let node = nodes[address.nodeID] else { return nil }
         guard let position = node.inputs[address.portID]?.position else { return nil }
         return CGPoint(
@@ -57,7 +56,7 @@ public class CanvasContext: ObservableObject {
         )
     }
 
-    public func node(at point: CGPoint) -> Node? {
+    public func node(at point: CGPoint) -> NodeElement? {
         for (_, node) in nodes.enumerated() {
             if let node = nodes[node.id] {
                 let frame = CGRect(

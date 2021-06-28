@@ -8,24 +8,27 @@
 import Foundation
 import CoreGraphics
 
-public protocol Port: Identifiable, GeomertryProperties {
+public protocol Port: Identifiable, GeomertryProperties where ID == String {
 
-    associatedtype Data
-
-    var id: String { get }
+    var id: ID { get }
 
     var title: String { get }
 
-    var data: Data { get set }
+    var value: String { get }
 }
 
-public struct InputPort<Data: Codable>: Port {
+public extension Port {
+
+    var value: String { " " }
+}
+
+public struct InputPort<RawValue>: Port {
 
     public var id: String
 
     public var title: String
 
-    public var data: Data
+    public var data: RawValue
 
     public var position: CGPoint = .zero
 
@@ -33,20 +36,20 @@ public struct InputPort<Data: Codable>: Port {
 
     public var size: CGSize = .zero
 
-    public init(id: String, title: String, data: Data) {
+    public init(id: String, title: String, data: RawValue) {
         self.id = id
         self.title = title
         self.data = data
     }
 }
 
-public struct OutputPort<Data: Codable>: Port {
+public struct OutputPort<RawValue>: Port {
 
     public var id: String
 
     public var title: String
 
-    public var data: Data
+    public var data: RawValue
 
     public var position: CGPoint = .zero
 
@@ -54,7 +57,7 @@ public struct OutputPort<Data: Codable>: Port {
 
     public var size: CGSize = .zero
 
-    public init(id: String, title: String, data: Data) {
+    public init(id: String, title: String, data: RawValue) {
         self.id = id
         self.title = title
         self.data = data
