@@ -19,17 +19,15 @@ struct ConnectionView: View {
 
     var body: some View {
         Path { path in
-//            print(start, end, edge.source, edge.target, context.portFrames)
             let x: CGFloat = (end.x - start.x) / 2
             let y: CGFloat = (end.y - start.y) / 2
-            let center: CGPoint = CGPoint(x: x, y: y)
+            let center: CGPoint = CGPoint(x: start.x + x, y: start.y + y)
             path.move(to: start)
-            path.addLine(to: end)
-//            path.addCurve(to: end,
-//                          control1: CGPoint(x: center.x, y: start.y),
-//                          control2: CGPoint(x: center.x, y: end.y))
+            path.addCurve(to: end,
+                          control1: CGPoint(x: center.x, y: start.y),
+                          control2: CGPoint(x: center.x, y: end.y))
         }
-        .stroke(lineWidth: 4)
+        .stroke(Color.black.opacity(0.4), lineWidth: 2)
     }
 }
 
@@ -45,28 +43,14 @@ struct EdgeView: View {
 
     var body: some View {
         Path { path in
-//            print(start, end, edge.source, edge.target, context.portFrames)
             let x: CGFloat = (end.x - start.x) / 2
             let y: CGFloat = (end.y - start.y) / 2
-            let center: CGPoint = CGPoint(x: x, y: y)
+            let center: CGPoint = CGPoint(x: start.x + x, y: start.y + y)
             path.move(to: start)
-            path.addLine(to: end)
-//            path.addCurve(to: end,
-//                          control1: CGPoint(x: center.x, y: start.y),
-//                          control2: CGPoint(x: center.x, y: end.y))
+            path.addCurve(to: end,
+                          control1: CGPoint(x: center.x, y: start.y),
+                          control2: CGPoint(x: center.x, y: end.y))
         }
         .stroke(lineWidth: 2)
     }
 }
-
-//struct EdgeView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        EdgeView(edge:
-//                    Edge(id: "1",
-//                         start: .zero,
-//                         end: CGPoint(x: UIScreen.main.bounds.width, y: UIScreen.main.bounds.height),
-//                         startConnectoin: Edge.Connection(nodeID: "", portID: "")
-//                        ))
-//            .ignoresSafeArea()
-//    }
-//}

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct NodeView: View {
+public struct NodeView<Content: View>: View {
 
     @Environment(\.canvasCoordinateSpace) var canvasCoordinateSpace: String
 
@@ -36,56 +36,51 @@ public struct NodeView: View {
             }
     }
 
-    public var body: some View {
-        VStack(spacing: 0) {
-            Text(node.title)
-                .padding(8)
-            HStack(spacing: 8) {
-                VStack {
-                    ForEach(node.inputs) { port in
-                        InputPortView(node: node, port: port, value: "\(0)")
-                    }
-                }
-                VStack {
-                    ForEach(node.outputs) { port in
-                        OutputPortView(node: node, port: port, value: "\(0)")
-                    }
-                }
-            }.padding(8)
-        }
-        .overlay(
-            RoundedRectangle(cornerRadius: cornerRadius)
-                .stroke(Color.black, lineWidth: 4)
-        )
-        .overlay(
-            context.focusNode?.id == node.id ?
-            RoundedRectangle(cornerRadius: cornerRadius)
-                .stroke(Color.blue, lineWidth: 4) : nil
-        )
-        .background(GeometryReader { proxy in
-            RoundedRectangle(cornerRadius: cornerRadius)
-                .fill(Color.white)
-                .onAppear {
-                    let frame = proxy.frame(in: .named(canvasCoordinateSpace))
-                    context.nodes[node.id]?.size = proxy.size
-                }
-        })
-        .frame(width: 260, alignment: .center)
-        .coordinateSpace(name: node.id)
-        .onTapGesture {
-            self.context.focusNode = node
-        }
-        .position(position)
-        .offset(offset)
-        .gesture(gesture)
-        .padding(12)
+    var content: ([InputPort], [OutputPort]) -> Content
 
+    public init(node: Node, content: @escaping ([InputPort], [OutputPort]) -> Content) {
+        self.node = node
+        self.content = content
+    }
+
+    public var body: some View {
+        content(node.inputs, node.outputs)
+            .background(GeometryReader { proxy in
+                Rectangle()
+                    .fill(Color.clear)
+                    .onAppear { context.nodes[node.id]?.size = proxy.size }
+            })
+            .coordinateSpace(name: node.id)
+            .position(position)
+            .offset(offset)
+            .gesture(gesture)
+            .onTapGesture { context.focusNode = node }
     }
 }
 
 struct NodeView_Previews: PreviewProvider {
+
+    static let node = Node(id: "0", title: "Function", position: .zero)
+
     static var previews: some View {
-        NodeView(node: Node(id: "0", title: "Function", position: .zero))
+        NodeView(node: node) { inputs, outputs in
+            HStack(spacing: 8) {
+                VStack {
+                    ForEach(inputs) { port in
+                        InputPortView(node: node, port: port, value: "\(0)") {
+                            Circle()
+                        }
+                    }
+                }
+                VStack {
+                    ForEach(outputs) { port in
+                        OutputPortView(node: node, port: port, value: "\(0)") {
+                            Circle()
+                        }
+                    }
+                }
+            }.padding(8)
+        }
             .environmentObject(CanvasContext())
     }
 }

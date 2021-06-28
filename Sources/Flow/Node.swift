@@ -8,7 +8,7 @@
 import Foundation
 import CoreGraphics
 
-public struct Node: Identifiable, GeomertryProperties, Codable {
+public struct Node<Data: Codable>: Identifiable, GeomertryProperties, Codable {
     
     public var id: String
 
@@ -20,16 +20,16 @@ public struct Node: Identifiable, GeomertryProperties, Codable {
 
     public var size: CGSize = .zero
 
-    public var inputs: [InputPort] = []
+    public var inputs: [InputPort<Data>] = []
 
-    public var outputs: [OutputPort] = []
+    public var outputs: [OutputPort<Data>] = []
 
     public init(
         id: String,
         title: String,
         position: CGPoint,
-        inputs: [InputPort] = [],
-        outputs: [OutputPort] = []
+        inputs: [InputPort<Data>] = [],
+        outputs: [OutputPort<Data>] = []
     ) {
         self.id = id
         self.title = title
