@@ -40,16 +40,27 @@ public protocol Node: Identifiable, GeomertryProperties where ID == String {
 
 public extension Node {
 
-    subscript(portID: String) -> Input {
+    subscript(inputPortID: String) -> Input {
         get {
-            let index = self.inputs.firstIndex(where: { $0.id == portID })!
+            let index = self.inputs.firstIndex(where: { $0.id == inputPortID })!
             return inputs[index]
         }
         set {
-            let index = self.inputs.firstIndex(where: { $0.id == portID })!
+            let index = self.inputs.firstIndex(where: { $0.id == inputPortID })!
             inputs[index] = newValue
         }
     }
+
+//    subscript(outputPortID: String) -> Output {
+//        get {
+//            let index = self.outputs.firstIndex(where: { $0.id == outputPortID })!
+//            return outputs[index]
+//        }
+//        set {
+//            let index = self.outputs.firstIndex(where: { $0.id == outputPortID })!
+//            outputs[index] = newValue
+//        }
+//    }
 }
 
 public struct IONode: Node {
@@ -74,7 +85,9 @@ public struct IONode: Node {
 
     public var outputs: [Output] = []
 
-//    let execute: ([Input]) -> [Output]
+    var execute: ([PortData]) -> [PortData]
+
+    func callAsFunction() -> [PortData] { execute(self.inputs.map { $0.data }) }
 
     public init(
         type: NodeType = .default,
@@ -82,8 +95,8 @@ public struct IONode: Node {
         title: String,
         position: CGPoint,
         inputs: [Input] = [],
-        outputs: [Output] = []
-//        execute: @escaping ([Input]) -> [Output]
+        outputs: [Output] = [],
+        execute: @escaping ([PortData]) -> [PortData]
     ) {
         self.type = type
         self.id = id
@@ -91,7 +104,7 @@ public struct IONode: Node {
         self.position = position
         self.inputs = inputs
         self.outputs = outputs
-//        self.execute = execute
+        self.execute = execute
     }
 
     public static func input(
@@ -100,7 +113,7 @@ public struct IONode: Node {
         position: CGPoint,
         outputs: [Output] = []
     ) -> IONode {
-        IONode(type: .input, id: id, title: title, position: position, outputs: outputs)
+        IONode(type: .input, id: id, title: title, position: position, outputs: outputs) { _ in outputs.map { $0.data } }
     }
 
     public static func output(
@@ -109,6 +122,6 @@ public struct IONode: Node {
         position: CGPoint,
         inputs: [Input] = []
     ) -> IONode {
-        IONode(type: .output, id: id, title: title, position: position, inputs: inputs)
+        IONode(type: .output, id: id, title: title, position: position, inputs: inputs) { inputs in [] }
     }
 }

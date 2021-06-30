@@ -118,8 +118,37 @@ public class Graph<NodeElement: Node>: ObservableObject {
 
 extension Graph {
 
-    public var inputs: [NodeElement] { nodes.filter { $0.type == .input } }
+    public var inputNodes: [NodeElement] { nodes.filter { $0.type == .input } }
 
-    public var ouputs: [NodeElement] { nodes.filter { $0.type == .output } }
+    public var ouputNodes: [NodeElement] { nodes.filter { $0.type == .output } }
+
+    public func connectedNodes(node: NodeElement, inputPort: InputPort) -> [NodeElement] {
+        let connectedEdge = self.edges.filter { $0.target ==  Address(nodeID: node.id, portID: inputPort.id) }
+        return connectedEdge.map { self[$0.source.nodeID] }
+    }
+
+    public func connectedPorts(node: NodeElement, inputPort: InputPort) -> [OutputPort] {
+        let connectedEdge = self.edges.filter { $0.target ==  Address(nodeID: node.id, portID: inputPort.id) }
+        return connectedEdge.compactMap { self[$0.source.nodeID].outputs[$0.source.portID] as! OutputPort }
+    }
+
+    public func execute() {
+        ouputNodes.forEach { node in
+            node.inputs.forEach { port in
+                if let port = port as? InputPort {
+                    let nodes = connectedNodes(node: node, inputPort: port)
+//                    port.data = .int(12)
+                }
+            }
+        }
+    }
+
+    public func probe(node: NodeElement, port: InputPort) -> PortData {
+        let nodes = connectedNodes(node: node, inputPort: port)
+
+        nodes.forEach { node in
+
+        }
+    }
 
 }

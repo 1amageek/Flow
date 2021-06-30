@@ -16,7 +16,7 @@ struct ContentView: View {
             IONode.input(id: "B", title: "B", position: CGPoint(x: 200, y: 400), outputs: [OutputPort(id: "0", title: "Output", data: .int(0))]),
             IONode(id: "SUM", title: "SUM", position: CGPoint(x: 490, y: 200),
                    inputs: [InputPort(id: "0", title: "A", data: .int(3)), InputPort(id: "1", title: "B", data: .int(3))],
-                   outputs: [OutputPort(id: "0", title: "Output", data: .int(3))]),
+                   outputs: [OutputPort(id: "0", title: "Output", data: .int(3))]) { _ in [] },
             IONode.output(id: "RESULT", title: "RESULT", position: CGPoint(x: 790, y: 200), inputs: [InputPort(id: "0", title: "Input", data: .string("sss"))])
         ],
         edges: [
