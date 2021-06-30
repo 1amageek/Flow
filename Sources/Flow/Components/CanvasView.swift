@@ -27,17 +27,20 @@ public struct CanvasView<NodeElement: Node, Content: View>: View {
     }
 
     public var body: some View {
-        ZStack {
-            ForEach(graph.nodes) { node in
-                content(node)
+//        ScrollView([.vertical, .horizontal], showsIndicators: true) {
+            ZStack {
+                ForEach(graph.nodes) { node in
+                    content(node)
+                }
+                ForEach(graph.edges) { edge in
+                    EdgeView<NodeElement>(edge: edge)
+                }
+                if let connnection = graph.connecting {
+                    ConnectionView(connection: connnection)
+                }
             }
-            ForEach(graph.edges) { edge in
-                EdgeView<NodeElement>(edge: edge)
-            }
-            if let connnection = graph.connecting {
-                ConnectionView(connection: connnection)
-            }
-        }
+//        }
+//        .background(Color.red)
         .onTapGesture {
             graph.focusNode = nil
         }

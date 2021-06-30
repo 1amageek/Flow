@@ -10,29 +10,33 @@ import CoreGraphics
 
 public protocol Port: Identifiable, GeomertryProperties where ID == String {
 
-    associatedtype RawValue
-
     var id: ID { get }
 
     var title: String { get }
 
     var value: String { get }
 
-    var data: RawValue { get }
+    var data: PortData { get }
 }
 
 public extension Port {
 
-    var value: String { String("\(data)") }
+    var value: String {
+        switch data {
+            case .none: return ""
+            case .int(let value): return "\(value)"
+            case .string(let value): return value
+        }
+    }
 }
 
-public struct InputPort<RawValue>: Port {
+public struct InputPort: Port {
 
     public var id: String
 
     public var title: String
 
-    public var data: RawValue
+    public var data: PortData
 
     public var position: CGPoint = .zero
 
@@ -40,20 +44,20 @@ public struct InputPort<RawValue>: Port {
 
     public var size: CGSize = .zero
 
-    public init(id: String, title: String, data: RawValue) {
+    public init(id: String, title: String, data: PortData) {
         self.id = id
         self.title = title
         self.data = data
     }
 }
 
-public struct OutputPort<RawValue>: Port {
+public struct OutputPort: Port {
 
     public var id: String
 
     public var title: String
 
-    public var data: RawValue
+    public var data: PortData
 
     public var position: CGPoint = .zero
 
@@ -61,7 +65,7 @@ public struct OutputPort<RawValue>: Port {
 
     public var size: CGSize = .zero
 
-    public init(id: String, title: String, data: RawValue) {
+    public init(id: String, title: String, data: PortData) {
         self.id = id
         self.title = title
         self.data = data

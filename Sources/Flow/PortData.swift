@@ -6,3 +6,12 @@
 //
 
 import Foundation
+
+
+public enum PortData {
+
+    case none
+    case int(Int)
+    case string(String)
+
+}

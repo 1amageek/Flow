@@ -12,12 +12,12 @@ struct ContentView: View {
 
     @ObservedObject public var graph: Graph = Graph(
         nodes: [
-            IONode(id: "A", title: "A", position: CGPoint(x: 200, y: 200), outputs: [OutputPort(id: "0", title: "Output", data: 0)]) { inputs in inputs },
-            IONode(id: "B", title: "B", position: CGPoint(x: 200, y: 400), outputs: [OutputPort(id: "0", title: "Output", data: 0)]) { inputs in inputs },
+            IONode.input(id: "A", title: "A", position: CGPoint(x: 200, y: 200), outputs: [OutputPort(id: "0", title: "Output", data: .int(0))]),
+            IONode.input(id: "B", title: "B", position: CGPoint(x: 200, y: 400), outputs: [OutputPort(id: "0", title: "Output", data: .int(0))]),
             IONode(id: "SUM", title: "SUM", position: CGPoint(x: 490, y: 200),
-                   inputs: [InputPort(id: "0", title: "A", data: 0), InputPort(id: "1", title: "B", data: 0)],
-                   outputs: [OutputPort(id: "0", title: "Output", data: 0)]) { inputs in inputs },
-            IONode(id: "RESULT", title: "RESULT", position: CGPoint(x: 790, y: 200), inputs: [InputPort(id: "0", title: "Input", data: 0)]) { inputs in inputs }
+                   inputs: [InputPort(id: "0", title: "A", data: .int(3)), InputPort(id: "1", title: "B", data: .int(3))],
+                   outputs: [OutputPort(id: "0", title: "Output", data: .int(3))]),
+            IONode.output(id: "RESULT", title: "RESULT", position: CGPoint(x: 790, y: 200), inputs: [InputPort(id: "0", title: "Input", data: .string("sss"))])
         ],
         edges: [
             Edge(id: "0", source: Address(nodeID: "A", portID: "0"), target: Address(nodeID: "SUM", portID: "0")),
@@ -39,6 +39,9 @@ struct ContentView: View {
                                         .frame(width: 8, height: 8)
                                         .inputPort(node: node, port: port)
                                     Text(port.title)
+                                    if node.type == .output {
+                                        Text(port.value)
+                                    }
                                 }
                             }
                         }

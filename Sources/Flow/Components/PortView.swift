@@ -153,7 +153,7 @@ struct JackModifier<NodeElement: Node, T: Port>: ViewModifier {
     }
 
     var gesture: some Gesture {
-        DragGesture(coordinateSpace: .named(canvasCoordinateSpace))
+        DragGesture(minimumDistance: 0, coordinateSpace: .named(canvasCoordinateSpace))
             .onChanged { value in
                 if context.connecting != nil {
                     context.connecting?.end = value.location
@@ -168,7 +168,7 @@ struct JackModifier<NodeElement: Node, T: Port>: ViewModifier {
     }
 
     func body(content: Content) -> some View {
-        content.gesture(gesture)
+        content.simultaneousGesture(gesture)
     }
 }
 

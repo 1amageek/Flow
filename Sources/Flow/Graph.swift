@@ -114,5 +114,12 @@ public class Graph<NodeElement: Node>: ObservableObject {
         }
         return nil
     }
+}
+
+extension Graph {
+
+    public var inputs: [NodeElement] { nodes.filter { $0.type == .input } }
+
+    public var ouputs: [NodeElement] { nodes.filter { $0.type == .output } }
 
 }
