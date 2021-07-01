@@ -7,13 +7,13 @@
 
 import SwiftUI
 
-public struct NodeView<NodeElement: Node, Content: View>: View {
+public struct NodeView<Content: View>: View {
 
     @Environment(\.canvasCoordinateSpace) var canvasCoordinateSpace: String
 
-    @EnvironmentObject var context: Graph<NodeElement>
+    @EnvironmentObject var context: Graph
 
-    var node: NodeElement
+    var node: Node
 
     var cornerRadius: CGFloat = 12
 
@@ -22,7 +22,7 @@ public struct NodeView<NodeElement: Node, Content: View>: View {
     var offset: CGSize { context.nodes[node.id]?.offset ?? .zero  }
 
     var gesture: some Gesture {
-        DragGesture(minimumDistance: 0)
+        DragGesture(minimumDistance: 0.1)
             .onChanged { value in
                 context.nodes[node.id]?.offset = value.translation
             }
@@ -36,9 +36,9 @@ public struct NodeView<NodeElement: Node, Content: View>: View {
             }
     }
 
-    var content: ([NodeElement.Input], [NodeElement.Output]) -> Content
+    var content: ([Port], [Port]) -> Content
 
-    public init(node: NodeElement, content: @escaping ([NodeElement.Input], [NodeElement.Output]) -> Content) {
+    public init(node: Node, content: @escaping ([Port], [Port]) -> Content) {
         self.node = node
         self.content = content
     }

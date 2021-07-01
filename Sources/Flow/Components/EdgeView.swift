@@ -29,9 +29,9 @@ struct ConnectionView: View {
     }
 }
 
-struct EdgeView<NodeElement: Node>: View {
+struct EdgeView: View {
 
-    @EnvironmentObject var context: Graph<NodeElement>
+    @EnvironmentObject var context: Graph
 
     var edge: Edge
 

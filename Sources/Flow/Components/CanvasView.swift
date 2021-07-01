@@ -15,13 +15,13 @@ extension EnvironmentValues {
     var canvasCoordinateSpace: String { self[CanvasCoordinateSpace] }
 }
 
-public struct CanvasView<NodeElement: Node, Content: View>: View {
+public struct CanvasView<Content: View>: View {
 
-    var graph: Graph<NodeElement>
+    var graph: Graph
 
-    var content: (NodeElement) -> Content
+    var content: (Node) -> Content
 
-    public init(_ graph: Graph<NodeElement>, @ViewBuilder content: @escaping (NodeElement) -> Content) {
+    public init(_ graph: Graph, @ViewBuilder content: @escaping (Node) -> Content) {
         self.graph = graph
         self.content = content
     }
@@ -33,7 +33,7 @@ public struct CanvasView<NodeElement: Node, Content: View>: View {
                     content(node)
                 }
                 ForEach(graph.edges) { edge in
-                    EdgeView<NodeElement>(edge: edge)
+                    EdgeView(edge: edge)
                 }
                 if let connnection = graph.connecting {
                     ConnectionView(connection: connnection)

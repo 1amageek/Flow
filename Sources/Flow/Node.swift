@@ -11,65 +11,19 @@ import CoreGraphics
 public enum NodeType {
     case input
     case output
-    case `default`
-}
-
-public protocol Node: Identifiable, GeomertryProperties where ID == String {
-
-    associatedtype Input: Port
-
-    associatedtype Output: Port
-
-    var type: NodeType { get }
-
-    var id: String { get }
-
-    var title: String { get }
-
-    var position: CGPoint { get set }
-
-    var offset: CGSize { get set }
-
-    var size: CGSize { get set }
-
-    var inputs: [Input] { get set }
-
-    var outputs: [Output] { get set }
-
+    case io
 }
 
 public extension Node {
 
-    subscript(inputPortID: String) -> Input {
-        get {
-            let index = self.inputs.firstIndex(where: { $0.id == inputPortID })!
-            return inputs[index]
-        }
-        set {
-            let index = self.inputs.firstIndex(where: { $0.id == inputPortID })!
-            inputs[index] = newValue
-        }
-    }
+    var inputs: [Port] { ports.filter { $0.type == .input } }
 
-//    subscript(outputPortID: String) -> Output {
-//        get {
-//            let index = self.outputs.firstIndex(where: { $0.id == outputPortID })!
-//            return outputs[index]
-//        }
-//        set {
-//            let index = self.outputs.firstIndex(where: { $0.id == outputPortID })!
-//            outputs[index] = newValue
-//        }
-//    }
+    var outputs: [Port] { ports.filter { $0.type == .output } }
 }
 
-public struct IONode: Node {
+public struct Node: Identifiable, GeomertryProperties {
 
-    public typealias Input = InputPort
-
-    public typealias Output = OutputPort
-
-    public var type: NodeType = .default
+    public var type: NodeType = .io
 
     public var id: String
 
@@ -81,47 +35,58 @@ public struct IONode: Node {
 
     public var size: CGSize = .zero
 
-    public var inputs: [Input] = []
+    public var ports: [Port] = []
 
-    public var outputs: [Output] = []
-
-    var execute: ([PortData]) -> [PortData]
-
-    func callAsFunction() -> [PortData] { execute(self.inputs.map { $0.data }) }
+    var execute: ([Port], [Port]) -> [Port.ID: PortData]
 
     public init(
-        type: NodeType = .default,
+        type: NodeType = .io,
         id: String,
         title: String,
         position: CGPoint,
-        inputs: [Input] = [],
-        outputs: [Output] = [],
-        execute: @escaping ([PortData]) -> [PortData]
+        ports: [Port] = [],
+        execute: @escaping ([Port], [Port]) -> [Port.ID: PortData]
     ) {
         self.type = type
         self.id = id
         self.title = title
         self.position = position
-        self.inputs = inputs
-        self.outputs = outputs
+        self.ports = ports
         self.execute = execute
+    }
+
+    public subscript(portID: Port.ID) -> Port {
+        get {
+            let index = self.ports.firstIndex(where: { $0.id == portID })!
+            return ports[index]
+        }
+        set {
+            let index = self.ports.firstIndex(where: { $0.id == portID })!
+            ports[index] = newValue
+        }
     }
 
     public static func input(
         id: String,
         title: String,
         position: CGPoint,
-        outputs: [Output] = []
-    ) -> IONode {
-        IONode(type: .input, id: id, title: title, position: position, outputs: outputs) { _ in outputs.map { $0.data } }
+        ports: [Port] = []
+    ) -> Node {
+        Node(type: .input, id: id, title: title, position: position, ports: ports) { _, outputs in
+            outputs.reduce([:]) { prev, current in
+                var now = prev
+                now[current.id] = current.data
+                return now
+            }
+        }
     }
 
     public static func output(
         id: String,
         title: String,
         position: CGPoint,
-        inputs: [Input] = []
-    ) -> IONode {
-        IONode(type: .output, id: id, title: title, position: position, inputs: inputs) { inputs in [] }
+        ports: [Port] = []
+    ) -> Node {
+        Node(type: .output, id: id, title: title, position: position, ports: ports) { _, _ in [:] }
     }
 }

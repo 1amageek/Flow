@@ -7,17 +7,17 @@
 
 import SwiftUI
 
-public class Graph<NodeElement: Node>: ObservableObject {
+public class Graph: ObservableObject {
 
-    @Published var nodes: [NodeElement] = []
+    @Published var nodes: [Node] = []
 
     @Published var edges: [Edge] = []
 
-    @Published var focusNode: NodeElement?
+    @Published var focusNode: Node?
 
     @Published var connecting: Connection?
 
-    public subscript(nodeID: String) -> NodeElement {
+    public subscript(nodeID: String) -> Node {
         get {
             let index = self.nodes.firstIndex(where: { $0.id == nodeID })!
             return nodes[index]
@@ -28,28 +28,20 @@ public class Graph<NodeElement: Node>: ObservableObject {
         }
     }
 
-    public init(nodes: [NodeElement] = [], edges: [Edge] = []) {
+    public init(nodes: [Node] = [], edges: [Edge] = []) {
         self._nodes = Published(initialValue: nodes)
         self._edges = Published(initialValue: edges)
     }
 
-    public func position<Element: Node>(at node: Element, port: Element.Input) -> CGPoint? {
-        guard let position = node.inputs[port.id]?.position else { return nil }
+    public func position(at node: Node, port: Port) -> CGPoint? {
+        guard let position = node.ports[port.id]?.position else { return nil }
         return CGPoint(
             x: node.position.x + node.offset.width - node.size.width / 2 + position.x,
             y: node.position.y + node.offset.height - node.size.height / 2 + position.y
         )
     }
 
-    public func position<Element: Node>(at node: Element, port: Element.Output) -> CGPoint? {
-        guard let position = node.outputs[port.id]?.position else { return nil }
-        return CGPoint(
-            x: node.position.x + node.offset.width - node.size.width / 2 + position.x,
-            y: node.position.y + node.offset.height - node.size.height / 2 + position.y
-        )
-    }
-
-    public func sourcePosition(address: Address) -> CGPoint? where NodeElement.ID == String, NodeElement.Output.ID == String {
+    public func sourcePosition(address: Address) -> CGPoint? {
         guard let node = nodes[address.nodeID] else { return nil }
         guard let position = node.outputs[address.portID]?.position else { return nil }
         return CGPoint(
@@ -58,7 +50,7 @@ public class Graph<NodeElement: Node>: ObservableObject {
         )
     }
 
-    public func targetPosition(address: Address) -> CGPoint? where NodeElement.ID == String, NodeElement.Input.ID == String {
+    public func targetPosition(address: Address) -> CGPoint? {
         guard let node = nodes[address.nodeID] else { return nil }
         guard let position = node.inputs[address.portID]?.position else { return nil }
         return CGPoint(
@@ -67,7 +59,7 @@ public class Graph<NodeElement: Node>: ObservableObject {
         )
     }
 
-    public func node(at point: CGPoint) -> NodeElement? {
+    public func node(at point: CGPoint) -> Node? {
         for (_, node) in nodes.enumerated() {
             if let node = nodes[node.id] {
                 let frame = CGRect(
@@ -118,37 +110,49 @@ public class Graph<NodeElement: Node>: ObservableObject {
 
 extension Graph {
 
-    public var inputNodes: [NodeElement] { nodes.filter { $0.type == .input } }
+    public var inputNodes: [Node] { nodes.filter { $0.type == .input } }
 
-    public var ouputNodes: [NodeElement] { nodes.filter { $0.type == .output } }
+    public var ouputNodes: [Node] { nodes.filter { $0.type == .output } }
 
-    public func connectedNodes(node: NodeElement, inputPort: InputPort) -> [NodeElement] {
+    public func connectedNodes(node: Node, inputPort: Port) -> [Node] {
         let connectedEdge = self.edges.filter { $0.target ==  Address(nodeID: node.id, portID: inputPort.id) }
         return connectedEdge.map { self[$0.source.nodeID] }
     }
 
-    public func connectedPorts(node: NodeElement, inputPort: InputPort) -> [OutputPort] {
-        let connectedEdge = self.edges.filter { $0.target ==  Address(nodeID: node.id, portID: inputPort.id) }
-        return connectedEdge.compactMap { self[$0.source.nodeID].outputs[$0.source.portID] as! OutputPort }
+    public func connectedAddress(node: Node, inputPort: Port) -> Address {
+        let connectedEdge = self.edges.filter { $0.target ==  Address(nodeID: node.id, portID: inputPort.id) }.first!
+        return connectedEdge.source
     }
 
-    public func execute() {
-        ouputNodes.forEach { node in
-            node.inputs.forEach { port in
-                if let port = port as? InputPort {
-                    let nodes = connectedNodes(node: node, inputPort: port)
-//                    port.data = .int(12)
+    public func data(for address: Address) -> PortData? {
+        let node: Node = self.nodes[address.nodeID]!
+        let port: Port = node[address.portID]
+        return data(node: node, port: port)
+    }
+
+    public func data(node: Node, port: Port) -> PortData? {
+        switch (node.type, port.type) {
+            case (.io, .input):
+                return data(for: connectedAddress(node: node, inputPort: port))
+            case (.io, .output): do {
+                let inputs = node.inputs.map { input -> Port in
+                    let address = connectedAddress(node: node, inputPort: input)
+                    let data = self.data(for: address)
+                    return Port.input(id: input.id, title: input.title, data: data)
                 }
+                let portData = node.execute(inputs, node.outputs)
+                let data = portData[port.id]
+                return data
             }
+            case (.input, .input): return nil
+            case (.input, .output): do {
+                let portData = node.execute(node.inputs, node.outputs)
+                let data = portData[port.id]
+                return data
+            }
+            case (.output, .input):
+                return data(for: connectedAddress(node: node, inputPort: port))
+            case (.output, .output): return nil
         }
     }
-
-    public func probe(node: NodeElement, port: InputPort) -> PortData {
-        let nodes = connectedNodes(node: node, inputPort: port)
-
-        nodes.forEach { node in
-
-        }
-    }
-
 }

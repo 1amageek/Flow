@@ -18,21 +18,21 @@ public protocol PortView: View {
     var port: Port { get }
 }
 
-public struct InputPortView<NodeElement: Node, Content: View>: PortView {
+public struct InputPortView<Content: View>: PortView {
 
     @Environment(\.canvasCoordinateSpace) var canvasCoordinateSpace: String
 
-    @EnvironmentObject var context: Graph<NodeElement>
+    @EnvironmentObject var context: Graph
 
-    public var node: NodeElement
+    public var node: Node
 
-    public var port: NodeElement.Input
+    public var port: Port
 
     var value: String
 
     var content: () -> Content
 
-    public init(node: NodeElement, port: NodeElement.Input, value: String, content: @escaping () -> Content) {
+    public init(node: Node, port: Port, value: String, content: @escaping () -> Content) {
         self.node = node
         self.port = port
         self.value = value
@@ -46,8 +46,8 @@ public struct InputPortView<NodeElement: Node, Content: View>: PortView {
                     .fill(Color.clear)
                     .onAppear {
                         let frame = proxy.frame(in: .named(node.id))
-                        context.nodes[node.id]?.inputs[port.id]?.size = proxy.size
-                        context.nodes[node.id]?.inputs[port.id]?.position = CGPoint(
+                        context.nodes[node.id]?.ports[port.id]?.size = proxy.size
+                        context.nodes[node.id]?.ports[port.id]?.position = CGPoint(
                             x: frame.origin.x + proxy.size.width / 2,
                             y: frame.origin.y + proxy.size.height / 2
                         )
@@ -72,21 +72,21 @@ public struct InputPortView<NodeElement: Node, Content: View>: PortView {
     }
 }
 
-public struct OutputPortView<NodeElement: Node, Content: View>: PortView {
+public struct OutputPortView<Content: View>: PortView {
 
     @Environment(\.canvasCoordinateSpace) var canvasCoordinateSpace: String
 
-    @EnvironmentObject var context: Graph<NodeElement>
+    @EnvironmentObject var context: Graph
 
-    public var node: NodeElement
+    public var node: Node
 
-    public var port: NodeElement.Output
+    public var port: Port
 
     var value: String
 
     var content: () -> Content
 
-    public init(node: NodeElement, port: NodeElement.Output, value: String, content: @escaping () -> Content) {
+    public init(node: Node, port: Port, value: String, content: @escaping () -> Content) {
         self.node = node
         self.port = port
         self.value = value
@@ -100,8 +100,8 @@ public struct OutputPortView<NodeElement: Node, Content: View>: PortView {
                     .fill(Color.clear)
                     .onAppear {
                         let frame = proxy.frame(in: .named(node.id))
-                        context.nodes[node.id]?.outputs[port.id]?.size = proxy.size
-                        context.nodes[node.id]?.outputs[port.id]?.position = CGPoint(
+                        context.nodes[node.id]?.ports[port.id]?.size = proxy.size
+                        context.nodes[node.id]?.ports[port.id]?.position = CGPoint(
                             x: frame.origin.x + proxy.size.width / 2,
                             y: frame.origin.y + proxy.size.height / 2
                         )
@@ -126,23 +126,23 @@ public struct OutputPortView<NodeElement: Node, Content: View>: PortView {
     }
 }
 
-struct JackModifier<NodeElement: Node, T: Port>: ViewModifier {
+struct JackModifier: ViewModifier {
 
     @Environment(\.canvasCoordinateSpace) var canvasCoordinateSpace: String
 
-    @EnvironmentObject var context: Graph<NodeElement>
+    @EnvironmentObject var context: Graph
 
-    var node: NodeElement
+    var node: Node
 
-    var port: T
+    var port: Port
 
     var onConnectingHandler: (DragGesture.Value) -> Void
 
     var onConnectedHandler: (DragGesture.Value) -> Void
 
     init(
-        node: NodeElement,
-        port: T,
+        node: Node,
+        port: Port,
         onConnecting: @escaping (DragGesture.Value) -> Void,
         onConnected: @escaping (DragGesture.Value) -> Void
     ) {
@@ -173,45 +173,45 @@ struct JackModifier<NodeElement: Node, T: Port>: ViewModifier {
 }
 
 
-struct InputPortModifier<NodeElement: Node>: ViewModifier {
+struct InputPortModifier: ViewModifier {
 
-    var node: NodeElement
+    var node: Node
 
-    var port: NodeElement.Input
+    var port: Port
 
-    init(node: NodeElement, port: NodeElement.Input) {
+    init(node: Node, port: Port) {
         self.node = node
         self.port = port
     }
 
     func body(content: Content) -> some View {
-        InputPortView<NodeElement, Content>(node: node, port: port, value: "") { content }
+        InputPortView<Content>(node: node, port: port, value: "") { content }
     }
 }
 
-struct OutputPortModifier<NodeElement: Node>: ViewModifier {
+struct OutputPortModifier: ViewModifier {
 
-    var node: NodeElement
+    var node: Node
 
-    var port: NodeElement.Output
+    var port: Port
 
-    init(node: NodeElement, port: NodeElement.Output) {
+    init(node: Node, port: Port) {
         self.node = node
         self.port = port
     }
 
     func body(content: Content) -> some View {
-        OutputPortView<NodeElement, Content>(node: node, port: port, value: "") { content }
+        OutputPortView<Content>(node: node, port: port, value: "") { content }
     }
 }
 
 extension View {
 
-    public func inputPort<NodeElement: Node>(node: NodeElement, port: NodeElement.Input) -> some View {
+    public func inputPort(node: Node, port: Port) -> some View {
         return self.modifier(InputPortModifier(node: node, port: port))
     }
 
-    public func outputPort<NodeElement: Node>(node: NodeElement, port: NodeElement.Output) -> some View {
+    public func outputPort(node: Node, port: Port) -> some View {
         return self.modifier(OutputPortModifier(node: node, port: port))
     }
 }
