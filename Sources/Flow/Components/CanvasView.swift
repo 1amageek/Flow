@@ -17,11 +17,11 @@ extension EnvironmentValues {
 
 public struct CanvasView<Content: View>: View {
 
-    var graph: Graph
+    var graph: Graph<Node<Any, Any>>
 
-    var content: (Node) -> Content
+    var content: (_ node: Node<Any, Any>) -> Content
 
-    public init(_ graph: Graph, @ViewBuilder content: @escaping (Node) -> Content) {
+    public init(_ graph: Graph<Node<Any, Any>>, @ViewBuilder content: @escaping (_ id: Node<Any, Any>) -> Content) {
         self.graph = graph
         self.content = content
     }

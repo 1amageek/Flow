@@ -31,13 +31,13 @@ struct ConnectionView: View {
 
 struct EdgeView: View {
 
-    @EnvironmentObject var context: Graph
+    @EnvironmentObject var context: Graph<Node<Any, Any>>
 
     var edge: Edge
 
-    var start: CGPoint { context.sourcePosition(address: edge.source) ?? .zero }
+    var start: CGPoint { context.position(with: edge.source) ?? .zero }
 
-    var end: CGPoint { context.targetPosition(address: edge.target) ?? .zero }
+    var end: CGPoint { context.position(with: edge.target) ?? .zero }
 
     var body: some View {
         Path { path in

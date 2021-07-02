@@ -7,34 +7,23 @@
 
 import SwiftUI
 
-public protocol PortView: View {
-
-    associatedtype Node
-
-    associatedtype Port
-
-    var node: Node { get }
-
-    var port: Port { get }
-}
-
-public struct InputPortView<Content: View>: PortView {
+public struct InputPortView<Content: View>: View {
 
     @Environment(\.canvasCoordinateSpace) var canvasCoordinateSpace: String
 
-    @EnvironmentObject var context: Graph
+    @EnvironmentObject var context: Graph<Node<Any, Any>>
 
-    public var node: Node
+    public var id: String
 
-    public var port: Port
+    public var portIndex: PortIndex
 
     var value: String
 
     var content: () -> Content
 
-    public init(node: Node, port: Port, value: String, content: @escaping () -> Content) {
-        self.node = node
-        self.port = port
+    public init(id: String, portIndex: PortIndex, value: String, content: @escaping () -> Content) {
+        self.id = id
+        self.portIndex = portIndex
         self.value = value
         self.content = content
     }
@@ -45,21 +34,22 @@ public struct InputPortView<Content: View>: PortView {
                 Rectangle()
                     .fill(Color.clear)
                     .onAppear {
-                        let frame = proxy.frame(in: .named(node.id))
-                        context.nodes[node.id]?.ports[port.id]?.size = proxy.size
-                        context.nodes[node.id]?.ports[port.id]?.position = CGPoint(
+                        let frame = proxy.frame(in: .named(id))
+                        context.nodes[id]?[.input(portIndex)].size = proxy.size
+                        context.nodes[id]?[.input(portIndex)].position = CGPoint(
                             x: frame.origin.x + proxy.size.width / 2,
                             y: frame.origin.y + proxy.size.height / 2
                         )
                     }
             })
-            .modifier(JackModifier(node: node, port: port,
+            .modifier(JackModifier(id: id, portIndex: portIndex,
                                    onConnecting: { value in
+                let address = Address(id: id, port: .input(portIndex))
                 context.connecting = Connection(
-                    id: node.id,
-                    start: context.position(at: node, port: port) ?? .zero,
+                    id: id,
+                    start: context.position(with: address) ?? .zero,
                     end: value.location,
-                    startAddress: Address(nodeID: node.id, portID: port.id)
+                    startAddress: address
                 )
             }, onConnected: { value in
                 if var connection = context.connecting {
@@ -72,23 +62,23 @@ public struct InputPortView<Content: View>: PortView {
     }
 }
 
-public struct OutputPortView<Content: View>: PortView {
+public struct OutputPortView<Content: View>: View {
 
     @Environment(\.canvasCoordinateSpace) var canvasCoordinateSpace: String
 
     @EnvironmentObject var context: Graph
 
-    public var node: Node
+    public var id: String
 
-    public var port: Port
+    public var portIndex: PortIndex
 
     var value: String
 
     var content: () -> Content
 
-    public init(node: Node, port: Port, value: String, content: @escaping () -> Content) {
-        self.node = node
-        self.port = port
+    public init(id: String, portIndex: Int, value: String, content: @escaping () -> Content) {
+        self.id = id
+        self.portIndex = portIndex
         self.value = value
         self.content = content
     }
@@ -99,21 +89,22 @@ public struct OutputPortView<Content: View>: PortView {
                 Rectangle()
                     .fill(Color.clear)
                     .onAppear {
-                        let frame = proxy.frame(in: .named(node.id))
-                        context.nodes[node.id]?.ports[port.id]?.size = proxy.size
-                        context.nodes[node.id]?.ports[port.id]?.position = CGPoint(
+                        let frame = proxy.frame(in: .named(id))
+                        context.nodes[id]?[.output(portIndex)].size = proxy.size
+                        context.nodes[id]?[.output(portIndex)].position = CGPoint(
                             x: frame.origin.x + proxy.size.width / 2,
                             y: frame.origin.y + proxy.size.height / 2
                         )
                     }
             })
-            .modifier(JackModifier(node: node, port: port,
+            .modifier(JackModifier(id: id, portIndex: portIndex,
                                    onConnecting: { value in
+                let address = Address(id: id, port: .output(portIndex))
                 context.connecting = Connection(
-                    id: node.id,
-                    start: context.position(at: node, port: port) ?? .zero,
+                    id: id,
+                    start: context.position(with: address) ?? .zero,
                     end: value.location,
-                    startAddress: Address(nodeID: node.id, portID: port.id)
+                    startAddress: address
                 )
             }, onConnected: { value in
                 if var connection = context.connecting {
@@ -132,22 +123,22 @@ struct JackModifier: ViewModifier {
 
     @EnvironmentObject var context: Graph
 
-    var node: Node
+    var id: String
 
-    var port: Port
+    var portIndex: Int
 
     var onConnectingHandler: (DragGesture.Value) -> Void
 
     var onConnectedHandler: (DragGesture.Value) -> Void
 
     init(
-        node: Node,
-        port: Port,
+        id: String,
+        portIndex: Int,
         onConnecting: @escaping (DragGesture.Value) -> Void,
         onConnected: @escaping (DragGesture.Value) -> Void
     ) {
-        self.node = node
-        self.port = port
+        self.id = id
+        self.portIndex = portIndex
         self.onConnectingHandler = onConnecting
         self.onConnectedHandler = onConnected
     }
@@ -175,43 +166,43 @@ struct JackModifier: ViewModifier {
 
 struct InputPortModifier: ViewModifier {
 
-    var node: Node
+    var id: String
 
-    var port: Port
+    var portIndex: PortIndex
 
-    init(node: Node, port: Port) {
-        self.node = node
-        self.port = port
+    init(id: String, portIndex: PortIndex) {
+        self.id = id
+        self.portIndex = portIndex
     }
 
     func body(content: Content) -> some View {
-        InputPortView<Content>(node: node, port: port, value: "") { content }
+        InputPortView<Content>(id: id, portIndex: portIndex, value: "") { content }
     }
 }
 
 struct OutputPortModifier: ViewModifier {
 
-    var node: Node
+    var id: String
 
-    var port: Port
+    var portIndex: PortIndex
 
-    init(node: Node, port: Port) {
-        self.node = node
-        self.port = port
+    init(id: String, portIndex: PortIndex) {
+        self.id = id
+        self.portIndex = portIndex
     }
 
     func body(content: Content) -> some View {
-        OutputPortView<Content>(node: node, port: port, value: "") { content }
+        OutputPortView<Content>(id: id, portIndex: portIndex, value: "") { content }
     }
 }
 
 extension View {
 
-    public func inputPort(node: Node, port: Port) -> some View {
-        return self.modifier(InputPortModifier(node: node, port: port))
+    public func inputPort(id: String, portIndex: Int) -> some View {
+        return self.modifier(InputPortModifier(id: id, portIndex: portIndex))
     }
 
-    public func outputPort(node: Node, port: Port) -> some View {
-        return self.modifier(OutputPortModifier(node: node, port: port))
+    public func outputPort(id: String, portIndex: Int) -> some View {
+        return self.modifier(OutputPortModifier(id: id, portIndex: portIndex))
     }
 }
