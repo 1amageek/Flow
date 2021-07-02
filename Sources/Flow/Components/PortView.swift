@@ -11,7 +11,7 @@ public struct InputPortView<Content: View>: View {
 
     @Environment(\.canvasCoordinateSpace) var canvasCoordinateSpace: String
 
-    @EnvironmentObject var context: Graph<Node<Any, Any>>
+    @EnvironmentObject var context: Graph
 
     public var id: String
 
@@ -159,7 +159,7 @@ struct JackModifier: ViewModifier {
     }
 
     func body(content: Content) -> some View {
-        content.simultaneousGesture(gesture)
+        content.gesture(gesture)
     }
 }
 
@@ -198,11 +198,13 @@ struct OutputPortModifier: ViewModifier {
 
 extension View {
 
-    public func inputPort(id: String, portIndex: Int) -> some View {
-        return self.modifier(InputPortModifier(id: id, portIndex: portIndex))
-    }
-
-    public func outputPort(id: String, portIndex: Int) -> some View {
-        return self.modifier(OutputPortModifier(id: id, portIndex: portIndex))
+    @ViewBuilder
+    public func port(_ address: Address) -> some View {
+        switch address.port {
+            case .input(let index):
+                self.modifier(InputPortModifier(id: address.id, portIndex: index))
+            case .output(let index):
+                self.modifier(OutputPortModifier(id: address.id, portIndex: index))
+        }
     }
 }

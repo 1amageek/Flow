@@ -31,7 +31,7 @@ struct ConnectionView: View {
 
 struct EdgeView: View {
 
-    @EnvironmentObject var context: Graph<Node<Any, Any>>
+    @EnvironmentObject var context: Graph
 
     var edge: Edge
 

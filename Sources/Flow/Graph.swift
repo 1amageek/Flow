@@ -7,17 +7,17 @@
 
 import SwiftUI
 
-public class Graph<T: PortProperties & GeometryProperties & Identifiable>: ObservableObject where T.ID == String {
+public class Graph: ObservableObject {
 
-    @Published var nodes: [T] = []
+    @Published var nodes: [Node] = []
 
     @Published var edges: [Edge] = []
 
-    @Published var focusNode: Node<Any, Any>?
+    @Published var focusNode: Node?
 
     @Published var connecting: Connection?
 
-    public subscript(nodeID: String) -> T {
+    public subscript(nodeID: String) -> Node {
         get {
             let index = self.nodes.firstIndex(where: { $0.id == nodeID })!
             return nodes[index]
@@ -28,16 +28,16 @@ public class Graph<T: PortProperties & GeometryProperties & Identifiable>: Obser
         }
     }
 
-    public init(nodes: [T] = [], edges: [Edge] = []) {
+    public init(nodes: [Node] = [], edges: [Edge] = []) {
         self._nodes = Published(initialValue: nodes)
         self._edges = Published(initialValue: edges)
     }
 
-    public func port(with address: Address) -> PortInfo? {
+    public func port(with address: Address) -> Port? {
         guard let node = nodes[address.id] else { return nil }
         switch address.port {
-            case .input(let index): return node.inputPorts[index]
-            case .output(let index): return node.outputPorts[index]
+            case .input(let index): return node.inputs[index]
+            case .output(let index): return node.outputs[index]
         }
     }
 
@@ -50,7 +50,7 @@ public class Graph<T: PortProperties & GeometryProperties & Identifiable>: Obser
         )
     }
 
-    public func node(at point: CGPoint) -> T? {
+    public func node(at point: CGPoint) -> Node? {
         for (_, node) in nodes.enumerated() {
             if let node = nodes[node.id] {
                 let frame = CGRect(
@@ -69,30 +69,34 @@ public class Graph<T: PortProperties & GeometryProperties & Identifiable>: Obser
     }
 
     public func inputPortAddress(at point: CGPoint) -> Address? {
+        print(node(at: point))
         guard let node = node(at: point) else { return nil }
-        for (index, port) in node.inputPorts.enumerated() {
+        for port in node.inputs {
             let frame = CGRect(
                 x: node.frame.origin.x + port.frame.origin.x,
                 y: node.frame.origin.y + port.frame.origin.y,
                 width: port.size.width,
                 height: port.size.height)
+            print("inputPortAddress", frame, point)
             if frame.contains(point) {
-                return Address(id: node.id, port: .input(index))
+                return Address(id: node.id, port: .input(port.id))
             }
         }
         return nil
     }
 
     public func outputPortAddress(at point: CGPoint) -> Address? {
+        print(node(at: point))
         guard let node = node(at: point) else { return nil }
-        for (index, port) in node.outputPorts.enumerated() {
+        for port in node.outputs {
             let frame = CGRect(
                 x: node.frame.origin.x + port.frame.origin.x,
                 y: node.frame.origin.y + port.frame.origin.y,
                 width: port.size.width,
                 height: port.size.height)
+            print("outputPortAddress", frame, point)
             if frame.contains(point) {
-                return Address(id: node.id, port: .output(index))
+                return Address(id: node.id, port: .output(port.id))
             }
         }
         return nil

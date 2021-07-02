@@ -13,7 +13,9 @@ public struct NodeView<Content: View>: View {
 
     @EnvironmentObject var context: Graph
 
-    var id: String
+    var node: Node
+
+    var id: Node.ID { node.id }
 
     var cornerRadius: CGFloat = 12
 
@@ -36,19 +38,15 @@ public struct NodeView<Content: View>: View {
             }
     }
 
-    var content: ([String], [String]) -> Content
+    var content: ([Port], [Port]) -> Content
 
-    var inputIDs: [String] { context.nodes[id]?.input.ports.enumerated().map { "\($0)" } ?? [] }
-
-    var outputIDs: [String] { context.nodes[id]?.output.ports.enumerated().map { "\($0)" } ?? [] }
-
-    public init(_ id: String, content: @escaping ([String], [String]) -> Content) {
-        self.id = id
+    public init(_ node: Node, content: @escaping ([Port], [Port]) -> Content) {
+        self.node = node
         self.content = content
     }
 
     public var body: some View {
-        content(inputIDs, outputIDs)
+        content(node.inputs, node.outputs)
             .background(GeometryReader { proxy in
                 Rectangle()
                     .fill(Color.clear)
@@ -57,7 +55,7 @@ public struct NodeView<Content: View>: View {
             .coordinateSpace(name: id)
             .position(position)
             .offset(offset)
-            .simultaneousGesture(gesture)
+            .gesture(gesture)
             .onTapGesture { context.focusNode = context.nodes[id] }
     }
 }

@@ -8,33 +8,13 @@
 import Foundation
 import CoreGraphics
 
-public protocol Convertible {
-
-    associatedtype Input: Connectable
-
-    associatedtype Output: Connectable
-
-    @PortBuilder var input: Self.Input { get }
-
-    @PortBuilder var output: Self.Output { get }
-
-    func callAsFunction(_ input: Input.Value) -> Output.Value
-}
-
 public enum NodeType {
     case input
     case output
     case io
 }
 
-public protocol PortProperties {
-    var inputPorts: [PortInfo] { get set }
-    var outputPorts: [PortInfo] { get set }
-}
-
-public struct Node<Input, Output>: Convertible, PortProperties, GeometryProperties, Identifiable {
-
-    public typealias Execution = (_ input: Input) -> Output
+public struct Node: GeometryProperties, Identifiable {
 
     public var type: NodeType = .io
 
@@ -42,61 +22,46 @@ public struct Node<Input, Output>: Convertible, PortProperties, GeometryProperti
 
     public var title: String?
 
-    public var input: PortGroup<Input>
-
-    public var output: PortGroup<Output>
-
-    public var execution: Execution
-
     public var position: CGPoint = .zero
 
     public var offset: CGSize = .zero
 
     public var size: CGSize = .zero
 
-    public var inputPorts: [PortInfo] {
-        get { input.ports }
-        set { input.ports = newValue }
-    }
+    public var inputs: [Port] = []
 
-    public var outputPorts: [PortInfo] {
-        get { output.ports }
-        set { output.ports = newValue }
-    }
+    public var outputs: [Port] = []
 
-    public init(
+    public init<T: Convertible>(
         type: NodeType = .io,
         id: String,
         title: String?,
         position: CGPoint = .zero,
-        @PortBuilder input: @escaping () -> PortGroup<Input>,
-        @PortBuilder output: @escaping  () -> PortGroup<Output>,
-        execution: @escaping Execution) {
+        inputs: [Interface] = [],
+        outputs: [Interface] = []
+    ) {
         self.type = type
         self.id = id
         self.title = title
         self.position = position
-        self.input = input()
-        self.output = output()
-        self.execution = execution
+        self.inputs = inputs.enumerated().map { Port(id: $0, title: $1.title) }
+        self.outputs = outputs.enumerated().map { Port(id: $0, title: $1.title) }
     }
-
-    public func callAsFunction(_ input: Input) -> Output { execution(input) }
 }
 
 extension Node {
 
-    subscript(port: Address.Port) -> PortInfo {
+    subscript(port: Address.Port) -> Port {
         get {
             switch port {
-                case .input(let index): return input.ports[index]
-                case .output(let index): return output.ports[index]
+                case .input(let index): return inputs[index]
+                case .output(let index): return outputs[index]
             }
         }
         set {
             switch port {
-                case .input(let index): input.ports[index] = newValue
-                case .output(let index): output.ports[index] = newValue
+                case .input(let index): inputs[index] = newValue
+                case .output(let index): outputs[index] = newValue
             }
         }
     }
@@ -108,31 +73,45 @@ extension Node {
         id: String,
         title: String,
         position: CGPoint,
-        @PortBuilder input: @escaping () -> PortGroup<Input>
-    ) -> Node where Input == Output {
-        Node(type: .input, id: id, title: title, position: position, input: input, output: input, execution: { input in input })
+        inputs: [Interface] = []
+    ) -> Node {
+        Node(type: .input, id: id, title: title, position: position, inputs: inputs, outputs: inputs)
     }
 
     public static func output(
         id: String,
         title: String,
         position: CGPoint,
-        @PortBuilder input: @escaping () -> PortGroup<Input>,
-        @PortBuilder output: @escaping  () -> PortGroup<Output>,
-        execution: @escaping Execution
+        outputs: [Interface] = []
     ) -> Node {
-        Node(type: .output, id: id, title: title, position: position, input: input, output: output, execution: execution)
+        Node(type: .output, id: id, title: title, position: position, inputs: outputs, outputs: outputs)
     }
 
     public static func io(
         id: String,
         title: String,
         position: CGPoint,
-        @PortBuilder output: @escaping  () -> PortGroup<Output>
-    ) -> Node where Input == Output {
-        Node(type: .io, id: id, title: title, position: position, input: output, output: output, execution: { output in output })
+        inputs: [Interface] = [],
+        outputs: [Interface] = []
+    ) -> Node {
+        Node(type: .io, id: id, title: title, position: position, inputs: inputs, outputs: outputs)
     }
 
+}
+
+extension Node {
+
+    var debugDescription: String {
+"""
+    id: \(id)
+    title: \(title ?? "")
+    position: \(position)
+    offset: \(offset)
+    frame: \(frame)
+    inputs: \(inputs)
+    outputs: \(outputs)
+"""
+    }
 }
 
 //public enum NodeType {

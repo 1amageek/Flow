@@ -8,30 +8,27 @@
 import Foundation
 import CoreGraphics
 
-public protocol Connectable {
+//public protocol Connectable {
+//
+//    associatedtype Value
+//
+//    var value: Value { get }
+//}
+//
+//public struct Interface<T>: Connectable {
+//
+//    public typealias Value = T
+//
+//    public var value: T
+//
+//    public init(_ value: Value) {
+//        self.value = value
+//    }
+//}
 
-    associatedtype Value
+public struct Port: Identifiable, GeometryProperties {
 
-    var value: Value { get }
-}
-
-public typealias PortIndex = Array<PortInfo>.Index
-
-public struct Port<T>: Connectable {
-
-    public typealias Value = T
-
-    public var title: String?
-
-    public var value: T
-
-    public init(_ value: Value, title: String? = nil) {
-        self.value = value
-        self.title = title
-    }
-}
-
-public struct PortInfo: GeometryProperties {
+    public var id: Int
 
     public var title: String?
 
@@ -41,48 +38,68 @@ public struct PortInfo: GeometryProperties {
 
     public var size: CGSize = .zero
 
+    public init(id: Int, title: String? = nil) {
+        self.id = id
+        self.title = title
+    }
+}
+
+public struct Interface {
+
+    public var title: String?
+
     public init(title: String? = nil) {
         self.title = title
     }
 }
 
-public struct PortGroup<T>: Connectable {
+//@resultBuilder
+//public struct InterfaceBuilder {
+//
+//    public static func buildBlock() -> [Port] {
+//        return []
+//    }
+//
+//    public static func buildBlock(_ interface: Interface) -> [Port] {
+//        return [interface].enumerated().map { Port(id: $0, title: $1.title) }
+//    }
+//
+//    public static func buildBlock(_ c0: Interface<C0>, _ c1: Interface<C1>) -> Interface<(C0, C1)> {
+//        return Interface((c0.value, c1.value))
+//    }
+//
+//    public static func buildBlock<C0, C1, C2>(_ c0: Interface<C0>, _ c1: Interface<C1>, _ c2: Interface<C2>) -> Interface<(C0, C1, C2)> {
+//        return Interface((c0.value, c1.value, c2.value))
+//    }
+//
+//    public static func buildBlock<C0, C1, C2, C3>(_ c0: Interface<C0>, _ c1: Interface<C1>, _ c2: Interface<C2>, _ c3: Interface<C3>) -> Interface<(C0, C1, C2, C3)> {
+//        return Interface((c0.value, c1.value, c2.value, c3.value))
+//    }
+//}
 
-    public typealias Value = T
-
-    public var value: T
-
-    public var ports: [PortInfo] = []
-
-    public init(_ value: T, ports: [PortInfo]) {
-        self.value = value
-        self.ports = ports
-    }
-}
-
-@resultBuilder
-public struct PortBuilder {
-
-    public static func buildBlock() -> PortGroup<()> {
-        return PortGroup<()>((), ports: [])
-    }
-
-    public static func buildBlock<Content>(_ content: Port<Content>) -> PortGroup<Content> {
-        return PortGroup<Content>(content.value, ports: [PortInfo(title: content.title)])
-    }
-
-    public static func buildBlock<C0, C1>(_ c0: Port<C0>, _ c1: Port<C1>) -> PortGroup<(C0, C1)> {
-        return PortGroup((c0.value, c1.value), ports: [PortInfo(title: c0.title), PortInfo(title: c1.title)])
-    }
-
-    public static func buildBlock<C0, C1, C2>(_ c0: Port<C0>, _ c1: Port<C1>, _ c2: Port<C2>) -> PortGroup<(C0, C1, C2)> {
-        return PortGroup((c0.value, c1.value, c2.value), ports: [PortInfo(title: c0.title), PortInfo(title: c1.title), PortInfo(title: c2.title)])
-    }
-
-    public static func buildBlock<C0, C1, C2, C3>(_ c0: Port<C0>, _ c1: Port<C1>, _ c2: Port<C2>, _ c3: Port<C3>) -> PortGroup<(C0, C1, C2, C3)> {
-        return PortGroup((c0.value, c1.value, c2.value, c3.value), ports: [PortInfo(title: c0.title), PortInfo(title: c1.title), PortInfo(title: c2.title), PortInfo(title: c3.title)])
-    }
-}
+//@resultBuilder
+//public struct InterfaceBuilder {
+//
+//    public static func buildBlock() -> Interface<()> {
+//        return Interface(())
+//    }
+//
+//    public static func buildBlock<Content>(_ content: Interface<Content>) -> Interface<Content> {
+//        return Interface(content.value)
+//    }
+//
+//    public static func buildBlock<C0, C1>(_ c0: Interface<C0>, _ c1: Interface<C1>) -> Interface<(C0, C1)> {
+//        return Interface((c0.value, c1.value))
+//    }
+//
+//    public static func buildBlock<C0, C1, C2>(_ c0: Interface<C0>, _ c1: Interface<C1>, _ c2: Interface<C2>) -> Interface<(C0, C1, C2)> {
+//        return Interface((c0.value, c1.value, c2.value))
+//    }
+//
+//    public static func buildBlock<C0, C1, C2, C3>(_ c0: Interface<C0>, _ c1: Interface<C1>, _ c2: Interface<C2>, _ c3: Interface<C3>) -> Interface<(C0, C1, C2, C3)> {
+//        return Interface((c0.value, c1.value, c2.value, c3.value))
+//    }
+//}
 
 //
 //

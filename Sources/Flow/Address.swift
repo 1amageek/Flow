@@ -7,6 +7,8 @@
 
 import Foundation
 
+public typealias PortIndex = Array<Port>.Index
+
 public struct Address: Hashable {
 
     public enum Port: Hashable {
@@ -30,4 +32,8 @@ public struct Address: Hashable {
         self.id = id
         self.port = port
     }
+
+    public static func input(_ id: String, index: PortIndex) -> Address { Address(id: id, port: .input(index)) }
+
+    public static func output(_ id: String, index: PortIndex) -> Address { Address(id: id, port: .output(index)) }
 }
