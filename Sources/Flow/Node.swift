@@ -110,7 +110,6 @@ extension Node {
     ) -> Node {
         Node(type: .io, id: id, title: title, position: position, inputs: inputs, outputs: outputs)
     }
-
 }
 
 extension Node {

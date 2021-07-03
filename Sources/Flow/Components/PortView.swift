@@ -50,15 +50,24 @@ public struct InputPortView<Content: View>: View {
                         )
                     }
             })
-            .modifier(JackModifier(id: id, portIndex: portIndex,
-                                   onConnecting: { value in
-                let address = Address(id: id, port: .input(portIndex))
-                context.connecting = Connection(
-                    id: id,
-                    start: context.position(with: address) ?? .zero,
-                    end: value.location,
-                    startAddress: address
-                )
+            .modifier(JackModifier(id: id, portIndex: portIndex, onConnecting: { value in
+                let address: Address = .input(id, index: portIndex)
+                if let edge = context.edges.filter({ $0.target == .input(id, index: portIndex) }).first {
+                    context.edges[edge.id] = nil
+                    context.connecting = Connection(
+                        id: id,
+                        start: context.position(with: edge.source) ?? .zero,
+                        end: value.location,
+                        startAddress: edge.source
+                    )
+                } else {
+                    context.connecting = Connection(
+                        id: id,
+                        start: context.position(with: address) ?? .zero,
+                        end: value.location,
+                        startAddress: address
+                    )
+                }
             }, onConnected: { value in
                 if var connection = context.connecting {
                     guard let address = context.outputPortAddress(at: value.location) else { return }
@@ -113,9 +122,8 @@ public struct OutputPortView<Content: View>: View {
                         )
                     }
             })
-            .modifier(JackModifier(id: id, portIndex: portIndex,
-                                   onConnecting: { value in
-                let address = Address(id: id, port: .output(portIndex))
+            .modifier(JackModifier(id: id, portIndex: portIndex, onConnecting: { value in
+                let address: Address = .output(id, index: portIndex)
                 context.connecting = Connection(
                     id: id,
                     start: context.position(with: address) ?? .zero,

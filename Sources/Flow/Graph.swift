@@ -9,6 +9,8 @@ import SwiftUI
 
 public class Graph: ObservableObject {
 
+    @Published var canvas: Canvas = Canvas()
+
     @Published var nodes: [Node] = []
 
     @Published var edges: [Edge] = []
@@ -81,7 +83,8 @@ public class Graph: ObservableObject {
                 x: node.frame.origin.x + port.frame.origin.x,
                 y: node.frame.origin.y + port.frame.origin.y,
                 width: port.size.width,
-                height: port.size.height)
+                height: port.size.height
+            )
             if frame.contains(point) {
                 return Address(id: node.id, port: .input(port.id))
             }
@@ -96,7 +99,8 @@ public class Graph: ObservableObject {
                 x: node.frame.origin.x + port.frame.origin.x,
                 y: node.frame.origin.y + port.frame.origin.y,
                 width: port.size.width,
-                height: port.size.height)
+                height: port.size.height
+            )
             if frame.contains(point) {
                 return Address(id: node.id, port: .output(port.id))
             }
