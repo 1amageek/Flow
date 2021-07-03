@@ -16,6 +16,12 @@ public enum NodeType {
 
 public struct Node: GeometryProperties, Identifiable {
 
+    public typealias Input = [PortData]
+
+    public typealias Output = [PortData]
+
+    public typealias Execution = (Input) -> Output
+
     public var type: NodeType = .io
 
     public var id: String
@@ -32,26 +38,34 @@ public struct Node: GeometryProperties, Identifiable {
 
     public var outputs: [Port] = []
 
-    public init<T: Convertible>(
+    public var execution: Execution = { input in input }
+
+    public init(
         type: NodeType = .io,
         id: String,
         title: String?,
         position: CGPoint = .zero,
         inputs: [Interface] = [],
-        outputs: [Interface] = []
+        outputs: [Interface] = [],
+        execution: @escaping Execution = { input in input }
     ) {
         self.type = type
         self.id = id
         self.title = title
         self.position = position
-        self.inputs = inputs.enumerated().map { Port(id: $0, title: $1.title) }
-        self.outputs = outputs.enumerated().map { Port(id: $0, title: $1.title) }
+        self.inputs = inputs.enumerated().map { .input(id: $0, data: $1.data, title: $1.title, node: self) }
+        self.outputs = outputs.enumerated().map { .output(id: $0, data: $1.data, title: $1.title, node: self) }
+        self.execution = execution
+    }
+
+    public func callAsFunction(_ input: Input) -> Output {
+        return execution(input)
     }
 }
 
 extension Node {
 
-    subscript(port: Address.Port) -> Port {
+    public subscript(port: Address.Port) -> Port {
         get {
             switch port {
                 case .input(let index): return inputs[index]
@@ -113,86 +127,3 @@ extension Node {
 """
     }
 }
-
-//public enum NodeType {
-//    case input
-//    case output
-//    case io
-//}
-//
-//public extension Node {
-//
-//    var inputs: [Port] { ports.filter { $0.type == .input } }
-//
-//    var outputs: [Port] { ports.filter { $0.type == .output } }
-//}
-//
-//public struct Node: Identifiable, GeomertryProperties {
-//
-//    public var type: NodeType = .io
-//
-//    public var id: String
-//
-//    public var title: String
-//
-//    public var position: CGPoint = .zero
-//
-//    public var offset: CGSize = .zero
-//
-//    public var size: CGSize = .zero
-//
-//    public var ports: [Port] = []
-//
-//    var execute: ([Port], [Port]) -> [Port.ID: PortData]
-//
-//    public init(
-//        type: NodeType = .io,
-//        id: String,
-//        title: String,
-//        position: CGPoint,
-//        ports: [Port] = [],
-//        execute: @escaping ([Port], [Port]) -> [Port.ID: PortData]
-//    ) {
-//        self.type = type
-//        self.id = id
-//        self.title = title
-//        self.position = position
-//        self.ports = ports
-//        self.execute = execute
-//    }
-//
-//    public subscript(portID: Port.ID) -> Port {
-//        get {
-//            let index = self.ports.firstIndex(where: { $0.id == portID })!
-//            return ports[index]
-//        }
-//        set {
-//            let index = self.ports.firstIndex(where: { $0.id == portID })!
-//            ports[index] = newValue
-//        }
-//    }
-//
-//    public static func input(
-//        id: String,
-//        title: String,
-//        position: CGPoint,
-//        ports: [Port] = []
-//    ) -> Node {
-//        Node(type: .input, id: id, title: title, position: position, ports: ports) { _, outputs in
-//            outputs.reduce([:]) { prev, current in
-//                var now = prev
-//                now[current.id] = current.data
-//                return now
-//            }
-//        }
-//    }
-//
-//    public static func output(
-//        id: String,
-//        title: String,
-//        position: CGPoint,
-//        ports: [Port] = []
-//    ) -> Node {
-//        Node(type: .output, id: id, title: title, position: position, ports: ports) { _, _ in [:] }
-//    }
-//}

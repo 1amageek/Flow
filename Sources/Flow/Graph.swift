@@ -28,6 +28,12 @@ public class Graph: ObservableObject {
         }
     }
 
+    public subscript(address: Address) -> Port {
+        let node = nodes[address.id]!
+        let port = node[address.port]
+        return port
+    }
+
     public init(nodes: [Node] = [], edges: [Edge] = []) {
         self._nodes = Published(initialValue: nodes)
         self._edges = Published(initialValue: edges)
@@ -69,7 +75,6 @@ public class Graph: ObservableObject {
     }
 
     public func inputPortAddress(at point: CGPoint) -> Address? {
-        print(node(at: point))
         guard let node = node(at: point) else { return nil }
         for port in node.inputs {
             let frame = CGRect(
@@ -77,7 +82,6 @@ public class Graph: ObservableObject {
                 y: node.frame.origin.y + port.frame.origin.y,
                 width: port.size.width,
                 height: port.size.height)
-            print("inputPortAddress", frame, point)
             if frame.contains(point) {
                 return Address(id: node.id, port: .input(port.id))
             }
@@ -86,7 +90,6 @@ public class Graph: ObservableObject {
     }
 
     public func outputPortAddress(at point: CGPoint) -> Address? {
-        print(node(at: point))
         guard let node = node(at: point) else { return nil }
         for port in node.outputs {
             let frame = CGRect(
@@ -94,7 +97,6 @@ public class Graph: ObservableObject {
                 y: node.frame.origin.y + port.frame.origin.y,
                 width: port.size.width,
                 height: port.size.height)
-            print("outputPortAddress", frame, point)
             if frame.contains(point) {
                 return Address(id: node.id, port: .output(port.id))
             }
@@ -102,52 +104,68 @@ public class Graph: ObservableObject {
         return nil
     }
 }
-//
-//extension Graph {
-//
-//    public var inputNodes: [Node] { nodes.filter { $0.type == .input } }
-//
-//    public var ouputNodes: [Node] { nodes.filter { $0.type == .output } }
-//
-//    public func connectedNodes(node: Node, inputPort: Port) -> [Node] {
-//        let connectedEdge = self.edges.filter { $0.target ==  Address(nodeID: node.id, portID: inputPort.id) }
-//        return connectedEdge.map { self[$0.source.nodeID] }
-//    }
-//
-//    public func connectedAddress(node: Node, inputPort: Port) -> Address {
-//        let connectedEdge = self.edges.filter { $0.target ==  Address(nodeID: node.id, portID: inputPort.id) }.first!
-//        return connectedEdge.source
-//    }
-//
-//    public func data(for address: Address) -> PortData? {
-//        let node: Node = self.nodes[address.nodeID]!
-//        let port: Port = node[address.portID]
-//        return data(node: node, port: port)
-//    }
-//
-//    public func data(node: Node, port: Port) -> PortData? {
-//        switch (node.type, port.type) {
-//            case (.io, .input):
-//                return data(for: connectedAddress(node: node, inputPort: port))
-//            case (.io, .output): do {
-//                let inputs = node.inputs.map { input -> Port in
-//                    let address = connectedAddress(node: node, inputPort: input)
-//                    let data = self.data(for: address)
-//                    return Port.input(id: input.id, title: input.title, data: data)
-//                }
-//                let portData = node.execute(inputs, node.outputs)
-//                let data = portData[port.id]
-//                return data
-//            }
-//            case (.input, .input): return nil
-//            case (.input, .output): do {
-//                let portData = node.execute(node.inputs, node.outputs)
-//                let data = portData[port.id]
-//                return data
-//            }
-//            case (.output, .input):
-//                return data(for: connectedAddress(node: node, inputPort: port))
-//            case (.output, .output): return nil
-//        }
-//    }
-//}
+
+extension Graph {
+
+    public var inputNodes: [Node] { nodes.filter { $0.type == .input } }
+
+    public var ouputNodes: [Node] { nodes.filter { $0.type == .output } }
+
+    public func connectedSourceNodes(node: Node, inputPort: Port) -> [Node] {
+        let connectedEdge = self.edges.filter { $0.target ==  inputPort.address }
+        return connectedEdge.map { self[$0.source.id] }
+    }
+
+    public func connectedSourceAddress(node: Node, inputPort: Port) -> Address? {
+        guard let connectedEdge = self.edges.filter({ $0.target ==  inputPort.address }).first else { return nil }
+        return connectedEdge.source
+    }
+
+    public func data(for address: Address) -> PortData {
+        guard let node: Node = nodes[address.id] else {
+            fatalError("[FLOW][WARNNING] address [\(address.id):\(address.port)] There are no nodes connected to this address.")
+        }
+        let port: Port = node[address.port]
+        return data(node: node, port: port)
+    }
+
+    func data(node: Node, port: Port) -> PortData {
+        switch (node.type, port.type) {
+            case (.io, .input):
+                guard let address = connectedSourceAddress(node: node, inputPort: port) else {
+                    return port.data
+                }
+                return data(for: address)
+            case (.io, .output): do {
+                let input = node.inputs.map { input -> PortData in
+                    guard let address = connectedSourceAddress(node: node, inputPort: input) else {
+                        return port.data
+                    }
+                    let data = self.data(for: address)
+                    return data
+                }
+                let portData = node(input)
+                let data = portData[port.id]
+                return data
+            }
+            case (.input, .input): return port.data
+            case (.input, .output): do {
+                let input = node.inputs
+                let output = node(input.map { $0.data })
+                let data = output[port.id]
+                return data
+            }
+            case (.output, .input):
+                guard let address = connectedSourceAddress(node: node, inputPort: port) else {
+                    return port.data
+                }
+                return data(for: address)
+            case (.output, .output): do {
+                let input = node.inputs
+                let output = node(input.map { $0.data })
+                let data = output[port.id]
+                return data
+            }
+        }
+    }
+}

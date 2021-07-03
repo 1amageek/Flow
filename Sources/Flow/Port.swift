@@ -8,27 +8,20 @@
 import Foundation
 import CoreGraphics
 
-//public protocol Connectable {
-//
-//    associatedtype Value
-//
-//    var value: Value { get }
-//}
-//
-//public struct Interface<T>: Connectable {
-//
-//    public typealias Value = T
-//
-//    public var value: T
-//
-//    public init(_ value: Value) {
-//        self.value = value
-//    }
-//}
+public enum PortType {
+    case input
+    case output
+}
 
 public struct Port: Identifiable, GeometryProperties {
 
+    public var node: Node
+
+    public var type: PortType
+
     public var id: Int
+
+    public var data: PortData
 
     public var title: String?
 
@@ -38,9 +31,30 @@ public struct Port: Identifiable, GeometryProperties {
 
     public var size: CGSize = .zero
 
-    public init(id: Int, title: String? = nil) {
+    init(type: PortType, id: Int, data: PortData, title: String? = nil, node: Node) {
+        self.type = type
         self.id = id
+        self.data = data
         self.title = title
+        self.node = node
+    }
+
+    static func input(id: Int, data: PortData, title: String? = nil, node: Node) -> Port {
+        Port(type: .input, id: id, data: data, title: title, node: node)
+    }
+
+    static func output(id: Int, data: PortData, title: String? = nil, node: Node) -> Port {
+        Port(type: .output, id: id, data: data, title: title, node: node)
+    }
+}
+
+extension Port {
+
+    public var address: Address {
+        switch type {
+            case .input: return .input(node.id, index: id)
+            case .output: return .output(node.id, index: id)
+        }
     }
 }
 
@@ -48,9 +62,20 @@ public struct Interface {
 
     public var title: String?
 
-    public init(title: String? = nil) {
+    public var data: PortData
+
+    public init(_ data: PortData, title: String? = nil) {
+        self.data = data
         self.title = title
     }
+
+    public static func bool(_ value: Bool? = nil, title: String? = nil) -> Interface { Interface(.bool(value), title: title) }
+
+    public static func int(_ value: Int? = nil, title: String? = nil) -> Interface { Interface(.int(value), title: title) }
+
+    public static func float(_ value: Float? = nil, title: String? = nil) -> Interface { Interface(.float(value), title: title) }
+
+    public static func string(_ value: String? = nil, title: String? = nil) -> Interface { Interface(.string(value), title: title) }
 }
 
 //@resultBuilder
@@ -101,95 +126,30 @@ public struct Interface {
 //    }
 //}
 
-//
-//
-//public struct PortItem: Identifiable, GeomertryProperties {
-//
-//    public var type: PortType
-//
-//    public var id: String
-//
-//    public var title: String
-//
-//    public var data: PortData?
-//
-//    public var position: CGPoint = .zero
-//
-//    public var offset: CGSize = .zero
-//
-//    public var size: CGSize = .zero
-//
-//    init(type: PortType, id: String, title: String, data: PortData? = nil) {
-//        self.type = type
-//        self.id = id
-//        self.title = title
-//        self.data = data
-//    }
-//
-//    public static func input(id: String, title: String, data: PortData? = nil) -> Port { Port(type: .input, id: id, title: title, data: data) }
-//
-//    public static func output(id: String, title: String, data: PortData? = nil) -> Port { Port(type: .output, id: id, title: title, data: data) }
-//
-//    public var text: String {
-//        get {
-//            guard let data = data else { return "" }
-//            switch data {
-//                case .none: return ""
-//                case .int(let value): return "\(value)"
-//                case .float(let value): return "\(value)"
-//                case .string(let value): return value
-//            }
-//        }
-//        set {
-//            guard let data = data else {
-//                self.data = .string(newValue)
-//                return
-//            }
-//            switch data {
-//                case .none: self.data = PortData.none
-//                case .int(_): self.data = .int(Int(newValue) ?? 0)
-//                case .float(_): self.data = .float(Float(newValue) ?? 0)
-//                case .string(_): self.data = .string(newValue)
-//            }
-//        }
-//    }
-//}
-//
-//public extension Port {
-//
-//    var intValue: Int {
-//        get {
-//            if case .int(let value) = self.data {
-//                return value
-//            }
-//            fatalError()
-//        }
-//        set {
-//            self.data = .int(newValue)
-//        }
-//    }
-//
-//    var floatValue: Float {
-//        get {
-//            if case .float(let value) = self.data {
-//                return value
-//            }
-//            fatalError()
-//        }
-//        set {
-//            self.data = .float(newValue)
-//        }
-//    }
-//
-//    var stringValue: String {
-//        get {
-//            if case .string(let value) = self.data {
-//                return value
-//            }
-//            fatalError()
-//        }
-//        set {
-//            self.data = .string(newValue)
-//        }
-//    }
-//}
+extension Port {
+
+    public var text: String {
+        get { self.data.text }
+        set {
+            switch self.data {
+                case .bool(_):
+                    if newValue == "true" {
+                        self.data = .bool(true)
+                        return
+                    }
+                    if newValue == "false" {
+                        self.data = .bool(false)
+                        return
+                    }
+                case .int(_):
+                    guard let value = Int(newValue) else { return }
+                    self.data = .int(value)
+                case .float(_):
+                    guard let value = Float(newValue) else { return }
+                    self.data = .float(value)
+                case .string(_):
+                    return self.data = .string(newValue)
+            }
+        }
+    }
+}

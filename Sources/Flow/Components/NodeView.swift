@@ -51,6 +51,7 @@ public struct NodeView<Content: View>: View {
                 Rectangle()
                     .fill(Color.clear)
                     .onAppear { context.nodes[id]?.size = proxy.size }
+                    .onChange(of: proxy.size ) { newValue in context.nodes[id]?.size = newValue }
             })
             .coordinateSpace(name: id)
             .position(position)

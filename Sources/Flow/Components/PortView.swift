@@ -41,6 +41,14 @@ public struct InputPortView<Content: View>: View {
                             y: frame.origin.y + proxy.size.height / 2
                         )
                     }
+                    .onChange(of: proxy.frame(in: .named(id))) { newValue in
+                        let frame = proxy.frame(in: .named(id))
+                        context.nodes[id]?[.input(portIndex)].size = proxy.size
+                        context.nodes[id]?[.input(portIndex)].position = CGPoint(
+                            x: frame.origin.x + proxy.size.width / 2,
+                            y: frame.origin.y + proxy.size.height / 2
+                        )
+                    }
             })
             .modifier(JackModifier(id: id, portIndex: portIndex,
                                    onConnecting: { value in
@@ -89,6 +97,14 @@ public struct OutputPortView<Content: View>: View {
                 Rectangle()
                     .fill(Color.clear)
                     .onAppear {
+                        let frame = proxy.frame(in: .named(id))
+                        context.nodes[id]?[.output(portIndex)].size = proxy.size
+                        context.nodes[id]?[.output(portIndex)].position = CGPoint(
+                            x: frame.origin.x + proxy.size.width / 2,
+                            y: frame.origin.y + proxy.size.height / 2
+                        )
+                    }
+                    .onChange(of: proxy.frame(in: .named(id))) { newValue in
                         let frame = proxy.frame(in: .named(id))
                         context.nodes[id]?[.output(portIndex)].size = proxy.size
                         context.nodes[id]?[.output(portIndex)].position = CGPoint(

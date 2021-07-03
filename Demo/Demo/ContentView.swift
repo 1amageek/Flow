@@ -12,34 +12,35 @@ struct ContentView: View {
 
     @ObservedObject public var graph: Graph = Graph(
         nodes: [
-            .input(id: "R", title: "R", position: CGPoint(x: 200, y: 200), inputs: [Interface()]),
-            .input(id: "G", title: "G", position: CGPoint(x: 200, y: 400), inputs: [Interface()]),
-            .input(id: "B", title: "B", position: CGPoint(x: 200, y: 600), inputs: [Interface()]),
-            .io(id: "RGB", title: "RGB", position: CGPoint(x: 400, y: 400), inputs: [Interface(), Interface(), Interface()], outputs: [Interface()])
-//            Node.input(id: "A", title: "A", position: CGPoint(x: 200, y: 200), input: , output: ,
-//            Node.input(id: "B", title: "B", position: CGPoint(x: 200, y: 400), ports: [.output(id: "0", title: "Output", data: .float(4))]),
-//            Node.io(id: "SUM", title: "SUM", position: CGPoint(x: 490, y: 200),
-//                 ports: [
-//                    .input(id: "0", title: "A"),
-//                    .input(id: "1", title: "B"),
-//                    .output(id: "2", title: "Output")
-//                 ], execute: sum),
-//            Node.output(id: "RESULT", title: "RESULT", position: CGPoint(x: 790, y: 200), ports: [.input(id: "0", title: "Input", data: .string("sss"))])
+            .input(id: "R", title: "R", position: CGPoint(x: 200, y: 200), inputs: [.float()]),
+            .input(id: "G", title: "G", position: CGPoint(x: 200, y: 400), inputs: [.float()]),
+            .input(id: "B", title: "B", position: CGPoint(x: 200, y: 600), inputs: [.float()]),
+            .io(id: "RGB", title: "RGB", position: CGPoint(x: 400, y: 400), inputs: [.float(), .float(), .float()], outputs: [])
         ],
         edges: [
-//            Edge(id: "0", source: Address(id: "R", port: .output(0)), target: Address(id: "RGB", port: .output(0))),
-//            Edge(id: "1", source: Address(nodeID: "B", portID: "0"), target: Address(nodeID: "SUM", portID: "1")),
-//            Edge(id: "2", source: Address(nodeID: "SUM", portID: "2"), target: Address(nodeID: "RESULT", portID: "0")),
+            Edge(source: .output("R", index: 0), target: .input("RGB", index: 0)),
+            Edge(source: .output("G", index: 0), target: .input("RGB", index: 1)),
+            Edge(source: .output("B", index: 0), target: .input("RGB", index: 2))
         ]
     )
 
     func inputNode(node: Node) -> some View {
         HStack(spacing: 16) {
             VStack {
+                ForEach(node.inputs) { port in
+                    HStack(alignment: .center, spacing: 8) {
+                        TextField("0", text: $graph[node.id][.input(port.id)].text)
+                            .frame(width: 40)
+                            .padding(2)
+                    }
+                }
+            }
+            VStack {
                 ForEach(node.outputs) { port in
                     HStack(alignment: .center, spacing: 8) {
-//                        TextField("0", text: $graph[node.id][port.id].text)
-//                            .frame(width: 120)
+                        if let data = graph.data(for: port.address) {
+                            Text(data.text)
+                        }
                         Circle()
                             .frame(width: 8, height: 8)
                             .port(.output(node.id, index: port.id))
@@ -58,9 +59,9 @@ struct ContentView: View {
                         Circle()
                             .frame(width: 8, height: 8)
                             .port(.input(node.id, index: port.id))
-//                        if let data = graph.data(node: node, port: port) {
-//                            Text(data.text)
-//                        }
+                        if let data = graph.data(for: port.address) {
+                            Text(data.text)
+                        }
                     }
                 }
             }
@@ -68,6 +69,15 @@ struct ContentView: View {
         .padding(8)
     }
 
+    var backgroundColor: Color {
+        return Color(
+            .sRGB,
+            red: Double(graph.data(for: .input("R", index: 0)).floatValue ?? 0),
+            green: Double(graph.data(for: .input("G", index: 0)).floatValue ?? 0),
+            blue: Double(graph.data(for: .input("B", index: 0)).floatValue ?? 0),
+            opacity: 1
+        )
+    }
 
     var body: some View {
         CanvasView(graph) { node in
@@ -85,11 +95,11 @@ struct ContentView: View {
                                     HStack(alignment: .center, spacing: 8) {
                                         Circle()
                                             .frame(width: 8, height: 8)
-                                            .port(.input(node.id, index: port.id))
+                                            .port(port.address)
                                         Text(port.title ?? "")
-//                                        if let data = graph.data(node: node, port: port) {
-//                                            Text(data.text)
-//                                        }
+                                        if let data = graph.data(for: port.address) {
+                                            Text(data.text)
+                                        }
                                     }
                                 }
                             }
@@ -97,18 +107,20 @@ struct ContentView: View {
                                 ForEach(outputs) { port in
                                     HStack(alignment: .center, spacing: 8) {
                                         Text(port.title ?? "")
-//                                        if let data = graph.data(node: node, port: port) {
-//                                            Text(data.text )
-//                                        }
+                                        if let data = graph.data(for: port.address) {
+                                            Text(data.text)
+                                        }
                                         Circle()
                                             .frame(width: 8, height: 8)
-                                            .port(.output(node.id, index: port.id))
+                                            .port(port.address)
                                     }
                                 }
                             }
                         }
                         .padding(8)
+                        .background(backgroundColor)
                     }
+
                 }
                 .padding(8)
                 .background(Color.white)
