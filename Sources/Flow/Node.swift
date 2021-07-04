@@ -8,71 +8,126 @@
 import Foundation
 import CoreGraphics
 
-public struct Address: Hashable {
-
-    public var nodeID: String
-
-    public var portID: String
-
-    public init(nodeID: String, portID: String) {
-        self.nodeID = nodeID
-        self.portID = portID
-    }
+public enum NodeType {
+    case input
+    case output
+    case io
 }
 
-public struct Port: Identifiable {
+public enum NodeError: Error {
+    case convertError
+    case mathematicalError
+}
+
+public struct Node: GeometryProperties, Identifiable {
+
+    public typealias Input = [PortData]
+
+    public typealias Output = [PortData]
+
+    public typealias Execution = (Input) -> Output
+
+    public var type: NodeType = .io
 
     public var id: String
 
-    public var title: String
+    public var title: String?
 
-    public init(id: String, title: String) {
-        self.id = id
-        self.title = title
-    }
-}
+    public var position: CGPoint = .zero
 
-public struct Node: Identifiable {
-    
-    public var id: String
+    public var offset: CGSize = .zero
 
-    public var title: String
+    public var size: CGSize = .zero
 
     public var inputs: [Port] = []
 
     public var outputs: [Port] = []
 
-    var ports: [Port] { inputs + outputs }
+    public var execution: Execution = { input in input }
 
     public init(
+        type: NodeType = .io,
         id: String,
-        title: String,
-        inputs: [Port] = [],
-        outputs: [Port] = []
+        title: String?,
+        position: CGPoint = .zero,
+        inputs: [Interface] = [],
+        outputs: [Interface] = [],
+        execution: @escaping Execution = { input in input }
     ) {
+        self.type = type
         self.id = id
         self.title = title
-        self.inputs = inputs
-        self.outputs = outputs
+        self.position = position
+        self.inputs = inputs.enumerated().map { .input(id: $0, data: $1.data, title: $1.title, node: self) }
+        self.outputs = outputs.enumerated().map { .output(id: $0, data: $1.data, title: $1.title, node: self) }
+        self.execution = execution
+    }
+
+    public func callAsFunction(_ input: Input) -> Output {
+        return execution(input)
     }
 }
 
 extension Node {
-    struct Geometry {
-        var frame: CGRect = .zero
-        var size: CGSize = .zero
-        var position: CGPoint = .zero
-        var offset: CGSize = .zero
-        var ports: [Port.ID: Port.Geometry] = [:]
+
+    public subscript(port: Address.Port) -> Port {
+        get {
+            switch port {
+                case .input(let index): return inputs[index]
+                case .output(let index): return outputs[index]
+            }
+        }
+        set {
+            switch port {
+                case .input(let index): inputs[index] = newValue
+                case .output(let index): outputs[index] = newValue
+            }
+        }
     }
 }
 
-extension Port {
-    struct Geometry {
-        var frameOnCanvas: CGRect = .zero
-        var frame: CGRect = .zero
-        var size: CGSize = .zero
-        var position: CGPoint = .zero
-        var offset: CGSize = .zero
+extension Node {
+
+    public static func input(
+        id: String,
+        title: String,
+        position: CGPoint,
+        inputs: [Interface] = []
+    ) -> Node {
+        Node(type: .input, id: id, title: title, position: position, inputs: inputs, outputs: inputs)
+    }
+
+    public static func output(
+        id: String,
+        title: String,
+        position: CGPoint,
+        outputs: [Interface] = []
+    ) -> Node {
+        Node(type: .output, id: id, title: title, position: position, inputs: outputs, outputs: outputs)
+    }
+
+    public static func io(
+        id: String,
+        title: String,
+        position: CGPoint,
+        inputs: [Interface] = [],
+        outputs: [Interface] = []
+    ) -> Node {
+        Node(type: .io, id: id, title: title, position: position, inputs: inputs, outputs: outputs)
+    }
+}
+
+extension Node {
+
+    var debugDescription: String {
+"""
+    id: \(id)
+    title: \(title ?? "")
+    position: \(position)
+    offset: \(offset)
+    frame: \(frame)
+    inputs: \(inputs)
+    outputs: \(outputs)
+"""
     }
 }

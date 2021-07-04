@@ -9,11 +9,130 @@ import SwiftUI
 import Flow
 
 struct ContentView: View {
+
+    @ObservedObject public var graph: Graph = Graph(
+        nodes: [
+            .input(id: "R", title: "R", position: CGPoint(x: 200, y: 200), inputs: [.float()]),
+            .input(id: "G", title: "G", position: CGPoint(x: 200, y: 400), inputs: [.float()]),
+            .input(id: "B", title: "B", position: CGPoint(x: 200, y: 600), inputs: [.float()]),
+            .sum(type: .float(0), id: "SUM", title: "SUM", position: CGPoint(x: 400, y: 400), inputs: [.float(), .float(), .float()]),
+            .output(id: "OUT", title: "OUT", position: CGPoint(x: 650, y: 400), outputs: [.float()])
+//            .io(id: "RGB", title: "RGB", position: CGPoint(x: 400, y: 400), inputs: [.float(), .float(), .float()], outputs: [])
+        ],
+        edges: [
+            Edge(source: .output("R", index: 0), target: .input("SUM", index: 0)),
+            Edge(source: .output("G", index: 0), target: .input("SUM", index: 1)),
+            Edge(source: .output("B", index: 0), target: .input("SUM", index: 2)),
+            Edge(source: .output("SUM", index: 0), target: .input("OUT", index: 0)),
+        ]
+    )
+
+    func inputNode(node: Node) -> some View {
+        HStack(spacing: 16) {
+            VStack {
+                ForEach(node.inputs) { port in
+                    HStack(alignment: .center, spacing: 8) {
+                        TextField("0", text: $graph[node.id][.input(port.id)].text)
+                            .frame(width: 40)
+                            .padding(2)
+                    }
+                }
+            }
+            VStack {
+                ForEach(node.outputs) { port in
+                    HStack(alignment: .center, spacing: 8) {
+                        if let data = graph.data(for: port.address) {
+                            Text(data.text)
+                        }
+                        Circle()
+                            .frame(width: 8, height: 8)
+                            .port(.output(node.id, index: port.id))
+                    }
+                }
+            }
+        }
+        .padding(8)
+    }
+
+    func outputNode(node: Node) -> some View {
+        HStack(spacing: 16) {
+            VStack {
+                ForEach(node.inputs) { port in
+                    HStack(alignment: .center, spacing: 8) {
+                        Circle()
+                            .frame(width: 8, height: 8)
+                            .port(.input(node.id, index: port.id))
+                        if let data = graph.data(for: port.address) {
+                            Text(data.text)
+                        }
+                    }
+                }
+            }
+        }
+        .padding(8)
+    }
+
+    var backgroundColor: Color {
+        return Color(
+            .sRGB,
+            red: Double(graph.data(for: .input("R", index: 0)).floatValue ?? 0),
+            green: Double(graph.data(for: .input("G", index: 0)).floatValue ?? 0),
+            blue: Double(graph.data(for: .input("B", index: 0)).floatValue ?? 0),
+            opacity: 1
+        )
+    }
+
     var body: some View {
-        CanvasView()
-//            .frame(width: 400, height: 400, alignment: .center)
-            .background(Color.white)
-            .ignoresSafeArea()
+        CanvasView(graph) { node in
+            NodeView(node) { inputs, outputs in
+                VStack {
+                    Text(node.title ?? "").bold()
+                    if node.type == .input {
+                        inputNode(node: node)
+                    } else if node.type == .output {
+                        outputNode(node: node)
+                    } else {
+                        HStack(spacing: 16) {
+                            VStack {
+                                ForEach(inputs) { port in
+                                    HStack(alignment: .center, spacing: 8) {
+                                        Circle()
+                                            .frame(width: 8, height: 8)
+                                            .port(port.address)
+                                        Text(port.title ?? "")
+                                        if let data = graph.data(for: port.address) {
+                                            Text(data.text)
+                                        }
+                                    }
+                                }
+                            }
+                            VStack {
+                                ForEach(outputs) { port in
+                                    HStack(alignment: .center, spacing: 8) {
+                                        Text(port.title ?? "")
+                                        if let data = graph.data(for: port.address) {
+                                            Text(data.text)
+                                        }
+                                        Circle()
+                                            .frame(width: 8, height: 8)
+                                            .port(port.address)
+                                    }
+                                }
+                            }
+                        }
+                        .padding(8)
+                    }
+
+                }
+                .padding(8)
+                .background(Color.white)
+                .cornerRadius(8)
+                .clipped()
+                .shadow(radius: 4)
+            }
+        }
+        .background(Color.white)
+        .ignoresSafeArea()
     }
 }
 

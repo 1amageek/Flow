@@ -5,8 +5,8 @@
 //  Created by nori on 2021/06/22.
 //
 
+import Foundation
 import CoreGraphics
-
 
 public struct Connection: Identifiable {
 
@@ -35,7 +35,6 @@ public struct Connection: Identifiable {
     }
 }
 
-
 public struct Edge: Identifiable {
 
     public var id: String
@@ -45,7 +44,7 @@ public struct Edge: Identifiable {
     public var target: Address
 
     public init(
-        id: String,
+        id: String = UUID().uuidString,
         source: Address,
         target: Address
     ) {
