@@ -34,16 +34,16 @@ struct FlowCanvasView: View {
 
     @ViewBuilder
     var portCircle: some View {
-        Circle()
+        RoundedRectangle(cornerRadius: 4)
             .fill(Color(.systemGray2))
-            .frame(width: 16, height: 16)
+            .frame(width: 22, height: 22)
     }
 
     @ViewBuilder
     func dataText(_ text: String, alignment: Alignment) -> some View {
         Text(text)
             .lineLimit(1)
-            .frame(maxWidth: 100, alignment: alignment)
+            .frame(maxWidth: 130, alignment: alignment)
     }
 
     func inputNode(node: Node) -> some View {
@@ -52,8 +52,9 @@ struct FlowCanvasView: View {
                 ForEach(node.inputs) { port in
                     HStack(alignment: .center, spacing: 8) {
                         TextField("0", text: $graph[node.id][.input(port.id)].text)
+                            .multilineTextAlignment(.trailing)
                             .padding(EdgeInsets(top: 2, leading: 6, bottom: 2, trailing: 6))
-                            .frame(maxWidth: 40)
+                            .frame(maxWidth: 100)
                             .background(Color(.systemGray3))
                             .cornerRadius(8)
                         Text(port.title ?? "")
@@ -159,13 +160,15 @@ struct FlowCanvasView: View {
                 EdgeShape(start: start, end: end)
                     .stroke(Color(.systemGray), lineWidth: 2)
             }
-        }, connectionView: { connection -> AnyView in
-            print(connection.startAddress, connection.endAddress)
-            return AnyView(EdgeShape(start: connection.start, end: connection.end)
-                .stroke(connection.isConnecting ? Color(.systemGreen) : Color(.systemBlue), lineWidth: 2))
+        }, connectionView: { connection in
+            EdgeShape(start: connection.start, end: connection.end)
+                .stroke(connection.isConnecting ? Color(.systemGreen) : Color(.systemBlue), lineWidth: 2)
         })
         .background(Color(.secondarySystemGroupedBackground))
         .ignoresSafeArea()
+        .onTapGesture(count: 2) {
+            graph.add(.sum(type: .float(), id: UUID().uuidString, title: "SUM", inputs: [.float(), .float()]))
+        }
     }
 }
 

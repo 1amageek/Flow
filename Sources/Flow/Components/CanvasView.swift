@@ -74,16 +74,12 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
                     .onAppear { graph.canvas.position = CGPoint(x: proxy.size.width / 2, y: proxy.size.height / 2) }
                     .onChange(of: proxy.size ) { newValue in graph.canvas.position = CGPoint(x: newValue.width / 2, y: newValue.height / 2) }
             })
+            .coordinateSpace(name: CanvasCoordinateSpace.defaultValue)
             .position(position)
             .offset(offset)
         }
-        .coordinateSpace(name: CanvasCoordinateSpace.defaultValue)
         .contentShape(Rectangle())
         .gesture(gesture)
-        .onTapGesture {
-            graph.focusNode = nil
-        }
         .environmentObject(graph)
-
     }
 }

@@ -19,22 +19,22 @@ public enum PortData {
     case float(FloatValue?)
     case string(StringValue?)
 
-    public static func bool(_ value: Bool?, error: NodeError? = nil) -> Self {
+    public static func bool(_ value: Bool? = nil, error: NodeError? = nil) -> Self {
         if let error = error { return .bool(.failure(error)) }
         return .bool(.success(value))
     }
 
-    public static func int(_ value: Int?, error: NodeError? = nil) -> Self {
+    public static func int(_ value: Int? = nil, error: NodeError? = nil) -> Self {
         if let error = error { return .int(.failure(error)) }
         return .int(.success(value))
     }
 
-    public static func float(_ value: Float?, error: NodeError? = nil) -> Self {
+    public static func float(_ value: Float? = nil, error: NodeError? = nil) -> Self {
         if let error = error { return .float(.failure(error)) }
         return .float(.success(value))
     }
 
-    public static func string(_ value: String?, error: NodeError? = nil) -> Self {
+    public static func string(_ value: String? = nil, error: NodeError? = nil) -> Self {
         if let error = error { return .string(.failure(error)) }
         return .string(.success(value))
     }
