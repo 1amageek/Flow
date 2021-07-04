@@ -8,16 +8,15 @@
 import SwiftUI
 import Flow
 
-struct ContentView: View {
+struct FlowCanvasView: View {
 
     @ObservedObject public var graph: Graph = Graph(
         nodes: [
-            .input(id: "R", title: "R", position: CGPoint(x: 200, y: 200), inputs: [.float()]),
-            .input(id: "G", title: "G", position: CGPoint(x: 200, y: 400), inputs: [.float()]),
-            .input(id: "B", title: "B", position: CGPoint(x: 200, y: 600), inputs: [.float()]),
+            .input(id: "R", title: "R", position: CGPoint(x: 200, y: 200), inputs: [.float(title: "R")]),
+            .input(id: "G", title: "G", position: CGPoint(x: 200, y: 400), inputs: [.float(title: "B")]),
+            .input(id: "B", title: "B", position: CGPoint(x: 200, y: 600), inputs: [.float(title: "B")]),
             .sum(type: .float(0), id: "SUM", title: "SUM", position: CGPoint(x: 400, y: 400), inputs: [.float(), .float(), .float()]),
             .output(id: "OUT", title: "OUT", position: CGPoint(x: 650, y: 400), outputs: [.float()])
-//            .io(id: "RGB", title: "RGB", position: CGPoint(x: 400, y: 400), inputs: [.float(), .float(), .float()], outputs: [])
         ],
         edges: [
             Edge(source: .output("R", index: 0), target: .input("SUM", index: 0)),
@@ -27,25 +26,46 @@ struct ContentView: View {
         ]
     )
 
+    let portSpacing: CGFloat = 24
+
+    @ViewBuilder
+    var portCircle: some View {
+        Circle()
+            .fill(Color(.systemGray2))
+            .frame(width: 16, height: 16)
+    }
+
+    @ViewBuilder
+    func dataText(_ text: String, alignment: Alignment) -> some View {
+        Text(text)
+            .lineLimit(1)
+            .frame(maxWidth: 100, alignment: alignment)
+    }
+
     func inputNode(node: Node) -> some View {
-        HStack(spacing: 16) {
-            VStack {
+        HStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: portSpacing) {
                 ForEach(node.inputs) { port in
                     HStack(alignment: .center, spacing: 8) {
                         TextField("0", text: $graph[node.id][.input(port.id)].text)
-                            .frame(width: 40)
-                            .padding(2)
+                            .padding(EdgeInsets(top: 2, leading: 6, bottom: 2, trailing: 6))
+                            .frame(maxWidth: 40)
+                            .background(Color(.systemGray3))
+                            .cornerRadius(8)
+                        Text(port.title ?? "")
+                            .lineLimit(1)
+                            .frame(maxWidth: 100, alignment: .leading)
                     }
                 }
             }
-            VStack {
+            Spacer()
+            VStack(alignment: .trailing, spacing: portSpacing) {
                 ForEach(node.outputs) { port in
                     HStack(alignment: .center, spacing: 8) {
                         if let data = graph.data(for: port.address) {
-                            Text(data.text)
+                            dataText(data.text, alignment: .trailing)
                         }
-                        Circle()
-                            .frame(width: 8, height: 8)
+                        portCircle
                             .port(.output(node.id, index: port.id))
                     }
                 }
@@ -55,66 +75,61 @@ struct ContentView: View {
     }
 
     func outputNode(node: Node) -> some View {
-        HStack(spacing: 16) {
-            VStack {
+        HStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: portSpacing) {
                 ForEach(node.inputs) { port in
                     HStack(alignment: .center, spacing: 8) {
-                        Circle()
-                            .frame(width: 8, height: 8)
+                        portCircle
                             .port(.input(node.id, index: port.id))
                         if let data = graph.data(for: port.address) {
-                            Text(data.text)
+                            dataText(data.text, alignment: .leading)
                         }
+                        Text(port.title ?? "")
+                            .lineLimit(1)
+                            .frame(maxWidth: 100, alignment: .leading)
                     }
                 }
             }
+            Spacer()
         }
         .padding(8)
     }
 
-    var backgroundColor: Color {
-        return Color(
-            .sRGB,
-            red: Double(graph.data(for: .input("R", index: 0)).floatValue ?? 0),
-            green: Double(graph.data(for: .input("G", index: 0)).floatValue ?? 0),
-            blue: Double(graph.data(for: .input("B", index: 0)).floatValue ?? 0),
-            opacity: 1
-        )
-    }
-
     var body: some View {
-        CanvasView(graph) { node in
+        CanvasView(graph, nodeView: { node in
             NodeView(node) { inputs, outputs in
-                VStack {
-                    Text(node.title ?? "").bold()
+                VStack(spacing: 0) {
+                    Text(node.title ?? "")
+                        .bold()
+                        .padding(8)
+                    Divider()
                     if node.type == .input {
                         inputNode(node: node)
                     } else if node.type == .output {
                         outputNode(node: node)
                     } else {
-                        HStack(spacing: 16) {
-                            VStack {
+                        HStack(spacing: 0) {
+                            VStack(alignment: .leading, spacing: portSpacing) {
                                 ForEach(inputs) { port in
                                     HStack(alignment: .center, spacing: 8) {
-                                        Circle()
-                                            .frame(width: 8, height: 8)
+                                        portCircle
                                             .port(port.address)
                                         Text(port.title ?? "")
                                         if let data = graph.data(for: port.address) {
-                                            Text(data.text)
+                                            dataText(data.text, alignment: .leading)
                                         }
                                     }
                                 }
                             }
-                            VStack {
+                            Spacer()
+                            VStack(alignment: .trailing, spacing: portSpacing) {
                                 ForEach(outputs) { port in
                                     HStack(alignment: .center, spacing: 8) {
                                         Text(port.title ?? "")
                                         if let data = graph.data(for: port.address) {
-                                            Text(data.text)
+                                            dataText(data.text, alignment: .trailing)
                                         }
-                                        Circle()
-                                            .frame(width: 8, height: 8)
+                                        portCircle
                                             .port(port.address)
                                     }
                                 }
@@ -124,20 +139,26 @@ struct ContentView: View {
                     }
 
                 }
-                .padding(8)
-                .background(Color.white)
+                .frame(width: 180)
+                .background(Color(.systemGray4))
                 .cornerRadius(8)
                 .clipped()
                 .shadow(radius: 4)
             }
-        }
-        .background(Color.white)
+        }, edgeView: { edge in
+            if let start = graph.position(with: edge.source),
+               let end = graph.position(with: edge.target) {
+                EdgeShape(start: start, end: end)
+                    .stroke(Color(.systemGray), lineWidth: 2)
+            }
+        })
+        .background(Color(.secondarySystemGroupedBackground))
         .ignoresSafeArea()
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
+struct FlowCanvasView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        FlowCanvasView()
     }
 }

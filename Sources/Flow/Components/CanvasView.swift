@@ -15,19 +15,25 @@ extension EnvironmentValues {
     var canvasCoordinateSpace: String { self[CanvasCoordinateSpace] }
 }
 
-public struct CanvasView<Content: View>: View {
+public struct CanvasView<NodeContent: View, EdgeContent: View>: View {
 
     var graph: Graph
 
-    var content: (_ node: Node) -> Content
+    var nodeView: (_ node: Node) -> NodeContent
+
+    var edgeView: (_ edge: Edge) -> EdgeContent
 
     var position: CGPoint { graph.canvas.position  }
 
     var offset: CGSize { graph.canvas.offset }
 
-    public init(_ graph: Graph, @ViewBuilder content: @escaping (_ id: Node) -> Content) {
+    public init(_ graph: Graph,
+                @ViewBuilder nodeView: @escaping (_ node: Node) -> NodeContent,
+                @ViewBuilder edgeView: @escaping (_ edge: Edge) -> EdgeContent
+    ) {
         self.graph = graph
-        self.content = content
+        self.nodeView = nodeView
+        self.edgeView = edgeView
     }
 
     var gesture: some Gesture {
@@ -49,10 +55,10 @@ public struct CanvasView<Content: View>: View {
         ZStack {
             ZStack {
                 ForEach(graph.nodes) { node in
-                    content(node)
+                    nodeView(node)
                 }
                 ForEach(graph.edges) { edge in
-                    EdgeView(edge: edge)
+                    edgeView(edge)
                 }
                 if let connnection = graph.connecting {
                     ConnectionView(connection: connnection)

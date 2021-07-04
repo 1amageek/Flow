@@ -29,7 +29,7 @@ struct ConnectionView: View {
     }
 }
 
-struct EdgeView: View {
+public struct EdgeView: View {
 
     @EnvironmentObject var context: Graph
 
@@ -39,16 +39,12 @@ struct EdgeView: View {
 
     var end: CGPoint { context.position(with: edge.target) ?? .zero }
 
-    var body: some View {
-        Path { path in
-            let x: CGFloat = (end.x - start.x) / 2
-            let y: CGFloat = (end.y - start.y) / 2
-            let center: CGPoint = CGPoint(x: start.x + x, y: start.y + y)
-            path.move(to: start)
-            path.addCurve(to: end,
-                          control1: CGPoint(x: center.x, y: start.y),
-                          control2: CGPoint(x: center.x, y: end.y))
-        }
-        .stroke(Color.black.opacity(0.4), lineWidth: 2)
+    public init(_ edge: Edge) {
+        self.edge = edge
+    }
+
+    public var body: some View {
+        EdgeShape(start: start, end: end)
+            .stroke(Color(.systemGray), lineWidth: 2)
     }
 }

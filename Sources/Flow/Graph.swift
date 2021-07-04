@@ -41,12 +41,15 @@ public class Graph: ObservableObject {
         self._edges = Published(initialValue: edges)
     }
 
-    public func port(with address: Address) -> Port? {
-        guard let node = nodes[address.id] else { return nil }
-        switch address.port {
-            case .input(let index): return node.inputs[index]
-            case .output(let index): return node.outputs[index]
+    /// Get the calculation results for a port at an arbitrary address.
+    /// - Parameter address: Address of the port you want to get.
+    /// - Returns: Calculated data
+    public func data(for address: Address) -> PortData {
+        guard let node: Node = nodes[address.id] else {
+            fatalError("[FLOW][WARNNING] address [\(address.id):\(address.port)] There are no nodes connected to this address.")
         }
+        let port: Port = node[address.port]
+        return data(node: node, port: port)
     }
 
     public func position(with address: Address) -> CGPoint? {
@@ -58,7 +61,27 @@ public class Graph: ObservableObject {
         )
     }
 
-    public func node(at point: CGPoint) -> Node? {
+    public func add(_ node: Node) {
+        self.nodes.append(node)
+    }
+
+    public func delete(_ node: Node) {
+        self.nodes[node.id] = nil
+    }
+}
+
+/// Process required to draw the port.
+extension Graph {
+
+    func port(with address: Address) -> Port? {
+        guard let node = nodes[address.id] else { return nil }
+        switch address.port {
+            case .input(let index): return node.inputs[index]
+            case .output(let index): return node.outputs[index]
+        }
+    }
+
+    func node(at point: CGPoint) -> Node? {
         for (_, node) in nodes.enumerated() {
             if let node = nodes[node.id] {
                 let frame = CGRect(
@@ -76,7 +99,7 @@ public class Graph: ObservableObject {
         return nil
     }
 
-    public func inputPortAddress(at point: CGPoint) -> Address? {
+    func inputPortAddress(at point: CGPoint) -> Address? {
         guard let node = node(at: point) else { return nil }
         for port in node.inputs {
             let frame = CGRect(
@@ -92,7 +115,7 @@ public class Graph: ObservableObject {
         return nil
     }
 
-    public func outputPortAddress(at point: CGPoint) -> Address? {
+    func outputPortAddress(at point: CGPoint) -> Address? {
         guard let node = node(at: point) else { return nil }
         for port in node.outputs {
             let frame = CGRect(
@@ -109,28 +132,21 @@ public class Graph: ObservableObject {
     }
 }
 
+/// Processing required to compute data for a node
 extension Graph {
 
-    public var inputNodes: [Node] { nodes.filter { $0.type == .input } }
+    var inputNodes: [Node] { nodes.filter { $0.type == .input } }
 
-    public var ouputNodes: [Node] { nodes.filter { $0.type == .output } }
+    var ouputNodes: [Node] { nodes.filter { $0.type == .output } }
 
-    public func connectedSourceNodes(node: Node, inputPort: Port) -> [Node] {
+    func connectedSourceNodes(node: Node, inputPort: Port) -> [Node] {
         let connectedEdge = self.edges.filter { $0.target ==  inputPort.address }
         return connectedEdge.map { self[$0.source.id] }
     }
 
-    public func connectedSourceAddress(node: Node, inputPort: Port) -> Address? {
+    func connectedSourceAddress(node: Node, inputPort: Port) -> Address? {
         guard let connectedEdge = self.edges.filter({ $0.target ==  inputPort.address }).first else { return nil }
         return connectedEdge.source
-    }
-
-    public func data(for address: Address) -> PortData {
-        guard let node: Node = nodes[address.id] else {
-            fatalError("[FLOW][WARNNING] address [\(address.id):\(address.port)] There are no nodes connected to this address.")
-        }
-        let port: Port = node[address.port]
-        return data(node: node, port: port)
     }
 
     func data(node: Node, port: Port) -> PortData {
