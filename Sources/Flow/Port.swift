@@ -78,54 +78,6 @@ public struct Interface {
     public static func string(_ value: String? = nil, title: String? = nil) -> Interface { Interface(.string(value), title: title) }
 }
 
-//@resultBuilder
-//public struct InterfaceBuilder {
-//
-//    public static func buildBlock() -> [Port] {
-//        return []
-//    }
-//
-//    public static func buildBlock(_ interface: Interface) -> [Port] {
-//        return [interface].enumerated().map { Port(id: $0, title: $1.title) }
-//    }
-//
-//    public static func buildBlock(_ c0: Interface<C0>, _ c1: Interface<C1>) -> Interface<(C0, C1)> {
-//        return Interface((c0.value, c1.value))
-//    }
-//
-//    public static func buildBlock<C0, C1, C2>(_ c0: Interface<C0>, _ c1: Interface<C1>, _ c2: Interface<C2>) -> Interface<(C0, C1, C2)> {
-//        return Interface((c0.value, c1.value, c2.value))
-//    }
-//
-//    public static func buildBlock<C0, C1, C2, C3>(_ c0: Interface<C0>, _ c1: Interface<C1>, _ c2: Interface<C2>, _ c3: Interface<C3>) -> Interface<(C0, C1, C2, C3)> {
-//        return Interface((c0.value, c1.value, c2.value, c3.value))
-//    }
-//}
-
-//@resultBuilder
-//public struct InterfaceBuilder {
-//
-//    public static func buildBlock() -> Interface<()> {
-//        return Interface(())
-//    }
-//
-//    public static func buildBlock<Content>(_ content: Interface<Content>) -> Interface<Content> {
-//        return Interface(content.value)
-//    }
-//
-//    public static func buildBlock<C0, C1>(_ c0: Interface<C0>, _ c1: Interface<C1>) -> Interface<(C0, C1)> {
-//        return Interface((c0.value, c1.value))
-//    }
-//
-//    public static func buildBlock<C0, C1, C2>(_ c0: Interface<C0>, _ c1: Interface<C1>, _ c2: Interface<C2>) -> Interface<(C0, C1, C2)> {
-//        return Interface((c0.value, c1.value, c2.value))
-//    }
-//
-//    public static func buildBlock<C0, C1, C2, C3>(_ c0: Interface<C0>, _ c1: Interface<C1>, _ c2: Interface<C2>, _ c3: Interface<C3>) -> Interface<(C0, C1, C2, C3)> {
-//        return Interface((c0.value, c1.value, c2.value, c3.value))
-//    }
-//}
-
 extension Port {
 
     public var text: String {

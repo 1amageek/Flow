@@ -14,6 +14,11 @@ public enum NodeType {
     case io
 }
 
+public enum NodeError: Error {
+    case convertError
+    case mathematicalError
+}
+
 public struct Node: GeometryProperties, Identifiable {
 
     public typealias Input = [PortData]
