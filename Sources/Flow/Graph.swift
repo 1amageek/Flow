@@ -11,13 +11,15 @@ public class Graph: ObservableObject {
 
     @Published var canvas: Canvas = Canvas()
 
-    @Published var nodes: [Node] = []
+    @Published public var nodes: [Node] = []
 
-    @Published var edges: [Edge] = []
+    @Published public var edges: [Edge] = []
 
-    @Published var focusNode: Node?
+    @Published public var focusNode: Node?
 
-    @Published var connecting: Connection?
+    @Published public var connecting: Connection?
+
+    private var shouldConnectNodeHandler: (_ nodes: [Node], _ edges: [Edge], _ connection: Connection) -> Bool
 
     public subscript(nodeID: String) -> Node {
         get {
@@ -36,9 +38,14 @@ public class Graph: ObservableObject {
         return port
     }
 
-    public init(nodes: [Node] = [], edges: [Edge] = []) {
+    public init(
+        nodes: [Node] = [],
+        edges: [Edge] = [],
+        shouldConnectNode: @escaping (_ nodes: [Node], _ edges: [Edge], _ connection: Connection) -> Bool = { _, _, _ in true}
+    ) {
         self._nodes = Published(initialValue: nodes)
         self._edges = Published(initialValue: edges)
+        self.shouldConnectNodeHandler = shouldConnectNode
     }
 
     /// Get the calculation results for a port at an arbitrary address.
@@ -68,6 +75,11 @@ public class Graph: ObservableObject {
     public func delete(_ node: Node) {
         self.nodes[node.id] = nil
     }
+}
+
+extension Graph {
+
+    func shouldConnect( _ connection: Connection) -> Bool { shouldConnectNodeHandler(self.nodes, self.edges, connection) }
 }
 
 /// Process required to draw the port.

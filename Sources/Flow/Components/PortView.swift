@@ -72,8 +72,10 @@ public struct InputPortView<Content: View>: View {
                 if var connection = context.connecting {
                     guard let address = context.outputPortAddress(at: value.location) else { return }
                     connection.endAddress = address
-                    let edge = Edge(id: UUID().uuidString, source: address, target: connection.startAddress)
-                    context.edges.append(edge)
+                    if context.shouldConnect(connection) {
+                        let edge = Edge(source: address, target: connection.startAddress)
+                        context.edges.append(edge)
+                    }
                 }
             }))
     }
@@ -134,8 +136,10 @@ public struct OutputPortView<Content: View>: View {
                 if var connection = context.connecting {
                     guard let address = context.inputPortAddress(at: value.location) else { return }
                     connection.endAddress = address
-                    let edge = Edge(id: UUID().uuidString, source: connection.startAddress, target: address)
-                    context.edges.append(edge)
+                    if context.shouldConnect(connection) {
+                        let edge = Edge(source: connection.startAddress, target: address)
+                        context.edges.append(edge)
+                    }
                 }
             }))
     }

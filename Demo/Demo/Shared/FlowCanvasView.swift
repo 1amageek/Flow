@@ -23,8 +23,10 @@ struct FlowCanvasView: View {
             Edge(source: .output("G", index: 0), target: .input("SUM", index: 1)),
             Edge(source: .output("B", index: 0), target: .input("SUM", index: 2)),
             Edge(source: .output("SUM", index: 0), target: .input("OUT", index: 0)),
-        ]
-    )
+        ],
+        shouldConnectNode: { _, edges, connection in
+        return !edges.contains(where: { $0.target == connection.startAddress || $0.target == connection.endAddress })
+    })
 
     let portSpacing: CGFloat = 24
 
