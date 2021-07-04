@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 public enum PortData: Equatable {
 
     case bool(Bool?)

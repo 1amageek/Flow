@@ -15,12 +15,15 @@ struct ContentView: View {
             .input(id: "R", title: "R", position: CGPoint(x: 200, y: 200), inputs: [.float()]),
             .input(id: "G", title: "G", position: CGPoint(x: 200, y: 400), inputs: [.float()]),
             .input(id: "B", title: "B", position: CGPoint(x: 200, y: 600), inputs: [.float()]),
-            .io(id: "RGB", title: "RGB", position: CGPoint(x: 400, y: 400), inputs: [.float(), .float(), .float()], outputs: [])
+            .sum(type: .float(0), id: "SUM", title: "SUM", position: CGPoint(x: 400, y: 400), inputs: [.float(), .float(), .float()]),
+            .output(id: "OUT", title: "OUT", position: CGPoint(x: 650, y: 400), outputs: [.float()])
+//            .io(id: "RGB", title: "RGB", position: CGPoint(x: 400, y: 400), inputs: [.float(), .float(), .float()], outputs: [])
         ],
         edges: [
-            Edge(source: .output("R", index: 0), target: .input("RGB", index: 0)),
-            Edge(source: .output("G", index: 0), target: .input("RGB", index: 1)),
-            Edge(source: .output("B", index: 0), target: .input("RGB", index: 2))
+            Edge(source: .output("R", index: 0), target: .input("SUM", index: 0)),
+            Edge(source: .output("G", index: 0), target: .input("SUM", index: 1)),
+            Edge(source: .output("B", index: 0), target: .input("SUM", index: 2)),
+            Edge(source: .output("SUM", index: 0), target: .input("OUT", index: 0)),
         ]
     )
 
@@ -118,7 +121,6 @@ struct ContentView: View {
                             }
                         }
                         .padding(8)
-                        .background(backgroundColor)
                     }
 
                 }
