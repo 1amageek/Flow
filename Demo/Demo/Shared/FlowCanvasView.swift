@@ -30,6 +30,8 @@ struct FlowCanvasView: View {
 
     let portSpacing: CGFloat = 24
 
+    let portHeight: CGFloat = 24
+
     @ViewBuilder
     var portCircle: some View {
         Circle()
@@ -58,6 +60,7 @@ struct FlowCanvasView: View {
                             .lineLimit(1)
                             .frame(maxWidth: 100, alignment: .leading)
                     }
+                    .frame(height: portHeight)
                 }
             }
             Spacer()
@@ -90,6 +93,7 @@ struct FlowCanvasView: View {
                             .lineLimit(1)
                             .frame(maxWidth: 100, alignment: .leading)
                     }
+                    .frame(height: portHeight)
                 }
             }
             Spacer()
@@ -121,6 +125,7 @@ struct FlowCanvasView: View {
                                             dataText(data.text, alignment: .leading)
                                         }
                                     }
+                                    .frame(height: portHeight)
                                 }
                             }
                             Spacer()
@@ -134,6 +139,7 @@ struct FlowCanvasView: View {
                                         portCircle
                                             .port(port.address)
                                     }
+                                    .frame(height: portHeight)
                                 }
                             }
                         }
