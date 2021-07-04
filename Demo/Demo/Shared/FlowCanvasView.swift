@@ -159,9 +159,10 @@ struct FlowCanvasView: View {
                 EdgeShape(start: start, end: end)
                     .stroke(Color(.systemGray), lineWidth: 2)
             }
-        }, connectionView: { connection in
-            EdgeShape(start: connection.start, end: connection.end)
-                .stroke(Color(.systemBlue), lineWidth: 2)
+        }, connectionView: { connection -> AnyView in
+            print(connection.startAddress, connection.endAddress)
+            return AnyView(EdgeShape(start: connection.start, end: connection.end)
+                .stroke(connection.isConnecting ? Color(.systemGreen) : Color(.systemBlue), lineWidth: 2))
         })
         .background(Color(.secondarySystemGroupedBackground))
         .ignoresSafeArea()

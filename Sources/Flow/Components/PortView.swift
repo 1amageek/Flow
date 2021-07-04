@@ -51,22 +51,27 @@ public struct InputPortView<Content: View>: View {
                     }
             })
             .modifier(JackModifier(id: id, portIndex: portIndex, onConnecting: { value in
-                let address: Address = .input(id, index: portIndex)
-                if let edge = context.edges.filter({ $0.target == .input(id, index: portIndex) }).first {
-                    context.edges[edge.id] = nil
-                    context.connecting = Connection(
-                        id: id,
-                        start: context.position(with: edge.source) ?? .zero,
-                        end: value.location,
-                        startAddress: edge.source
-                    )
+                if context.connecting != nil {
+                    context.connecting?.end = value.location
+                    context.connecting?.endAddress = context.outputPortAddress(at: value.location)
                 } else {
-                    context.connecting = Connection(
-                        id: id,
-                        start: context.position(with: address) ?? .zero,
-                        end: value.location,
-                        startAddress: address
-                    )
+                    let address: Address = .input(id, index: portIndex)
+                    if let edge = context.edges.filter({ $0.target == .input(id, index: portIndex) }).first {
+                        context.edges[edge.id] = nil
+                        context.connecting = Connection(
+                            id: id,
+                            start: context.position(with: edge.source) ?? .zero,
+                            end: value.location,
+                            startAddress: edge.source
+                        )
+                    } else {
+                        context.connecting = Connection(
+                            id: id,
+                            start: context.position(with: address) ?? .zero,
+                            end: value.location,
+                            startAddress: address
+                        )
+                    }
                 }
             }, onConnected: { value in
                 if var connection = context.connecting {
@@ -125,13 +130,18 @@ public struct OutputPortView<Content: View>: View {
                     }
             })
             .modifier(JackModifier(id: id, portIndex: portIndex, onConnecting: { value in
-                let address: Address = .output(id, index: portIndex)
-                context.connecting = Connection(
-                    id: id,
-                    start: context.position(with: address) ?? .zero,
-                    end: value.location,
-                    startAddress: address
-                )
+                if context.connecting != nil {
+                    context.connecting?.end = value.location
+                    context.connecting?.endAddress = context.inputPortAddress(at: value.location)
+                } else {
+                    let address: Address = .output(id, index: portIndex)
+                    context.connecting = Connection(
+                        id: id,
+                        start: context.position(with: address) ?? .zero,
+                        end: value.location,
+                        startAddress: address
+                    )
+                }
             }, onConnected: { value in
                 if var connection = context.connecting {
                     guard let address = context.inputPortAddress(at: value.location) else { return }
@@ -173,13 +183,7 @@ struct JackModifier: ViewModifier {
 
     var gesture: some Gesture {
         DragGesture(minimumDistance: 0, coordinateSpace: .named(canvasCoordinateSpace))
-            .onChanged { value in
-                if context.connecting != nil {
-                    context.connecting?.end = value.location
-                } else {
-                    onConnectingHandler(value)
-                }
-            }
+            .onChanged { value in onConnectingHandler(value) }
             .onEnded { value in
                 onConnectedHandler(value)
                 context.connecting = nil

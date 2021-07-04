@@ -20,6 +20,8 @@ public struct Connection: Identifiable {
 
     public var endAddress: Address?
 
+    public var isConnecting: Bool { endAddress != nil }
+
     public init(
         id: String,
         start: CGPoint = .zero,
