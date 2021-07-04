@@ -15,7 +15,7 @@ extension EnvironmentValues {
     var canvasCoordinateSpace: String { self[CanvasCoordinateSpace] }
 }
 
-public struct CanvasView<NodeContent: View, EdgeContent: View>: View {
+public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent: View>: View {
 
     var graph: Graph
 
@@ -23,17 +23,21 @@ public struct CanvasView<NodeContent: View, EdgeContent: View>: View {
 
     var edgeView: (_ edge: Edge) -> EdgeContent
 
+    var connectionView: (_ connection: Connection) -> ConnectionContent
+
     var position: CGPoint { graph.canvas.position  }
 
     var offset: CGSize { graph.canvas.offset }
 
     public init(_ graph: Graph,
                 @ViewBuilder nodeView: @escaping (_ node: Node) -> NodeContent,
-                @ViewBuilder edgeView: @escaping (_ edge: Edge) -> EdgeContent
+                @ViewBuilder edgeView: @escaping (_ edge: Edge) -> EdgeContent,
+                @ViewBuilder connectionView: @escaping (_ connection: Connection) -> ConnectionContent
     ) {
         self.graph = graph
         self.nodeView = nodeView
         self.edgeView = edgeView
+        self.connectionView = connectionView
     }
 
     var gesture: some Gesture {
@@ -61,7 +65,7 @@ public struct CanvasView<NodeContent: View, EdgeContent: View>: View {
                     edgeView(edge)
                 }
                 if let connnection = graph.connecting {
-                    ConnectionView(connection: connnection)
+                    connectionView(connnection)
                 }
             }
             .background(GeometryReader { proxy in

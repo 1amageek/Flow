@@ -143,7 +143,7 @@ struct FlowCanvasView: View {
                 .background(Color(.systemGray4))
                 .cornerRadius(8)
                 .clipped()
-                .shadow(radius: 4)
+                .shadow(radius: 8)
             }
         }, edgeView: { edge in
             if let start = graph.position(with: edge.source),
@@ -151,6 +151,9 @@ struct FlowCanvasView: View {
                 EdgeShape(start: start, end: end)
                     .stroke(Color(.systemGray), lineWidth: 2)
             }
+        }, connectionView: { connection in
+            EdgeShape(start: connection.start, end: connection.end)
+                .stroke(Color(.systemBlue), lineWidth: 2)
         })
         .background(Color(.secondarySystemGroupedBackground))
         .ignoresSafeArea()
