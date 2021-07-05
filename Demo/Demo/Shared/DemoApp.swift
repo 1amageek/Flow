@@ -14,11 +14,7 @@ struct DemoApp: App {
 
     var body: some Scene {
         WindowGroup {
-
             FlowCanvasView()
-
-//            ContentView()
-//                .environmentObject(model)
         }
     }
 }
