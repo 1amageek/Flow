@@ -84,6 +84,30 @@ CanvasView(graph, nodeView: { node in
 
 ```
 
+### CanvasView
+
+```swift
+CanvasView(graph, nodeView: { node in
+    // NodeView
+}, edgeView: { edge in
+    // EdgeView
+}, connectionView: { connection in
+    // ConnectionView
+})
+```
+
+### NodeView
+
+```swift
+NodeView(node) { inputs, outputs in }
+```
+
+### Port
+
+```swift
+Circle().port(port.address)
+```
+
 __Add Node to Gaph__
 
 ```swift
