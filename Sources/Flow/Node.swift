@@ -92,7 +92,7 @@ extension Node {
         id: String,
         title: String,
         inputs: [Interface] = [],
-        position: CGPoint
+        position: CGPoint = .zero
     ) -> Node {
         Node(type: .input, id: id, title: title, inputs: inputs, outputs: inputs, position: position)
     }
@@ -101,7 +101,7 @@ extension Node {
         id: String,
         title: String,
         outputs: [Interface] = [],
-        position: CGPoint
+        position: CGPoint = .zero
     ) -> Node {
         Node(type: .output, id: id, title: title, inputs: outputs, outputs: outputs, position: position)
     }
@@ -111,7 +111,7 @@ extension Node {
         title: String,
         inputs: [Interface] = [],
         outputs: [Interface] = [],
-        position: CGPoint
+        position: CGPoint = .zero
     ) -> Node {
         Node(type: .io, id: id, title: title, inputs: inputs, outputs: outputs, position: position)
     }

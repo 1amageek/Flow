@@ -20,7 +20,7 @@ struct FlowCanvasView: View {
 
             .input(id: "DATAA", title: "DATA A", inputs: [.floatArray([1, 2, 3, 4], title: "R")], position: CGPoint(x: 200, y: 900)),
             .input(id: "DATAB", title: "DATA B", inputs: [.floatArray([1, 2, 3, 4], title: "R")], position: CGPoint(x: 200, y: 1100)),
-            .product(type: .float(0), id: "PRODUCT", title: "PRODUCT", inputs: [.floatArray(), .floatArray()], position: CGPoint(x: 400, y: 1000)),
+            .product(type: .floatArray(), id: "PRODUCT", title: "PRODUCT", inputs: [.floatArray(), .floatArray()], position: CGPoint(x: 400, y: 1000)),
 
         ],
         edges: [
