@@ -49,9 +49,9 @@ public struct Node: GeometryProperties, Identifiable {
         type: NodeType = .io,
         id: String,
         title: String?,
-        position: CGPoint = .zero,
         inputs: [Interface] = [],
         outputs: [Interface] = [],
+        position: CGPoint = .zero,
         execution: @escaping Execution = { input in input }
     ) {
         self.type = type
@@ -91,29 +91,29 @@ extension Node {
     public static func input(
         id: String,
         title: String,
-        position: CGPoint,
-        inputs: [Interface] = []
+        inputs: [Interface] = [],
+        position: CGPoint
     ) -> Node {
-        Node(type: .input, id: id, title: title, position: position, inputs: inputs, outputs: inputs)
+        Node(type: .input, id: id, title: title, inputs: inputs, outputs: inputs, position: position)
     }
 
     public static func output(
         id: String,
         title: String,
-        position: CGPoint,
-        outputs: [Interface] = []
+        outputs: [Interface] = [],
+        position: CGPoint
     ) -> Node {
-        Node(type: .output, id: id, title: title, position: position, inputs: outputs, outputs: outputs)
+        Node(type: .output, id: id, title: title, inputs: outputs, outputs: outputs, position: position)
     }
 
     public static func io(
         id: String,
         title: String,
-        position: CGPoint,
         inputs: [Interface] = [],
-        outputs: [Interface] = []
+        outputs: [Interface] = [],
+        position: CGPoint
     ) -> Node {
-        Node(type: .io, id: id, title: title, position: position, inputs: inputs, outputs: outputs)
+        Node(type: .io, id: id, title: title, inputs: inputs, outputs: outputs, position: position)
     }
 }
 

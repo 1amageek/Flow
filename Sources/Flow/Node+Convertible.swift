@@ -7,6 +7,7 @@
 
 import Foundation
 import CoreGraphics
+import Accelerate
 
 extension Node {
 
@@ -14,10 +15,10 @@ extension Node {
         type: PortData,
         id: String,
         title: String,
-        position: CGPoint = .zero,
-        inputs: [Interface] = []
+        inputs: [Interface] = [],
+        position: CGPoint = .zero
     ) -> Node {
-        Node(type: .io, id: id, title: title, position: position, inputs: inputs, outputs: [Interface(type)]) { input in
+        Node(type: .io, id: id, title: title, inputs: inputs, outputs: [Interface(type)], position: position) { input in
             switch type {
                 case .bool(_):
                     let result = input.compactMap({ $0.boolValue }).reduce(false) { $0 || $1 }
@@ -31,6 +32,38 @@ extension Node {
                 case .string(_):
                     let result = input.compactMap({ $0.stringValue }).reduce("", +)
                     return [.string(result)]
+                case .boolArray(_):
+                    let values: [[Bool]] = input.compactMap({ $0.boolArrayValue })
+                    if let first = values.first {
+                        let result = values.reduce(Array(repeating: false, count: first.count), { prev, current in
+                            return zip(prev, current).map { $0 || $1 }
+                        })
+                        return [.boolArray(result)]
+                    }
+                    return [.boolArray([])]
+                case .intArray(_):
+                    let values: [[Float]] = input.compactMap({ $0.floatArrayValue })
+                    if let first = values.first {
+                        let result = values.reduce(Array(repeating: 0, count: first.count), { vDSP.add($0, $1) }).map({ Int($0) })
+                        return [.intArray(result)]
+                    }
+                    return [.intArray([])]
+                case .floatArray(_):
+                    let values: [[Float]] = input.compactMap({ $0.floatArrayValue })
+                    if let first = values.first {
+                        let result = values.reduce(Array(repeating: 0, count: first.count), { vDSP.add($0, $1) })
+                        return [.floatArray(result)]
+                    }
+                    return [.floatArray([])]
+                case .stringArray(_):
+                    let values: [[String]] = input.compactMap({ $0.stringArrayValue })
+                    if let first = values.first {
+                        let result = values.reduce(Array(repeating: "", count: first.count), { prev, current in
+                            return zip(prev, current).map { $0 + $1 }
+                        })
+                        return [.stringArray(result)]
+                    }
+                    return [.stringArray([])]
             }
         }
     }
@@ -39,22 +72,47 @@ extension Node {
         type: PortData,
         id: String,
         title: String,
-        position: CGPoint = .zero,
-        inputs: [Interface] = []
+        inputs: [Interface] = [],
+        position: CGPoint = .zero
     ) -> Node {
-        Node(type: .io, id: id, title: title, position: position, inputs: inputs, outputs: [Interface(type)]) { input in
+        Node(type: .io, id: id, title: title, inputs: inputs, outputs: [Interface(type)], position: position) { input in
             switch type {
                 case .bool(_):
-                    let result = input.compactMap({ $0.boolValue }).reduce(false) { $0 && $1 }
+                    let result = input.compactMap({ $0.boolValue }).reduce(true) { $0 && $1 }
                     return [.bool(result)]
                 case .int(_):
-                    let result = input.compactMap({ $0.intValue }).reduce(.zero, *)
+                    let result = input.compactMap({ $0.intValue }).reduce(1, *)
                     return [.int(result)]
                 case .float(_):
-                    let result = input.compactMap({ $0.floatValue }).reduce(.zero, *)
+                    let result = input.compactMap({ $0.floatValue }).reduce(1, *)
                     return [.float(result)]
                 case .string(_):
                     return [.string(.failure(.convertError))]
+                case .boolArray(_):
+                    let values: [[Bool]] = input.compactMap({ $0.boolArrayValue })
+                    if let first = values.first {
+                        let result = values.reduce(Array(repeating: true, count: first.count), { prev, current in
+                            return zip(prev, current).map { $0 && $1 }
+                        })
+                        return [.boolArray(result)]
+                    }
+                    return [.boolArray([])]
+                case .intArray(_):
+                    let values: [[Float]] = input.compactMap({ $0.floatArrayValue })
+                    if let first = values.first {
+                        let result = values.reduce(Array(repeating: 1, count: first.count), { vDSP.multiply($0, $1) }).map({ Int($0) })
+                        return [.intArray(result)]
+                    }
+                    return [.intArray([])]
+                case .floatArray(_):
+                    let values: [[Float]] = input.compactMap({ $0.floatArrayValue })
+                    if let first = values.first {
+                        let result = values.reduce(Array(repeating: 1, count: first.count), { vDSP.multiply($0, $1) })
+                        return [.floatArray(result)]
+                    }
+                    return [.floatArray([])]
+                case .stringArray(_):
+                    return [.stringArray(.failure(.convertError))]
             }
         }
     }
@@ -63,10 +121,10 @@ extension Node {
         type: PortData,
         id: String,
         title: String,
-        position: CGPoint = .zero,
-        inputs: [Interface] = []
+        inputs: [Interface] = [],
+        position: CGPoint = .zero
     ) -> Node {
-        Node(type: .io, id: id, title: title, position: position, inputs: inputs, outputs: [Interface(type)]) { input in
+        Node(type: .io, id: id, title: title, inputs: inputs, outputs: [Interface(type)], position: position) { input in
             switch type {
                 case .bool(_):
                     return [.bool(.failure(.convertError))]
@@ -82,18 +140,40 @@ extension Node {
                     return [.float(result)]
                 case .string(_):
                     return [.string(.failure(.convertError))]
+                case .boolArray(_):
+                    return [.boolArray(.failure(.convertError))]
+                case .intArray(_):
+                    let values: [[Float]] = input.compactMap({ $0.floatArrayValue })
+                    if values.count == 0 { return [.intArray(.failure(.mathematicalError))] }
+                    if let first = values.first {
+                        let totalValues = values.reduce(Array(repeating: 0, count: first.count), { vDSP.add($0, $1) })
+                        let result = vDSP.divide(totalValues, Float(values.count)).map({ Int($0) })
+                        return [.intArray(result)]
+                    }
+                    return [.intArray([])]
+                case .floatArray(_):
+                    let values: [[Float]] = input.compactMap({ $0.floatArrayValue })
+                    if values.count == 0 { return [.floatArray(.failure(.mathematicalError))] }
+                    if let first = values.first {
+                        let totalValues = values.reduce(Array(repeating: 0, count: first.count), { vDSP.add($0, $1) })
+                        let result = vDSP.divide(totalValues, Float(values.count))
+                        return [.floatArray(result)]
+                    }
+                    return [.floatArray([])]
+                case .stringArray(_):
+                    return [.stringArray(.failure(.convertError))]
             }
         }
     }
 
-    public static func `var`(
+    public static func varp(
         type: PortData,
         id: String,
         title: String,
-        position: CGPoint = .zero,
-        inputs: [Interface] = []
+        inputs: [Interface] = [],
+        position: CGPoint = .zero
     ) -> Node {
-        Node(type: .io, id: id, title: title, position: position, inputs: inputs, outputs: [Interface(type)]) { input in
+        Node(type: .io, id: id, title: title, inputs: inputs, outputs: [Interface(type)], position: position) { input in
             switch type {
                 case .bool(_):
                     return [.bool(.failure(.convertError))]
@@ -111,8 +191,41 @@ extension Node {
                     return [.float(result)]
                 case .string(_):
                     return [.string(.failure(.convertError))]
+                case .boolArray(_):
+                    return [.boolArray(.failure(.convertError))]
+                case .intArray(_):
+                    let values: [[Float]] = input.compactMap({ $0.floatArrayValue })
+                    if values.count == 0 { return [.intArray(.failure(.mathematicalError))] }
+                    if let first = values.first {
+                        let totalValues = values.reduce(Array(repeating: 0, count: first.count), { vDSP.add($0, $1) })
+                        let squereValues = values.map({ vDSP.multiply($0, $0) })
+                        let squereTotalValues = squereValues.reduce(Array(repeating: 0, count: first.count), { vDSP.add($0, $1) })
+                        let squereAvarageValues = vDSP.divide(squereTotalValues, Float(values.count))
+                        let averageValues = vDSP.divide(totalValues, Float(values.count))
+                        let averageSquereValues = vDSP.multiply(averageValues, averageValues)
+                        let result = vDSP.subtract(squereAvarageValues, averageSquereValues).map({ Int($0) })
+                        return [.intArray(result)]
+                    }
+                    return [.intArray([])]
+                case .floatArray(_):
+                    let values: [[Float]] = input.compactMap({ $0.floatArrayValue })
+                    if values.count == 0 { return [.floatArray(.failure(.mathematicalError))] }
+                    if let first = values.first {
+                        let totalValues = values.reduce(Array(repeating: 0, count: first.count), { vDSP.add($0, $1) })
+                        let squereValues = values.map({ vDSP.multiply($0, $0) })
+                        let squereTotalValues = squereValues.reduce(Array(repeating: 0, count: first.count), { vDSP.add($0, $1) })
+                        let squereAvarageValues = vDSP.divide(squereTotalValues, Float(values.count))
+                        let averageValues = vDSP.divide(totalValues, Float(values.count))
+                        let averageSquereValues = vDSP.multiply(averageValues, averageValues)
+                        let result = vDSP.subtract(squereAvarageValues, averageSquereValues)
+                        return [.floatArray(result)]
+                    }
+                    return [.floatArray([])]
+                case .stringArray(_):
+                    return [.stringArray(.failure(.convertError))]
             }
         }
     }
 
 }
+

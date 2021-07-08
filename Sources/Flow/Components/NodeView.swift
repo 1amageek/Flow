@@ -24,7 +24,7 @@ public struct NodeView<Content: View>: View {
     var offset: CGSize { context.nodes[id]?.offset ?? .zero  }
 
     var gesture: some Gesture {
-        DragGesture(minimumDistance: 0.1)
+        DragGesture(minimumDistance: 0.2)
             .onChanged { value in
                 context.nodes[id]?.offset = value.translation
             }
@@ -57,7 +57,11 @@ public struct NodeView<Content: View>: View {
             .position(position)
             .offset(offset)
             .gesture(gesture)
-            .onTapGesture { context.focusNode = context.nodes[id] }
+            .onTapGesture {
+                context.focusNode = context.nodes[id]
+
+                print(context.data(for: .output(id, index: 0)))
+            }
     }
 }
 

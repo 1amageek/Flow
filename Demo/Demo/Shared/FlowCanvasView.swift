@@ -12,17 +12,25 @@ struct FlowCanvasView: View {
 
     @ObservedObject public var graph: Graph = Graph(
         nodes: [
-            .input(id: "R", title: "R", position: CGPoint(x: 200, y: 200), inputs: [.float(title: "R")]),
-            .input(id: "G", title: "G", position: CGPoint(x: 200, y: 400), inputs: [.float(title: "B")]),
-            .input(id: "B", title: "B", position: CGPoint(x: 200, y: 600), inputs: [.float(title: "B")]),
-            .sum(type: .float(0), id: "SUM", title: "SUM", position: CGPoint(x: 400, y: 400), inputs: [.float(), .float(), .float()]),
-            .output(id: "OUT", title: "OUT", position: CGPoint(x: 650, y: 400), outputs: [.float()])
+            .input(id: "R", title: "R", inputs: [.float(title: "R")], position: CGPoint(x: 200, y: 200)),
+            .input(id: "G", title: "G", inputs: [.float(title: "B")], position: CGPoint(x: 200, y: 400)),
+            .input(id: "B", title: "B", inputs: [.float(title: "B")], position: CGPoint(x: 200, y: 600)),
+            .sum(type: .float(0), id: "SUM", title: "SUM", inputs: [.float(), .float(), .float()], position: CGPoint(x: 400, y: 400)),
+            .output(id: "OUT", title: "OUT", outputs: [.float()], position: CGPoint(x: 650, y: 400)),
+
+            .input(id: "DATAA", title: "DATA A", inputs: [.floatArray([1, 2, 3, 4], title: "R")], position: CGPoint(x: 200, y: 900)),
+            .input(id: "DATAB", title: "DATA B", inputs: [.floatArray([1, 2, 3, 4], title: "R")], position: CGPoint(x: 200, y: 1100)),
+            .product(type: .float(0), id: "PRODUCT", title: "PRODUCT", inputs: [.floatArray(), .floatArray()], position: CGPoint(x: 400, y: 1000)),
+
         ],
         edges: [
             Edge(source: .output("R", index: 0), target: .input("SUM", index: 0)),
             Edge(source: .output("G", index: 0), target: .input("SUM", index: 1)),
             Edge(source: .output("B", index: 0), target: .input("SUM", index: 2)),
             Edge(source: .output("SUM", index: 0), target: .input("OUT", index: 0)),
+
+            Edge(source: .output("DATAA", index: 0), target: .input("PRODUCT", index: 0)),
+            Edge(source: .output("DATAB", index: 0), target: .input("PRODUCT", index: 1)),
         ],
         shouldConnectNode: { _, edges, connection in
         return !edges.contains(where: { $0.target == connection.startAddress || $0.target == connection.endAddress })
@@ -51,12 +59,18 @@ struct FlowCanvasView: View {
             VStack(alignment: .leading, spacing: portSpacing) {
                 ForEach(node.inputs) { port in
                     HStack(alignment: .center, spacing: 8) {
-                        TextField("0", text: $graph[node.id][.input(port.id)].text)
-                            .multilineTextAlignment(.trailing)
-                            .padding(EdgeInsets(top: 2, leading: 6, bottom: 2, trailing: 6))
-                            .frame(maxWidth: 100)
-                            .background(Color(.systemGray3))
-                            .cornerRadius(8)
+                        if case .bool(let value) = port.data {
+//                            Toggle(isOn: $graph[node.id][.input(port.id)].boolValue) {
+//
+//                            }
+                        } else {
+                            TextField("0", text: $graph[node.id][.input(port.id)].text)
+                                .multilineTextAlignment(.trailing)
+                                .padding(EdgeInsets(top: 2, leading: 6, bottom: 2, trailing: 6))
+                                .frame(maxWidth: 100)
+                                .background(Color(.systemGray3))
+                                .cornerRadius(8)
+                        }
                         Text(port.title ?? "")
                             .lineLimit(1)
                             .frame(maxWidth: 100, alignment: .leading)
@@ -127,6 +141,9 @@ struct FlowCanvasView: View {
                                         }
                                     }
                                     .frame(height: portHeight)
+                                    .onTapGesture {
+                                        print(graph.data(for: port.address))
+                                    }
                                 }
                             }
                             Spacer()

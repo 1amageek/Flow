@@ -76,6 +76,14 @@ public struct Interface {
     public static func float(_ value: Float? = nil, title: String? = nil) -> Interface { Interface(.float(value), title: title) }
 
     public static func string(_ value: String? = nil, title: String? = nil) -> Interface { Interface(.string(value), title: title) }
+
+    public static func boolArray(_ value: [Bool] = [], title: String? = nil) -> Interface { Interface(.boolArray(value), title: title) }
+
+    public static func intArray(_ value: [Int] = [], title: String? = nil) -> Interface { Interface(.intArray(value), title: title) }
+
+    public static func floatArray(_ value: [Float] = [], title: String? = nil) -> Interface { Interface(.floatArray(value), title: title) }
+
+    public static func stringArray(_ value: [String] = [], title: String? = nil) -> Interface { Interface(.stringArray(value), title: title) }
 }
 
 extension Port {
@@ -101,6 +109,7 @@ extension Port {
                     self.data = .float(value)
                 case .string(_):
                     return self.data = .string(newValue)
+                default: fatalError()
             }
         }
     }

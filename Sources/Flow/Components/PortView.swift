@@ -182,7 +182,7 @@ struct JackModifier: ViewModifier {
     }
 
     var gesture: some Gesture {
-        DragGesture(minimumDistance: 0, coordinateSpace: .named(canvasCoordinateSpace))
+        DragGesture(minimumDistance: 0.2, coordinateSpace: .named(canvasCoordinateSpace))
             .onChanged { value in onConnectingHandler(value) }
             .onEnded { value in
                 onConnectedHandler(value)
