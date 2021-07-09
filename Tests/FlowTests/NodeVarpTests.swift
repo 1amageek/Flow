@@ -4,7 +4,7 @@ import XCTest
 final class NodeVarpTests: XCTestCase {
 
     func testNodeVarpBool() throws {
-        let n0 = Node.varp(portData: .bool(), id: "", title: "")
+        let n0 = Node.varp(portData: .bool(), id: "", name: "")
         do {
             let output = n0([.bool(false), .bool(false)])
             XCTAssertNil(output.first!.boolValue)
@@ -12,7 +12,7 @@ final class NodeVarpTests: XCTestCase {
     }
 
     func testNodeVarpInt() throws {
-        let n0 = Node.varp(portData: .int(), id: "", title: "")
+        let n0 = Node.varp(portData: .int(), id: "", name: "")
         do {
             let output = n0([.int(0), .int(0)])
             XCTAssertEqual(output.first!.intValue!, 0)
@@ -36,7 +36,7 @@ final class NodeVarpTests: XCTestCase {
     }
 
     func testNodeVarpFloat() throws {
-        let n0 = Node.varp(portData: .float(), id: "", title: "")
+        let n0 = Node.varp(portData: .float(), id: "", name: "")
         do {
             let output = n0([.float(0), .float(0)])
             XCTAssertEqual(output.first!.floatValue!, 0)
@@ -60,7 +60,7 @@ final class NodeVarpTests: XCTestCase {
     }
 
     func testNodeVarpString() throws {
-        let n0 = Node.varp(portData: .string(), id: "", title: "")
+        let n0 = Node.varp(portData: .string(), id: "", name: "")
         do {
             let output = n0([.string("a"), .string("b")])
             XCTAssertNil(output.first!.stringValue)
@@ -72,13 +72,13 @@ final class NodeVarpTests: XCTestCase {
     }
 
     func testNodeVarpBoolArray() throws {
-        let n0 = Node.varp(portData: .boolArray(), id: "", title: "")
+        let n0 = Node.varp(portData: .boolArray(), id: "", name: "")
         let output = n0([.boolArray([false]), .boolArray([false])])
         XCTAssertNil(output.first!.boolArrayValue)
     }
 
     func testNodeVarpIntArray() throws {
-        let n0 = Node.varp(portData: .intArray(), id: "", title: "")
+        let n0 = Node.varp(portData: .intArray(), id: "", name: "")
         do {
             let output = n0([.intArray([0]), .intArray([0])])
             XCTAssertEqual(output.first!.intArrayValue!, [0])
@@ -106,7 +106,7 @@ final class NodeVarpTests: XCTestCase {
     }
 
     func testNodeVarpFloatArray() throws {
-        let n0 = Node.varp(portData: .floatArray(), id: "", title: "")
+        let n0 = Node.varp(portData: .floatArray(), id: "", name: "")
         do {
             let output = n0([.floatArray([0]), .floatArray([0])])
             XCTAssertEqual(output.first!.floatArrayValue!, [0])
@@ -134,7 +134,7 @@ final class NodeVarpTests: XCTestCase {
     }
 
     func testNodeVarpStringArray() throws {
-        let n0 = Node.varp(portData: .stringArray(), id: "", title: "")
+        let n0 = Node.varp(portData: .stringArray(), id: "", name: "")
         do {
             let output = n0([.stringArray(["a"]), .stringArray(["b"])])
             XCTAssertNil(output.first!.stringArrayValue)

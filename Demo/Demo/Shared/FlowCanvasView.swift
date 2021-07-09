@@ -12,15 +12,15 @@ struct FlowCanvasView: View {
 
     @ObservedObject public var graph: Graph = Graph(
         nodes: [
-            .input(id: "R", title: "R", inputs: [.float(title: "R")], position: CGPoint(x: 200, y: 200)),
-            .input(id: "G", title: "G", inputs: [.float(title: "B")], position: CGPoint(x: 200, y: 400)),
-            .input(id: "B", title: "B", inputs: [.float(title: "B")], position: CGPoint(x: 200, y: 600)),
-            .sum(portData: .float(0), id: "SUM", title: "SUM", inputs: [.float(), .float(), .float()], position: CGPoint(x: 400, y: 400)),
-            .output(id: "OUT", title: "OUT", outputs: [.float()], position: CGPoint(x: 650, y: 400)),
+            .input(id: "R", name: "R", inputs: [.float(name: "R")], position: CGPoint(x: 200, y: 200)),
+            .input(id: "G", name: "G", inputs: [.float(name: "B")], position: CGPoint(x: 200, y: 400)),
+            .input(id: "B", name: "B", inputs: [.float(name: "B")], position: CGPoint(x: 200, y: 600)),
+            .sum(portData: .float(0), id: "SUM", name: "SUM", inputs: [.float(), .float(), .float()], position: CGPoint(x: 400, y: 400)),
+            .output(id: "OUT", name: "OUT", outputs: [.float()], position: CGPoint(x: 650, y: 400)),
 
-            .input(id: "DATAA", title: "DATA A", inputs: [.floatArray([1, 2, 3, 4], title: "R")], position: CGPoint(x: 200, y: 900)),
-            .input(id: "DATAB", title: "DATA B", inputs: [.floatArray([1, 2, 3, 4], title: "R")], position: CGPoint(x: 200, y: 1100)),
-            .product(portData: .floatArray(), id: "PRODUCT", title: "PRODUCT", inputs: [.floatArray(), .floatArray()], position: CGPoint(x: 400, y: 1000)),
+            .input(id: "DATAA", name: "DATA A", inputs: [.floatArray([1, 2, 3, 4], name: "R")], position: CGPoint(x: 200, y: 900)),
+            .input(id: "DATAB", name: "DATA B", inputs: [.floatArray([1, 2, 3, 4], name: "R")], position: CGPoint(x: 200, y: 1100)),
+            .product(portData: .floatArray(), id: "PRODUCT", name: "PRODUCT", inputs: [.floatArray(), .floatArray()], position: CGPoint(x: 400, y: 1000)),
 
         ],
         edges: [
@@ -71,7 +71,7 @@ struct FlowCanvasView: View {
                                 .background(Color(.systemGray3))
                                 .cornerRadius(8)
                         }
-                        Text(port.title ?? "")
+                        Text(port.name ?? "")
                             .lineLimit(1)
                             .frame(maxWidth: 100, alignment: .leading)
                     }
@@ -104,7 +104,7 @@ struct FlowCanvasView: View {
                         if let data = graph.data(for: port.address) {
                             dataText(data.text, alignment: .leading)
                         }
-                        Text(port.title ?? "")
+                        Text(port.name ?? "")
                             .lineLimit(1)
                             .frame(maxWidth: 100, alignment: .leading)
                     }
@@ -120,7 +120,7 @@ struct FlowCanvasView: View {
         CanvasView(graph, nodeView: { node in
             NodeView(node) { inputs, outputs in
                 VStack(spacing: 0) {
-                    Text(node.title ?? "")
+                    Text(node.name ?? "")
                         .bold()
                         .padding(8)
                     Divider()
@@ -135,7 +135,7 @@ struct FlowCanvasView: View {
                                     HStack(alignment: .center, spacing: 8) {
                                         portCircle
                                             .port(port.address)
-                                        Text(port.title ?? "")
+                                        Text(port.name ?? "")
                                         if let data = graph.data(for: port.address) {
                                             dataText(data.text, alignment: .leading)
                                         }
@@ -150,7 +150,7 @@ struct FlowCanvasView: View {
                             VStack(alignment: .trailing, spacing: portSpacing) {
                                 ForEach(outputs) { port in
                                     HStack(alignment: .center, spacing: 8) {
-                                        Text(port.title ?? "")
+                                        Text(port.name ?? "")
                                         if let data = graph.data(for: port.address) {
                                             dataText(data.text, alignment: .trailing)
                                         }
@@ -184,7 +184,7 @@ struct FlowCanvasView: View {
         .background(Color(.secondarySystemGroupedBackground))
         .ignoresSafeArea()
         .onTapGesture(count: 2) {
-            graph.add(.sum(portData: .float(), id: UUID().uuidString, title: "SUM", inputs: [.float(), .float()]))
+            graph.add(.sum(portData: .float(), id: UUID().uuidString, name: "SUM", inputs: [.float(), .float()]))
         }
     }
 }

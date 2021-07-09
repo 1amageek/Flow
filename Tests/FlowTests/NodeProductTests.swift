@@ -4,7 +4,7 @@ import XCTest
 final class NodeProductTests: XCTestCase {
 
     func testNodeProductBool() throws {
-        let n0 = Node.product(portData: .bool(), id: "", title: "")
+        let n0 = Node.product(portData: .bool(), id: "", name: "")
         do {
             let output = n0([.bool(false), .bool(false)])
             XCTAssertFalse(output.first!.boolValue!)
@@ -44,7 +44,7 @@ final class NodeProductTests: XCTestCase {
     }
 
     func testNodeProductInt() throws {
-        let n0 = Node.product(portData: .int(), id: "", title: "")
+        let n0 = Node.product(portData: .int(), id: "", name: "")
         do {
             let output = n0([.int(0), .int(0)])
             XCTAssertEqual(output.first!.intValue!, 0)
@@ -72,7 +72,7 @@ final class NodeProductTests: XCTestCase {
     }
 
     func testNodeProductFloat() throws {
-        let n0 = Node.product(portData: .float(), id: "", title: "")
+        let n0 = Node.product(portData: .float(), id: "", name: "")
         do {
             let output = n0([.float(0), .float(0)])
             XCTAssertEqual(output.first!.floatValue!, 0)
@@ -100,7 +100,7 @@ final class NodeProductTests: XCTestCase {
     }
 
     func testNodeProductString() throws {
-        let n0 = Node.product(portData: .string(), id: "", title: "")
+        let n0 = Node.product(portData: .string(), id: "", name: "")
         do {
             let output = n0([.string("a"), .string("b")])
             XCTAssertNil(output.first!.stringValue)
@@ -112,7 +112,7 @@ final class NodeProductTests: XCTestCase {
     }
 
     func testNodeProductBoolArray() throws {
-        let n0 = Node.product(portData: .boolArray(), id: "", title: "")
+        let n0 = Node.product(portData: .boolArray(), id: "", name: "")
         do {
             let output = n0([.boolArray([false]), .boolArray([false])])
             XCTAssertEqual(output.first!.boolArrayValue!, [false])
@@ -152,7 +152,7 @@ final class NodeProductTests: XCTestCase {
     }
 
     func testNodeProductIntArray() throws {
-        let n0 = Node.product(portData: .intArray(), id: "", title: "")
+        let n0 = Node.product(portData: .intArray(), id: "", name: "")
         do {
             let output = n0([.intArray([0]), .intArray([0])])
             XCTAssertEqual(output.first!.intArrayValue!, [0])
@@ -176,7 +176,7 @@ final class NodeProductTests: XCTestCase {
     }
 
     func testNodeProductFloatArray() throws {
-        let n0 = Node.product(portData: .floatArray(), id: "", title: "")
+        let n0 = Node.product(portData: .floatArray(), id: "", name: "")
         do {
             let output = n0([.floatArray([0]), .floatArray([0])])
             XCTAssertEqual(output.first!.intArrayValue!, [0])
@@ -200,7 +200,7 @@ final class NodeProductTests: XCTestCase {
     }
 
     func testNodeProductStringArray() throws {
-        let n0 = Node.product(portData: .stringArray(), id: "", title: "")
+        let n0 = Node.product(portData: .stringArray(), id: "", name: "")
         do {
             let output = n0([.stringArray(["a"]), .stringArray(["b"])])
             XCTAssertNil(output.first!.stringArrayValue)

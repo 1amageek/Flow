@@ -15,11 +15,11 @@ extension Node {
         _ type: String? = nil,
         portData: PortData,
         id: String,
-        title: String,
+        name: String,
         inputs: [Interface] = [],
         position: CGPoint = .zero
     ) -> Node {
-        Node(type: .io(type), id: id, title: title, inputs: inputs, outputs: [Interface(portData)], position: position) { input in
+        Node(type: .io(type), id: id, name: name, inputs: inputs, outputs: [Interface(portData)], position: position) { input in
             switch portData {
                 case .bool(_):
                     let result = input.compactMap({ $0.boolValue }).reduce(false) { $0 || $1 }
@@ -73,11 +73,11 @@ extension Node {
         _ type: String? = nil,
         portData: PortData,
         id: String,
-        title: String,
+        name: String,
         inputs: [Interface] = [],
         position: CGPoint = .zero
     ) -> Node {
-        Node(type: .io(type), id: id, title: title, inputs: inputs, outputs: [Interface(portData)], position: position) { input in
+        Node(type: .io(type), id: id, name: name, inputs: inputs, outputs: [Interface(portData)], position: position) { input in
             switch portData {
                 case .bool(_):
                     let result = input.compactMap({ $0.boolValue }).reduce(true) { $0 && $1 }
@@ -123,11 +123,11 @@ extension Node {
         _ type: String? = nil,
         portData: PortData,
         id: String,
-        title: String,
+        name: String,
         inputs: [Interface] = [],
         position: CGPoint = .zero
     ) -> Node {
-        Node(type: .io(type), id: id, title: title, inputs: inputs, outputs: [Interface(portData)], position: position) { input in
+        Node(type: .io(type), id: id, name: name, inputs: inputs, outputs: [Interface(portData)], position: position) { input in
             switch portData {
                 case .bool(_):
                     return [.bool(.failure(.convertError))]
@@ -173,11 +173,11 @@ extension Node {
         _ type: String? = nil,
         portData: PortData,
         id: String,
-        title: String,
+        name: String,
         inputs: [Interface] = [],
         position: CGPoint = .zero
     ) -> Node {
-        Node(type: .io(type), id: id, title: title, inputs: inputs, outputs: [Interface(portData)], position: position) { input in
+        Node(type: .io(type), id: id, name: name, inputs: inputs, outputs: [Interface(portData)], position: position) { input in
             switch portData {
                 case .bool(_):
                     return [.bool(.failure(.convertError))]

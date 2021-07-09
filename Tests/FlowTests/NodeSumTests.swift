@@ -4,7 +4,7 @@ import XCTest
 final class NodeSumTests: XCTestCase {
     
     func testNodeSumBool() throws {
-        let n0 = Node.sum(portData: .bool(), id: "", title: "")
+        let n0 = Node.sum(portData: .bool(), id: "", name: "")
         do {
             let output = n0([.bool(false), .bool(false)])
             XCTAssertFalse(output.first!.boolValue!)
@@ -40,7 +40,7 @@ final class NodeSumTests: XCTestCase {
     }
 
     func testNodeSumInt() throws {
-        let n0 = Node.sum(portData: .int(), id: "", title: "")
+        let n0 = Node.sum(portData: .int(), id: "", name: "")
         do {
             let output = n0([.int(0), .int(0)])
             XCTAssertEqual(output.first!.intValue!, 0)
@@ -64,7 +64,7 @@ final class NodeSumTests: XCTestCase {
     }
 
     func testNodeSumFloat() throws {
-        let n0 = Node.sum(portData: .float(), id: "", title: "")
+        let n0 = Node.sum(portData: .float(), id: "", name: "")
         do {
             let output = n0([.float(0), .float(0)])
             XCTAssertEqual(output.first!.floatValue!, 0)
@@ -88,7 +88,7 @@ final class NodeSumTests: XCTestCase {
     }
 
     func testNodeSumString() throws {
-        let n0 = Node.sum(portData: .string(), id: "", title: "")
+        let n0 = Node.sum(portData: .string(), id: "", name: "")
         do {
             let output = n0([.string("a"), .string("b")])
             XCTAssertEqual(output.first!.stringValue!, "ab")
@@ -100,7 +100,7 @@ final class NodeSumTests: XCTestCase {
     }
 
     func testNodeSumBoolArray() throws {
-        let n0 = Node.sum(portData: .boolArray(), id: "", title: "")
+        let n0 = Node.sum(portData: .boolArray(), id: "", name: "")
         do {
             let output = n0([.boolArray([false]), .boolArray([false])])
             XCTAssertEqual(output.first!.boolArrayValue!, [false])
@@ -153,7 +153,7 @@ final class NodeSumTests: XCTestCase {
     }
 
     func testNodeSumIntArray() throws {
-        let n0 = Node.sum(portData: .intArray(), id: "", title: "")
+        let n0 = Node.sum(portData: .intArray(), id: "", name: "")
         do {
             let output = n0([.intArray([0]), .intArray([0])])
             XCTAssertEqual(output.first!.intArrayValue!, [0])
@@ -181,7 +181,7 @@ final class NodeSumTests: XCTestCase {
     }
 
     func testNodeSumFloatArray() throws {
-        let n0 = Node.sum(portData: .floatArray(), id: "", title: "")
+        let n0 = Node.sum(portData: .floatArray(), id: "", name: "")
         do {
             let output = n0([.floatArray([0]), .floatArray([0])])
             XCTAssertEqual(output.first!.floatArrayValue!, [0])
@@ -209,7 +209,7 @@ final class NodeSumTests: XCTestCase {
     }
 
     func testNodeSumStringArray() throws {
-        let n0 = Node.sum(portData: .stringArray(), id: "", title: "")
+        let n0 = Node.sum(portData: .stringArray(), id: "", name: "")
         do {
             let output = n0([.stringArray(["a"]), .stringArray(["b"])])
             XCTAssertEqual(output.first!.stringArrayValue!, ["ab"])

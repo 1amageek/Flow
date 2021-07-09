@@ -31,7 +31,7 @@ public struct Node: GeometryProperties, Identifiable {
 
     public var id: String
 
-    public var title: String?
+    public var name: String = ""
 
     public var position: CGPoint = .zero
 
@@ -48,7 +48,7 @@ public struct Node: GeometryProperties, Identifiable {
     public init(
         type: NodeType = .io(),
         id: String,
-        title: String?,
+        name: String = "",
         inputs: [Interface] = [],
         outputs: [Interface] = [],
         position: CGPoint = .zero,
@@ -56,10 +56,10 @@ public struct Node: GeometryProperties, Identifiable {
     ) {
         self.type = type
         self.id = id
-        self.title = title
+        self.name = name
         self.position = position
-        self.inputs = inputs.enumerated().map { .input(id: $0, data: $1.data, title: $1.title, node: self) }
-        self.outputs = outputs.enumerated().map { .output(id: $0, data: $1.data, title: $1.title, node: self) }
+        self.inputs = inputs.enumerated().map { .input(id: $0, data: $1.data, name: $1.name, node: self) }
+        self.outputs = outputs.enumerated().map { .output(id: $0, data: $1.data, name: $1.name, node: self) }
         self.execution = execution
     }
 
@@ -91,32 +91,32 @@ extension Node {
     public static func input(
         _ type: String? = nil,
         id: String,
-        title: String,
+        name: String,
         inputs: [Interface] = [],
         position: CGPoint = .zero
     ) -> Node {
-        Node(type: .input(type), id: id, title: title, inputs: inputs, outputs: inputs, position: position)
+        Node(type: .input(type), id: id, name: name, inputs: inputs, outputs: inputs, position: position)
     }
 
     public static func output(
         _ type: String? = nil,
         id: String,
-        title: String,
+        name: String,
         outputs: [Interface] = [],
         position: CGPoint = .zero
     ) -> Node {
-        Node(type: .output(type), id: id, title: title, inputs: outputs, outputs: outputs, position: position)
+        Node(type: .output(type), id: id, name: name, inputs: outputs, outputs: outputs, position: position)
     }
 
     public static func io(
         _ type: String? = nil,
         id: String,
-        title: String,
+        name: String,
         inputs: [Interface] = [],
         outputs: [Interface] = [],
         position: CGPoint = .zero
     ) -> Node {
-        Node(type: .io(type), id: id, title: title, inputs: inputs, outputs: outputs, position: position)
+        Node(type: .io(type), id: id, name: name, inputs: inputs, outputs: outputs, position: position)
     }
 }
 
@@ -125,7 +125,7 @@ extension Node {
     var debugDescription: String {
 """
     id: \(id)
-    title: \(title ?? "")
+    name: \(name)
     position: \(position)
     offset: \(offset)
     frame: \(frame)

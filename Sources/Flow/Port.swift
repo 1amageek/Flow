@@ -23,7 +23,7 @@ public struct Port: Identifiable, GeometryProperties {
 
     public var data: PortData
 
-    public var title: String?
+    public var name: String?
 
     public var position: CGPoint = .zero
 
@@ -31,20 +31,20 @@ public struct Port: Identifiable, GeometryProperties {
 
     public var size: CGSize = .zero
 
-    init(type: PortType, id: Int, data: PortData, title: String? = nil, node: Node) {
+    init(type: PortType, id: Int, data: PortData, name: String? = nil, node: Node) {
         self.type = type
         self.id = id
         self.data = data
-        self.title = title
+        self.name = name
         self.node = node
     }
 
-    static func input(id: Int, data: PortData, title: String? = nil, node: Node) -> Port {
-        Port(type: .input, id: id, data: data, title: title, node: node)
+    static func input(id: Int, data: PortData, name: String? = nil, node: Node) -> Port {
+        Port(type: .input, id: id, data: data, name: name, node: node)
     }
 
-    static func output(id: Int, data: PortData, title: String? = nil, node: Node) -> Port {
-        Port(type: .output, id: id, data: data, title: title, node: node)
+    static func output(id: Int, data: PortData, name: String? = nil, node: Node) -> Port {
+        Port(type: .output, id: id, data: data, name: name, node: node)
     }
 }
 
@@ -60,30 +60,30 @@ extension Port {
 
 public struct Interface {
 
-    public var title: String?
+    public var name: String?
 
     public var data: PortData
 
-    public init(_ data: PortData, title: String? = nil) {
+    public init(_ data: PortData, name: String? = nil) {
         self.data = data
-        self.title = title
+        self.name = name
     }
 
-    public static func bool(_ value: Bool? = nil, title: String? = nil) -> Interface { Interface(.bool(value), title: title) }
+    public static func bool(_ value: Bool? = nil, name: String? = nil) -> Interface { Interface(.bool(value), name: name) }
 
-    public static func int(_ value: Int? = nil, title: String? = nil) -> Interface { Interface(.int(value), title: title) }
+    public static func int(_ value: Int? = nil, name: String? = nil) -> Interface { Interface(.int(value), name: name) }
 
-    public static func float(_ value: Float? = nil, title: String? = nil) -> Interface { Interface(.float(value), title: title) }
+    public static func float(_ value: Float? = nil, name: String? = nil) -> Interface { Interface(.float(value), name: name) }
 
-    public static func string(_ value: String? = nil, title: String? = nil) -> Interface { Interface(.string(value), title: title) }
+    public static func string(_ value: String? = nil, name: String? = nil) -> Interface { Interface(.string(value), name: name) }
 
-    public static func boolArray(_ value: [Bool] = [], title: String? = nil) -> Interface { Interface(.boolArray(value), title: title) }
+    public static func boolArray(_ value: [Bool] = [], name: String? = nil) -> Interface { Interface(.boolArray(value), name: name) }
 
-    public static func intArray(_ value: [Int] = [], title: String? = nil) -> Interface { Interface(.intArray(value), title: title) }
+    public static func intArray(_ value: [Int] = [], name: String? = nil) -> Interface { Interface(.intArray(value), name: name) }
 
-    public static func floatArray(_ value: [Float] = [], title: String? = nil) -> Interface { Interface(.floatArray(value), title: title) }
+    public static func floatArray(_ value: [Float] = [], name: String? = nil) -> Interface { Interface(.floatArray(value), name: name) }
 
-    public static func stringArray(_ value: [String] = [], title: String? = nil) -> Interface { Interface(.stringArray(value), title: title) }
+    public static func stringArray(_ value: [String] = [], name: String? = nil) -> Interface { Interface(.stringArray(value), name: name) }
 }
 
 extension Port {
