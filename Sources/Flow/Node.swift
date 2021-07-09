@@ -9,9 +9,9 @@ import Foundation
 import CoreGraphics
 
 public enum NodeType {
-    case input
-    case output
-    case io
+    case input(_ type: String? = nil)
+    case output(_ type: String? = nil)
+    case io(_ type: String? = nil)
 }
 
 public enum NodeError: Error {
@@ -27,7 +27,7 @@ public struct Node: GeometryProperties, Identifiable {
 
     public typealias Execution = (Input) -> Output
 
-    public var type: NodeType = .io
+    public var type: NodeType = .io()
 
     public var id: String
 
@@ -46,7 +46,7 @@ public struct Node: GeometryProperties, Identifiable {
     public var execution: Execution = { input in input }
 
     public init(
-        type: NodeType = .io,
+        type: NodeType = .io(),
         id: String,
         title: String?,
         inputs: [Interface] = [],
@@ -89,31 +89,34 @@ extension Node {
 extension Node {
 
     public static func input(
+        _ type: String? = nil,
         id: String,
         title: String,
         inputs: [Interface] = [],
         position: CGPoint = .zero
     ) -> Node {
-        Node(type: .input, id: id, title: title, inputs: inputs, outputs: inputs, position: position)
+        Node(type: .input(type), id: id, title: title, inputs: inputs, outputs: inputs, position: position)
     }
 
     public static func output(
+        _ type: String? = nil,
         id: String,
         title: String,
         outputs: [Interface] = [],
         position: CGPoint = .zero
     ) -> Node {
-        Node(type: .output, id: id, title: title, inputs: outputs, outputs: outputs, position: position)
+        Node(type: .output(type), id: id, title: title, inputs: outputs, outputs: outputs, position: position)
     }
 
     public static func io(
+        _ type: String? = nil,
         id: String,
         title: String,
         inputs: [Interface] = [],
         outputs: [Interface] = [],
         position: CGPoint = .zero
     ) -> Node {
-        Node(type: .io, id: id, title: title, inputs: inputs, outputs: outputs, position: position)
+        Node(type: .io(type), id: id, title: title, inputs: inputs, outputs: outputs, position: position)
     }
 }
 

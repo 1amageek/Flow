@@ -147,9 +147,23 @@ extension Graph {
 /// Processing required to compute data for a node
 extension Graph {
 
-    var inputNodes: [Node] { nodes.filter { $0.type == .input } }
+    var inputNodes: [Node] {
+        nodes.filter { node in
+            if case .input(_) = node.type {
+                return true
+            }
+            return false
+        }
+    }
 
-    var ouputNodes: [Node] { nodes.filter { $0.type == .output } }
+    var ouputNodes: [Node] {
+        nodes.filter { node in
+            if case .output(_) = node.type {
+                return true
+            }
+            return false
+        }
+    }
 
     func connectedSourceNodes(node: Node, inputPort: Port) -> [Node] {
         let connectedEdge = self.edges.filter { $0.target ==  inputPort.address }

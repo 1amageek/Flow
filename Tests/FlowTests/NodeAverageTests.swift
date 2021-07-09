@@ -4,7 +4,7 @@ import XCTest
 final class NodeAverageTests: XCTestCase {
 
     func testNodeAverageBool() throws {
-        let n0 = Node.average(type: .bool(), id: "", title: "")
+        let n0 = Node.average(portData: .bool(), id: "", title: "")
         do {
             let output = n0([.bool(false), .bool(false)])
             XCTAssertNil(output.first!.boolValue)
@@ -12,7 +12,7 @@ final class NodeAverageTests: XCTestCase {
     }
 
     func testNodeAverageInt() throws {
-        let n0 = Node.average(type: .int(), id: "", title: "")
+        let n0 = Node.average(portData: .int(), id: "", title: "")
         do {
             let output = n0([.int(0), .int(0)])
             XCTAssertEqual(output.first!.intValue!, 0)
@@ -40,7 +40,7 @@ final class NodeAverageTests: XCTestCase {
     }
 
     func testNodeAverageFloat() throws {
-        let n0 = Node.average(type: .float(), id: "", title: "")
+        let n0 = Node.average(portData: .float(), id: "", title: "")
         do {
             let output = n0([.float(0), .float(0)])
             XCTAssertEqual(output.first!.floatValue!, 0)
@@ -68,7 +68,7 @@ final class NodeAverageTests: XCTestCase {
     }
 
     func testNodeAverageString() throws {
-        let n0 = Node.average(type: .string(), id: "", title: "")
+        let n0 = Node.average(portData: .string(), id: "", title: "")
         do {
             let output = n0([.string("a"), .string("b")])
             XCTAssertNil(output.first!.stringValue)
@@ -80,13 +80,13 @@ final class NodeAverageTests: XCTestCase {
     }
 
     func testNodeAverageBoolArray() throws {
-        let n0 = Node.average(type: .boolArray(), id: "", title: "")
+        let n0 = Node.average(portData: .boolArray(), id: "", title: "")
         let output = n0([.bool(false), .bool(false)])
         XCTAssertNil(output.first!.boolValue)
     }
 
     func testNodeAverageIntArray() throws {
-        let n0 = Node.average(type: .intArray(), id: "", title: "")
+        let n0 = Node.average(portData: .intArray(), id: "", title: "")
         do {
             let output = n0([.intArray([0]), .intArray([0])])
             XCTAssertEqual(output.first!.intArrayValue!, [0])
@@ -110,7 +110,7 @@ final class NodeAverageTests: XCTestCase {
     }
 
     func testNodeAverageFloatArray() throws {
-        let n0 = Node.average(type: .floatArray(), id: "", title: "")
+        let n0 = Node.average(portData: .floatArray(), id: "", title: "")
         do {
             let output = n0([.floatArray([0]), .floatArray([0])])
             XCTAssertEqual(output.first!.floatArrayValue!, [0])
@@ -134,7 +134,7 @@ final class NodeAverageTests: XCTestCase {
     }
 
     func testNodeAverageStringArray() throws {
-        let n0 = Node.average(type: .stringArray(), id: "", title: "")
+        let n0 = Node.average(portData: .stringArray(), id: "", title: "")
         do {
             let output = n0([.stringArray(["a"]), .stringArray(["b"])])
             XCTAssertNil(output.first!.stringArrayValue)

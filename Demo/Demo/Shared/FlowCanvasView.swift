@@ -15,12 +15,12 @@ struct FlowCanvasView: View {
             .input(id: "R", title: "R", inputs: [.float(title: "R")], position: CGPoint(x: 200, y: 200)),
             .input(id: "G", title: "G", inputs: [.float(title: "B")], position: CGPoint(x: 200, y: 400)),
             .input(id: "B", title: "B", inputs: [.float(title: "B")], position: CGPoint(x: 200, y: 600)),
-            .sum(type: .float(0), id: "SUM", title: "SUM", inputs: [.float(), .float(), .float()], position: CGPoint(x: 400, y: 400)),
+            .sum(portData: .float(0), id: "SUM", title: "SUM", inputs: [.float(), .float(), .float()], position: CGPoint(x: 400, y: 400)),
             .output(id: "OUT", title: "OUT", outputs: [.float()], position: CGPoint(x: 650, y: 400)),
 
             .input(id: "DATAA", title: "DATA A", inputs: [.floatArray([1, 2, 3, 4], title: "R")], position: CGPoint(x: 200, y: 900)),
             .input(id: "DATAB", title: "DATA B", inputs: [.floatArray([1, 2, 3, 4], title: "R")], position: CGPoint(x: 200, y: 1100)),
-            .product(type: .floatArray(), id: "PRODUCT", title: "PRODUCT", inputs: [.floatArray(), .floatArray()], position: CGPoint(x: 400, y: 1000)),
+            .product(portData: .floatArray(), id: "PRODUCT", title: "PRODUCT", inputs: [.floatArray(), .floatArray()], position: CGPoint(x: 400, y: 1000)),
 
         ],
         edges: [
@@ -124,9 +124,9 @@ struct FlowCanvasView: View {
                         .bold()
                         .padding(8)
                     Divider()
-                    if node.type == .input {
+                    if case .input(_) = node.type {
                         inputNode(node: node)
-                    } else if node.type == .output {
+                    } else if case .output(_) = node.type {
                         outputNode(node: node)
                     } else {
                         HStack(spacing: 0) {
@@ -184,7 +184,7 @@ struct FlowCanvasView: View {
         .background(Color(.secondarySystemGroupedBackground))
         .ignoresSafeArea()
         .onTapGesture(count: 2) {
-            graph.add(.sum(type: .float(), id: UUID().uuidString, title: "SUM", inputs: [.float(), .float()]))
+            graph.add(.sum(portData: .float(), id: UUID().uuidString, title: "SUM", inputs: [.float(), .float()]))
         }
     }
 }

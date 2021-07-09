@@ -12,14 +12,15 @@ import Accelerate
 extension Node {
 
     public static func sum(
-        type: PortData,
+        _ type: String? = nil,
+        portData: PortData,
         id: String,
         title: String,
         inputs: [Interface] = [],
         position: CGPoint = .zero
     ) -> Node {
-        Node(type: .io, id: id, title: title, inputs: inputs, outputs: [Interface(type)], position: position) { input in
-            switch type {
+        Node(type: .io(type), id: id, title: title, inputs: inputs, outputs: [Interface(portData)], position: position) { input in
+            switch portData {
                 case .bool(_):
                     let result = input.compactMap({ $0.boolValue }).reduce(false) { $0 || $1 }
                     return [.bool(result)]
@@ -69,14 +70,15 @@ extension Node {
     }
 
     public static func product(
-        type: PortData,
+        _ type: String? = nil,
+        portData: PortData,
         id: String,
         title: String,
         inputs: [Interface] = [],
         position: CGPoint = .zero
     ) -> Node {
-        Node(type: .io, id: id, title: title, inputs: inputs, outputs: [Interface(type)], position: position) { input in
-            switch type {
+        Node(type: .io(type), id: id, title: title, inputs: inputs, outputs: [Interface(portData)], position: position) { input in
+            switch portData {
                 case .bool(_):
                     let result = input.compactMap({ $0.boolValue }).reduce(true) { $0 && $1 }
                     return [.bool(result)]
@@ -118,14 +120,15 @@ extension Node {
     }
 
     public static func average(
-        type: PortData,
+        _ type: String? = nil,
+        portData: PortData,
         id: String,
         title: String,
         inputs: [Interface] = [],
         position: CGPoint = .zero
     ) -> Node {
-        Node(type: .io, id: id, title: title, inputs: inputs, outputs: [Interface(type)], position: position) { input in
-            switch type {
+        Node(type: .io(type), id: id, title: title, inputs: inputs, outputs: [Interface(portData)], position: position) { input in
+            switch portData {
                 case .bool(_):
                     return [.bool(.failure(.convertError))]
                 case .int(_):
@@ -167,14 +170,15 @@ extension Node {
     }
 
     public static func varp(
-        type: PortData,
+        _ type: String? = nil,
+        portData: PortData,
         id: String,
         title: String,
         inputs: [Interface] = [],
         position: CGPoint = .zero
     ) -> Node {
-        Node(type: .io, id: id, title: title, inputs: inputs, outputs: [Interface(type)], position: position) { input in
-            switch type {
+        Node(type: .io(type), id: id, title: title, inputs: inputs, outputs: [Interface(portData)], position: position) { input in
+            switch portData {
                 case .bool(_):
                     return [.bool(.failure(.convertError))]
                 case .int(_):
