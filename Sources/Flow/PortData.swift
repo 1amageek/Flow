@@ -27,6 +27,16 @@ public enum PortData {
     case floatArray(FloatArray?)
     case stringArray(StringArray?)
 
+    public var isArray: Bool {
+        switch self {
+            case .boolArray(_): return true
+            case .intArray(_): return true
+            case .floatArray(_): return true
+            case .stringArray(_): return true
+            default: return false
+        }
+    }
+
     public static func bool(_ value: Bool? = nil, error: NodeError? = nil) -> Self {
         if let error = error { return .bool(.failure(error)) }
         return .bool(.success(value))
