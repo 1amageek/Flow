@@ -7,44 +7,6 @@
 
 import Foundation
 
-//extension Result: Codable {
-//
-//    enum CodingKeys: CodingKey {
-//        case success
-//        case failure
-//    }
-//
-//    public func encode(to encoder: Encoder) throws {
-//        var container = encoder.container(keyedBy: CodingKeys.self)
-//        switch self {
-//            case .success(let type):
-//                try container.encode(type, forKey: .success)
-//            case .failure(let type):
-//                try container.encode(type, forKey: .failure)
-//        }
-//    }
-//
-//    public init(from decoder: Decoder) throws {
-//        let container = try decoder.container(keyedBy: CodingKeys.self)
-//        let key = container.allKeys.first
-//        switch key {
-//            case .success:
-//                let type = try container.decode(String?.self, forKey: .success)
-//                self = .success(type)
-//            case .failure:
-//                let type = try container.decode(String?.self, forKey: .failure)
-//                self = .failure(type)
-//            default:
-//                throw DecodingError.dataCorrupted(
-//                    DecodingError.Context(
-//                        codingPath: container.codingPath,
-//                        debugDescription: "Unabled to decode enum."
-//                    )
-//                )
-//        }
-//    }
-//}
-
 extension PortData: Codable {
 
     enum CodingKeys: CodingKey {
