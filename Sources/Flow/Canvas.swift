@@ -8,10 +8,10 @@
 import Foundation
 import CoreGraphics
 
-struct Canvas {
+struct Canvas: Codable {
 
     var position: CGPoint = .zero
 
     var offset: CGSize = .zero
-
+    
 }

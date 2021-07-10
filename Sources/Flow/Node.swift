@@ -8,6 +8,11 @@
 import Foundation
 import CoreGraphics
 
+/// NodeType defines the identifier of the function that Node is responsible for in addition to input, output, and io.
+/// type: {
+///     kind: "io" | "output" | "input",
+///     id: String
+/// }
 public enum NodeType {
     case input(_ type: String? = nil)
     case output(_ type: String? = nil)
@@ -58,8 +63,8 @@ public struct Node: GeometryProperties, Identifiable {
         self.id = id
         self.name = name
         self.position = position
-        self.inputs = inputs.enumerated().map { .input(id: $0, data: $1.data, name: $1.name, node: self) }
-        self.outputs = outputs.enumerated().map { .output(id: $0, data: $1.data, name: $1.name, node: self) }
+        self.inputs = inputs.enumerated().map { .input(id: $0, data: $1.data, name: $1.name, nodeID: self.id) }
+        self.outputs = outputs.enumerated().map { .output(id: $0, data: $1.data, name: $1.name, nodeID: self.id) }
         self.execution = execution
     }
 

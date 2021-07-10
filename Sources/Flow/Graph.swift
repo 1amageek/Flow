@@ -41,7 +41,7 @@ public class Graph: ObservableObject {
     public init(
         nodes: [Node] = [],
         edges: [Edge] = [],
-        shouldConnectNode: @escaping (_ nodes: [Node], _ edges: [Edge], _ connection: Connection) -> Bool = { _, _, _ in true}
+        shouldConnectNode: @escaping (_ nodes: [Node], _ edges: [Edge], _ connection: Connection) -> Bool = { _, _, _ in true }
     ) {
         self._nodes = Published(initialValue: nodes)
         self._edges = Published(initialValue: edges)
@@ -74,6 +74,11 @@ public class Graph: ObservableObject {
 
     public func delete(_ node: Node) {
         self.nodes[node.id] = nil
+    }
+
+    public func dump() throws -> Data {
+        let snapshot: Snapshot = Snapshot(nodes: nodes, edges: edges)
+        return try JSONEncoder().encode(snapshot)
     }
 }
 
@@ -214,4 +219,50 @@ extension Graph {
             }
         }
     }
+}
+
+extension Graph {
+    
+    public struct Snapshot: Codable {
+
+        public var nodes: [Node]
+
+        public var edges: [Edge]
+
+        public init(nodes: [Node] = [], edges: [Edge] = []) {
+            self.nodes = nodes
+            self.edges = edges
+        }
+    }
+}
+
+extension Graph.Snapshot: CustomDebugStringConvertible {
+
+    public var debugDescription: String {
+
+        func portDescription(_ ports: [Port]) -> String {
+            return ports.map({ port in
+                return "[\(port.type), id: \(port.id), data: \(port.data.text), name: \(port.name ?? ""), position: \(port.position)]"
+            }).joined(separator: "\n   ")
+        }
+
+        let nodesDescription: String = nodes.map { node in
+            return "[\(node.type), id: \(node.id), name: \(node.name), position: \(node.position)]\n   \(portDescription(node.inputs))\n   \(portDescription(node.outputs)) "
+        }.joined(separator: "\n")
+
+        let edgesDescription: String = edges.map { edge in
+            return "[\(edge.id), target: \(edge.target), source: \(edge.source)]"
+        }.joined(separator: "\n")
+
+        return
+"""
+**
+Graph Snapshot (Nodes count: \(nodes.count) Edges count: \(edges.count))
+NODES
+\(nodesDescription)
+EDGES
+\(edgesDescription)
+"""
+    }
+
 }

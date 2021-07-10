@@ -8,14 +8,14 @@
 import Foundation
 import CoreGraphics
 
-public enum PortType {
+public enum PortType: String, Codable {
     case input
     case output
 }
 
 public struct Port: Identifiable, GeometryProperties {
 
-    public var node: Node
+    public var nodeID: Node.ID
 
     public var type: PortType
 
@@ -31,20 +31,20 @@ public struct Port: Identifiable, GeometryProperties {
 
     public var size: CGSize = .zero
 
-    init(type: PortType, id: Int, data: PortData, name: String? = nil, node: Node) {
+    init(type: PortType, id: Int, data: PortData, name: String? = nil, nodeID: Node.ID) {
         self.type = type
         self.id = id
         self.data = data
         self.name = name
-        self.node = node
+        self.nodeID = nodeID
     }
 
-    static func input(id: Int, data: PortData, name: String? = nil, node: Node) -> Port {
-        Port(type: .input, id: id, data: data, name: name, node: node)
+    static func input(id: Int, data: PortData, name: String? = nil, nodeID: Node.ID) -> Port {
+        Port(type: .input, id: id, data: data, name: name, nodeID: nodeID)
     }
 
-    static func output(id: Int, data: PortData, name: String? = nil, node: Node) -> Port {
-        Port(type: .output, id: id, data: data, name: name, node: node)
+    static func output(id: Int, data: PortData, name: String? = nil, nodeID: Node.ID) -> Port {
+        Port(type: .output, id: id, data: data, name: name, nodeID: nodeID)
     }
 }
 
@@ -52,8 +52,8 @@ extension Port {
 
     public var address: Address {
         switch type {
-            case .input: return .input(node.id, index: id)
-            case .output: return .output(node.id, index: id)
+            case .input: return .input(nodeID, index: id)
+            case .output: return .output(nodeID, index: id)
         }
     }
 }
