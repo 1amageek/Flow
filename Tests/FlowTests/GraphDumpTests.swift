@@ -15,7 +15,6 @@ final class GraphDumpTests: XCTestCase {
                 .input(id: "DATAA", name: "DATA A", inputs: [.floatArray([1, 2, 3, 4], name: "R")], position: CGPoint(x: 200, y: 900)),
                 .input(id: "DATAB", name: "DATA B", inputs: [.floatArray([1, 2, 3, 4], name: "R")], position: CGPoint(x: 200, y: 1100)),
                 .product(portData: .floatArray(), id: "PRODUCT", name: "PRODUCT", inputs: [.floatArray(), .floatArray()], position: CGPoint(x: 400, y: 1000)),
-
             ],
             edges: [
                 Edge(source: .output("R", index: 0), target: .input("SUM", index: 0)),

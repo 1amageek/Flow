@@ -31,10 +31,7 @@ struct FlowCanvasView: View {
 
             Edge(source: .output("DATAA", index: 0), target: .input("PRODUCT", index: 0)),
             Edge(source: .output("DATAB", index: 0), target: .input("PRODUCT", index: 1)),
-        ],
-        shouldConnectNode: { _, edges, connection in
-        return !edges.contains(where: { $0.target == connection.startAddress || $0.target == connection.endAddress })
-    })
+        ])
 
     let portSpacing: CGFloat = 24
 
@@ -141,9 +138,6 @@ struct FlowCanvasView: View {
                                         }
                                     }
                                     .frame(height: portHeight)
-                                    .onTapGesture {
-                                        print(graph.data(for: port.address))
-                                    }
                                 }
                             }
                             Spacer()
@@ -180,12 +174,14 @@ struct FlowCanvasView: View {
         }, connectionView: { connection in
             EdgeShape(start: connection.start, end: connection.end)
                 .stroke(connection.isConnecting ? Color(.systemGreen) : Color(.systemBlue), lineWidth: 2)
+        }, shouldConnectNode: { _, edges, connection in
+            return !edges.contains(where: { $0.target == connection.startAddress || $0.target == connection.endAddress })
         })
-        .background(Color(.secondarySystemGroupedBackground))
-        .ignoresSafeArea()
-        .onTapGesture(count: 2) {
-            graph.add(.sum(portData: .float(), id: UUID().uuidString, name: "SUM", inputs: [.float(), .float()]))
-        }
+            .background(Color(.secondarySystemGroupedBackground))
+            .ignoresSafeArea()
+            .onTapGesture(count: 2) {
+                graph.add(.sum(portData: .float(), id: UUID().uuidString, name: "SUM", inputs: [.float(), .float()]))
+            }
     }
 }
 

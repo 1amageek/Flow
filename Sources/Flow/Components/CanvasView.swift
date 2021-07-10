@@ -32,12 +32,14 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
     public init(_ graph: Graph,
                 @ViewBuilder nodeView: @escaping (_ node: Node) -> NodeContent,
                 @ViewBuilder edgeView: @escaping (_ edge: Edge) -> EdgeContent,
-                @ViewBuilder connectionView: @escaping (_ connection: Connection) -> ConnectionContent
+                @ViewBuilder connectionView: @escaping (_ connection: Connection) -> ConnectionContent,
+                shouldConnectNode: @escaping (_ nodes: [Node], _ edges: [Edge], _ connection: Connection) -> Bool = { _, _, _ in true }
     ) {
         self.graph = graph
         self.nodeView = nodeView
         self.edgeView = edgeView
         self.connectionView = connectionView
+        self.graph.shouldConnectNodeHandler = shouldConnectNode
     }
 
     var gesture: some Gesture {

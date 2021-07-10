@@ -57,11 +57,7 @@ public struct NodeView<Content: View>: View {
             .position(position)
             .offset(offset)
             .gesture(gesture)
-            .onTapGesture {
-                context.focusNode = context.nodes[id]
-
-                print(context.data(for: .output(id, index: 0)))
-            }
+            .onTapGesture { context.focusNode = context.nodes[id] }
     }
 }
 

@@ -19,7 +19,7 @@ public class Graph: ObservableObject {
 
     @Published public var connecting: Connection?
 
-    private var shouldConnectNodeHandler: (_ nodes: [Node], _ edges: [Edge], _ connection: Connection) -> Bool
+    var shouldConnectNodeHandler: ((_ nodes: [Node], _ edges: [Edge], _ connection: Connection) -> Bool)!
 
     public subscript(nodeID: String) -> Node {
         get {
@@ -40,13 +40,18 @@ public class Graph: ObservableObject {
 
     public init(
         nodes: [Node] = [],
-        edges: [Edge] = [],
-        shouldConnectNode: @escaping (_ nodes: [Node], _ edges: [Edge], _ connection: Connection) -> Bool = { _, _, _ in true }
+        edges: [Edge] = []
     ) {
         self._nodes = Published(initialValue: nodes)
         self._edges = Published(initialValue: edges)
-        self.shouldConnectNodeHandler = shouldConnectNode
     }
+
+    public class func from(data: Data) throws -> Graph {
+        let snapshot = try JSONDecoder().decode(Graph.Snapshot.self, from: data)
+        return self.from(snapshot: snapshot)
+    }
+
+    public class func from(snapshot: Snapshot) -> Graph { Graph(nodes: snapshot.nodes, edges: snapshot.edges) }
 
     /// Get the calculation results for a port at an arbitrary address.
     /// - Parameter address: Address of the port you want to get.
