@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum PortData {
+public enum PortData: Hashable {
 
     public typealias BoolValue = Result<Bool?, NodeError>
     public typealias IntValue = Result<Int?, NodeError>

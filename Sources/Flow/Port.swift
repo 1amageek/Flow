@@ -13,7 +13,16 @@ public enum PortType: String, Codable {
     case output
 }
 
-public struct Port: Identifiable, GeometryProperties {
+public struct Port: Identifiable, Hashable, GeometryProperties {
+
+    public static func == (lhs: Port, rhs: Port) -> Bool { lhs.hashValue == rhs.hashValue }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(nodeID)
+        hasher.combine(type)
+        hasher.combine(id)
+        hasher.combine(data)
+    }
 
     public var nodeID: Node.ID
 

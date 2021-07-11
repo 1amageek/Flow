@@ -19,6 +19,8 @@ public class Graph: ObservableObject {
 
     @Published public var connecting: Connection?
 
+    let dataStore: DataStore = DataStore()
+
     var shouldConnectNodeHandler: ((_ nodes: [Node], _ edges: [Edge], _ connection: Connection) -> Bool)!
 
     public subscript(nodeID: String) -> Node {
@@ -200,14 +202,22 @@ extension Graph {
                     let data = self.data(for: address)
                     return data
                 }
-                let portData = node(input)
-                let data = portData[port.id]
+                if let cache = self.dataStore[input] {
+                    return cache[port.id]
+                }
+                let output = node(input)
+                self.dataStore[input] = output
+                let data = output[port.id]
                 return data
             }
             case (.input, .input): return port.data
             case (.input, .output): do {
-                let input = node.inputs
-                let output = node(input.map { $0.data })
+                let input = node.inputs.map { $0.data }
+                if let cache = self.dataStore[input] {
+                    return cache[port.id]
+                }
+                let output = node(input)
+                self.dataStore[input] = output
                 let data = output[port.id]
                 return data
             }
@@ -217,8 +227,12 @@ extension Graph {
                 }
                 return data(for: address)
             case (.output, .output): do {
-                let input = node.inputs
-                let output = node(input.map { $0.data })
+                let input = node.inputs.map { $0.data }
+                if let cache = self.dataStore[input] {
+                    return cache[port.id]
+                }
+                let output = node(input)
+                self.dataStore[input] = output
                 let data = output[port.id]
                 return data
             }
