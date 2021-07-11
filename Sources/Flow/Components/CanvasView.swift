@@ -29,6 +29,10 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
 
     var offset: CGSize { graph.canvas.offset }
 
+    var scale: CGFloat { graph.canvas.sacle  }
+
+    @State var initialScale: CGFloat = 1
+
     public init(_ graph: Graph,
                 @ViewBuilder nodeView: @escaping (_ node: Node) -> NodeContent,
                 @ViewBuilder edgeView: @escaping (_ edge: Edge) -> EdgeContent,
@@ -39,10 +43,12 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
         self.nodeView = nodeView
         self.edgeView = edgeView
         self.connectionView = connectionView
-        self.graph.shouldConnectNodeHandler = shouldConnectNode
+        if self.graph.shouldConnectNodeHandler == nil {
+            self.graph.shouldConnectNodeHandler = shouldConnectNode
+        }
     }
 
-    var gesture: some Gesture {
+    var dragGesture: some Gesture {
         DragGesture(minimumDistance: 0.15)
             .onChanged { value in
                 graph.canvas.offset = value.translation
@@ -54,6 +60,16 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
                     x: position.x + value.translation.width,
                     y: position.y + value.translation.height
                 )
+            }
+    }
+
+    var magnificationGesture: some Gesture {
+        MagnificationGesture()
+            .onChanged { value in
+                graph.canvas.sacle = initialScale * value
+            }
+            .onEnded { value in
+                initialScale = initialScale * value
             }
     }
 
@@ -79,9 +95,11 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
             .coordinateSpace(name: CanvasCoordinateSpace.defaultValue)
             .position(position)
             .offset(offset)
+            .scaleEffect(scale)
         }
         .contentShape(Rectangle())
-        .gesture(gesture)
+        .gesture(SimultaneousGesture(dragGesture, magnificationGesture))
         .environmentObject(graph)
     }
 }
+

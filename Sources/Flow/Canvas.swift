@@ -10,6 +10,8 @@ import CoreGraphics
 
 struct Canvas: Codable {
 
+    var sacle: CGFloat = 1
+
     var position: CGPoint = .zero
 
     var offset: CGSize = .zero
