@@ -36,33 +36,45 @@ extension Node {
                 case .boolArray(_):
                     let values: [[Bool]] = input.compactMap({ $0.boolArrayValue })
                     if let first = values.first {
-                        let result = values.reduce(Array(repeating: false, count: first.count), { prev, current in
-                            return zip(prev, current).map { $0 || $1 }
-                        })
-                        return [.boolArray(result)]
+                        if values.count > 1 {
+                            let result = values.reduce(Array(repeating: false, count: first.count), { prev, current in
+                                return zip(prev, current).map { $0 || $1 }
+                            })
+                            return [.boolArray(result)]
+                        }
+                        return [.boolArray(first)]
                     }
                     return [.boolArray([])]
                 case .intArray(_):
                     let values: [[Float]] = input.compactMap({ $0.floatArrayValue })
                     if let first = values.first {
-                        let result = values.reduce(Array(repeating: 0, count: first.count), { vDSP.add($0, $1) }).map({ Int($0) })
-                        return [.intArray(result)]
+                        if values.count > 1 {
+                            let result = values.reduce(Array(repeating: 0, count: first.count), { vDSP.add($0, $1) }).map({ Int($0) })
+                            return [.intArray(result)]
+                        }
+                        return [.intArray(first.map({ Int($0) }))]
                     }
                     return [.intArray([])]
                 case .floatArray(_):
                     let values: [[Float]] = input.compactMap({ $0.floatArrayValue })
                     if let first = values.first {
-                        let result = values.reduce(Array(repeating: 0, count: first.count), { vDSP.add($0, $1) })
-                        return [.floatArray(result)]
+                        if values.count > 1 {
+                            let result = values.reduce(Array(repeating: 0, count: first.count), { vDSP.add($0, $1) })
+                            return [.floatArray(result)]
+                        }
+                        return [.floatArray(first)]
                     }
                     return [.floatArray([])]
                 case .stringArray(_):
                     let values: [[String]] = input.compactMap({ $0.stringArrayValue })
                     if let first = values.first {
-                        let result = values.reduce(Array(repeating: "", count: first.count), { prev, current in
-                            return zip(prev, current).map { $0 + $1 }
-                        })
-                        return [.stringArray(result)]
+                        if values.count > 1 {
+                            let result = values.reduce(Array(repeating: "", count: first.count), { prev, current in
+                                return zip(prev, current).map { $0 + $1 }
+                            })
+                            return [.stringArray(result)]
+                        }
+                        return [.stringArray(first)]
                     }
                     return [.stringArray([])]
             }
@@ -93,24 +105,33 @@ extension Node {
                 case .boolArray(_):
                     let values: [[Bool]] = input.compactMap({ $0.boolArrayValue })
                     if let first = values.first {
-                        let result = values.reduce(Array(repeating: true, count: first.count), { prev, current in
-                            return zip(prev, current).map { $0 && $1 }
-                        })
-                        return [.boolArray(result)]
+                        if values.count > 1 {
+                            let result = values.reduce(Array(repeating: true, count: first.count), { prev, current in
+                                return zip(prev, current).map { $0 && $1 }
+                            })
+                            return [.boolArray(result)]
+                        }
+                        return [.boolArray(first)]
                     }
                     return [.boolArray([])]
                 case .intArray(_):
                     let values: [[Float]] = input.compactMap({ $0.floatArrayValue })
                     if let first = values.first {
-                        let result = values.reduce(Array(repeating: 1, count: first.count), { vDSP.multiply($0, $1) }).map({ Int($0) })
-                        return [.intArray(result)]
+                        if values.count > 1 {
+                            let result = values.reduce(Array(repeating: 1, count: first.count), { vDSP.multiply($0, $1) }).map({ Int($0) })
+                            return [.intArray(result)]
+                        }
+                        return [.intArray(first.map({ Int($0) }))]
                     }
                     return [.intArray([])]
                 case .floatArray(_):
                     let values: [[Float]] = input.compactMap({ $0.floatArrayValue })
                     if let first = values.first {
-                        let result = values.reduce(Array(repeating: 1, count: first.count), { vDSP.multiply($0, $1) })
-                        return [.floatArray(result)]
+                        if values.count > 1 {
+                            let result = values.reduce(Array(repeating: 1, count: first.count), { vDSP.multiply($0, $1) })
+                            return [.floatArray(result)]
+                        }
+                        return [.floatArray(first)]
                     }
                     return [.floatArray([])]
                 case .stringArray(_):
@@ -149,18 +170,24 @@ extension Node {
                     let values: [[Float]] = input.compactMap({ $0.floatArrayValue })
                     if values.count == 0 { return [.intArray(.failure(.mathematicalError))] }
                     if let first = values.first {
-                        let totalValues = values.reduce(Array(repeating: 0, count: first.count), { vDSP.add($0, $1) })
-                        let result = vDSP.divide(totalValues, Float(values.count)).map({ Int($0) })
-                        return [.intArray(result)]
+                        if values.count > 1 {
+                            let totalValues = values.reduce(Array(repeating: 0, count: first.count), { vDSP.add($0, $1) })
+                            let result = vDSP.divide(totalValues, Float(values.count)).map({ Int($0) })
+                            return [.intArray(result)]
+                        }
+                        return [.intArray(first.map({ Int($0) }))]
                     }
                     return [.intArray([])]
                 case .floatArray(_):
                     let values: [[Float]] = input.compactMap({ $0.floatArrayValue })
                     if values.count == 0 { return [.floatArray(.failure(.mathematicalError))] }
                     if let first = values.first {
-                        let totalValues = values.reduce(Array(repeating: 0, count: first.count), { vDSP.add($0, $1) })
-                        let result = vDSP.divide(totalValues, Float(values.count))
-                        return [.floatArray(result)]
+                        if values.count > 1 {
+                            let totalValues = values.reduce(Array(repeating: 0, count: first.count), { vDSP.add($0, $1) })
+                            let result = vDSP.divide(totalValues, Float(values.count))
+                            return [.floatArray(result)]
+                        }
+                        return [.floatArray(first)]
                     }
                     return [.floatArray([])]
                 case .stringArray(_):
@@ -201,28 +228,34 @@ extension Node {
                     let values: [[Float]] = input.compactMap({ $0.floatArrayValue })
                     if values.count == 0 { return [.intArray(.failure(.mathematicalError))] }
                     if let first = values.first {
-                        let totalValues = values.reduce(Array(repeating: 0, count: first.count), { vDSP.add($0, $1) })
-                        let squereValues = values.map({ vDSP.multiply($0, $0) })
-                        let squereTotalValues = squereValues.reduce(Array(repeating: 0, count: first.count), { vDSP.add($0, $1) })
-                        let squereAvarageValues = vDSP.divide(squereTotalValues, Float(values.count))
-                        let averageValues = vDSP.divide(totalValues, Float(values.count))
-                        let averageSquereValues = vDSP.multiply(averageValues, averageValues)
-                        let result = vDSP.subtract(squereAvarageValues, averageSquereValues).map({ Int($0) })
-                        return [.intArray(result)]
+                        if values.count > 1 {
+                            let totalValues = values.reduce(Array(repeating: 0, count: first.count), { vDSP.add($0, $1) })
+                            let squereValues = values.map({ vDSP.multiply($0, $0) })
+                            let squereTotalValues = squereValues.reduce(Array(repeating: 0, count: first.count), { vDSP.add($0, $1) })
+                            let squereAvarageValues = vDSP.divide(squereTotalValues, Float(values.count))
+                            let averageValues = vDSP.divide(totalValues, Float(values.count))
+                            let averageSquereValues = vDSP.multiply(averageValues, averageValues)
+                            let result = vDSP.subtract(squereAvarageValues, averageSquereValues).map({ Int($0) })
+                            return [.intArray(result)]
+                        }
+                        return [.intArray(Array(repeating: 0, count: first.count))]
                     }
                     return [.intArray([])]
                 case .floatArray(_):
                     let values: [[Float]] = input.compactMap({ $0.floatArrayValue })
                     if values.count == 0 { return [.floatArray(.failure(.mathematicalError))] }
                     if let first = values.first {
-                        let totalValues = values.reduce(Array(repeating: 0, count: first.count), { vDSP.add($0, $1) })
-                        let squereValues = values.map({ vDSP.multiply($0, $0) })
-                        let squereTotalValues = squereValues.reduce(Array(repeating: 0, count: first.count), { vDSP.add($0, $1) })
-                        let squereAvarageValues = vDSP.divide(squereTotalValues, Float(values.count))
-                        let averageValues = vDSP.divide(totalValues, Float(values.count))
-                        let averageSquereValues = vDSP.multiply(averageValues, averageValues)
-                        let result = vDSP.subtract(squereAvarageValues, averageSquereValues)
-                        return [.floatArray(result)]
+                        if values.count > 1 {
+                            let totalValues = values.reduce(Array(repeating: 0, count: first.count), { vDSP.add($0, $1) })
+                            let squereValues = values.map({ vDSP.multiply($0, $0) })
+                            let squereTotalValues = squereValues.reduce(Array(repeating: 0, count: first.count), { vDSP.add($0, $1) })
+                            let squereAvarageValues = vDSP.divide(squereTotalValues, Float(values.count))
+                            let averageValues = vDSP.divide(totalValues, Float(values.count))
+                            let averageSquereValues = vDSP.multiply(averageValues, averageValues)
+                            let result = vDSP.subtract(squereAvarageValues, averageSquereValues)
+                            return [.floatArray(result)]
+                        }
+                        return [.floatArray(Array(repeating: 0, count: first.count))]
                     }
                     return [.floatArray([])]
                 case .stringArray(_):

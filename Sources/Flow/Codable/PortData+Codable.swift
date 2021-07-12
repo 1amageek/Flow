@@ -67,16 +67,16 @@ extension PortData: Codable {
                 let value = try container.decode(String?.self, forKey: .string)
                 self = .string(value)
             case .boolArray:
-                let value = try container.decode([Bool].self, forKey: .boolArray)
+                let value = try container.decode([Bool]?.self, forKey: .boolArray)
                 self = .boolArray(value)
             case .intArray:
-                let value = try container.decode([Int].self, forKey: .intArray)
+                let value = try container.decode([Int]?.self, forKey: .intArray)
                 self = .intArray(value)
             case .floatArray:
-                let value = try container.decode([Float].self, forKey: .floatArray)
+                let value = try container.decode([Float]?.self, forKey: .floatArray)
                 self = .floatArray(value)
             case .stringArray:
-                let value = try container.decode([String].self, forKey: .stringArray)
+                let value = try container.decode([String]?.self, forKey: .stringArray)
                 self = .stringArray(value)
             default:
                 throw DecodingError.dataCorrupted(

@@ -13,10 +13,10 @@ public enum PortData: Hashable {
     public typealias IntValue = Result<Int?, NodeError>
     public typealias FloatValue = Result<Float?, NodeError>
     public typealias StringValue = Result<String?, NodeError>
-    public typealias BoolArray = Result<[Bool], NodeError>
-    public typealias IntArray = Result<[Int], NodeError>
-    public typealias FloatArray = Result<[Float], NodeError>
-    public typealias StringArray = Result<[String], NodeError>
+    public typealias BoolArray = Result<[Bool]?, NodeError>
+    public typealias IntArray = Result<[Int]?, NodeError>
+    public typealias FloatArray = Result<[Float]?, NodeError>
+    public typealias StringArray = Result<[String]?, NodeError>
 
     case bool(BoolValue?)
     case int(IntValue?)
@@ -57,22 +57,22 @@ public enum PortData: Hashable {
         return .string(.success(value))
     }
 
-    public static func boolArray(_ value: [Bool] = [], error: NodeError? = nil) -> Self {
+    public static func boolArray(_ value: [Bool]? = nil, error: NodeError? = nil) -> Self {
         if let error = error { return .boolArray(.failure(error)) }
         return .boolArray(.success(value))
     }
 
-    public static func intArray(_ value: [Int] = [], error: NodeError? = nil) -> Self {
+    public static func intArray(_ value: [Int]? = nil, error: NodeError? = nil) -> Self {
         if let error = error { return .intArray(.failure(error)) }
         return .intArray(.success(value))
     }
 
-    public static func floatArray(_ value: [Float] = [], error: NodeError? = nil) -> Self {
+    public static func floatArray(_ value: [Float]? = nil, error: NodeError? = nil) -> Self {
         if let error = error { return .floatArray(.failure(error)) }
         return .floatArray(.success(value))
     }
 
-    public static func stringArray(_ value: [String] = [], error: NodeError? = nil) -> Self {
+    public static func stringArray(_ value: [String]? = nil, error: NodeError? = nil) -> Self {
         if let error = error { return .stringArray(.failure(error)) }
         return .stringArray(.success(value))
     }

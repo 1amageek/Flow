@@ -86,13 +86,13 @@ public struct Interface {
 
     public static func string(_ value: String? = nil, name: String? = nil) -> Interface { Interface(.string(value), name: name) }
 
-    public static func boolArray(_ value: [Bool] = [], name: String? = nil) -> Interface { Interface(.boolArray(value), name: name) }
+    public static func boolArray(_ value: [Bool]? = nil, name: String? = nil) -> Interface { Interface(.boolArray(value), name: name) }
 
-    public static func intArray(_ value: [Int] = [], name: String? = nil) -> Interface { Interface(.intArray(value), name: name) }
+    public static func intArray(_ value: [Int]? = nil, name: String? = nil) -> Interface { Interface(.intArray(value), name: name) }
 
-    public static func floatArray(_ value: [Float] = [], name: String? = nil) -> Interface { Interface(.floatArray(value), name: name) }
+    public static func floatArray(_ value: [Float]? = nil, name: String? = nil) -> Interface { Interface(.floatArray(value), name: name) }
 
-    public static func stringArray(_ value: [String] = [], name: String? = nil) -> Interface { Interface(.stringArray(value), name: name) }
+    public static func stringArray(_ value: [String]? = nil, name: String? = nil) -> Interface { Interface(.stringArray(value), name: name) }
 }
 
 extension Port {

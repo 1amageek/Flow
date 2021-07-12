@@ -24,10 +24,7 @@ final class GraphDumpTests: XCTestCase {
 
                 Edge(source: .output("DATAA", index: 0), target: .input("PRODUCT", index: 0)),
                 Edge(source: .output("DATAB", index: 0), target: .input("PRODUCT", index: 1)),
-            ],
-            shouldConnectNode: { _, edges, connection in
-            return !edges.contains(where: { $0.target == connection.startAddress || $0.target == connection.endAddress })
-        })
+            ])
 
         let data = try! graph.dump()
         let snapshot = try! JSONDecoder().decode(Graph.Snapshot.self, from: data)
