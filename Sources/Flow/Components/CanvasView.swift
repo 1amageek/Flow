@@ -17,6 +17,18 @@ extension EnvironmentValues {
 
 public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent: View>: View {
 
+    enum DragState {
+        case none
+        case dragging(CGSize)
+
+        var translaction: CGSize {
+            switch self {
+                case .none: return .zero
+                case .dragging(let value): return value
+            }
+        }
+    }
+
     var context: Context
 
     var nodeView: (_ node: Node) -> NodeContent
@@ -25,13 +37,18 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
 
     var connectionView: (_ connection: Connection) -> ConnectionContent
 
-    var position: CGPoint { context.canvas.position  }
-
-    var offset: CGSize { context.canvas.offset }
+    var offset: CGSize {
+        CGSize(
+            width: context.canvas.offset.width + dragState.translaction.width,
+            height: context.canvas.offset.height + dragState.translaction.height
+        )
+    }
 
     var scale: CGFloat { context.canvas.sacle  }
 
     @State var initialScale: CGFloat = 1
+
+    @State var dragState: DragState = .none
 
     public init(_ context: Context,
                 @ViewBuilder nodeView: @escaping (_ node: Node) -> NodeContent,
@@ -51,14 +68,13 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
     var dragGesture: some Gesture {
         DragGesture(minimumDistance: 0.15)
             .onChanged { value in
-                context.canvas.offset = value.translation
+                dragState = .dragging(value.translation)
             }
             .onEnded { value in
-                let position = context.canvas.position
-                context.canvas.offset = .zero
-                context.canvas.position = CGPoint(
-                    x: position.x + value.translation.width,
-                    y: position.y + value.translation.height
+                dragState = .none
+                context.canvas.offset = CGSize(
+                    width: context.canvas.offset.width + value.translation.width,
+                    height: context.canvas.offset.height + value.translation.height
                 )
             }
     }
@@ -86,20 +102,23 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
                     connectionView(connnection)
                 }
             }
-            .background(GeometryReader { proxy in
-                Rectangle()
-                    .fill(Color.clear)
-                    .onAppear { context.canvas.position = CGPoint(x: proxy.size.width / 2, y: proxy.size.height / 2) }
-                    .onChange(of: proxy.size ) { newValue in context.canvas.position = CGPoint(x: newValue.width / 2, y: newValue.height / 2) }
-            })
             .coordinateSpace(name: CanvasCoordinateSpace.defaultValue)
-            .position(position)
             .offset(offset)
             .scaleEffect(scale)
         }
         .contentShape(Rectangle())
         .gesture(SimultaneousGesture(dragGesture, magnificationGesture))
         .environmentObject(context)
+        .onDrop(of: [Node.draggableType], isTargeted: nil) { providers, location in
+            Node.fromItemProviders(providers) { nodes in
+                nodes.forEach { node in
+                    var node = node
+                    let position = CGPoint(x: location.x - context.canvas.offset.width, y: location.y - context.canvas.offset.height)
+                    context.graph.add(node.set(position))
+                }
+            }
+            return true
+        }
     }
 }
 

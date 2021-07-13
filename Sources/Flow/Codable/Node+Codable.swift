@@ -33,13 +33,13 @@ extension NodeType: Codable {
         let key = container.allKeys.first
         switch key {
             case .input:
-                let id = try container.decode(String.self, forKey: .input)
+                let id = try container.decode(Callable.ID.self, forKey: .input)
                 self = .input(id)
             case .output:
-                let id = try container.decode(String.self, forKey: .output)
+                let id = try container.decode(Callable.ID.self, forKey: .output)
                 self = .output(id)
             case .io:
-                let id = try container.decode(String.self, forKey: .io)
+                let id = try container.decode(Callable.ID.self, forKey: .io)
                 self = .io(id)
             default:
                 throw DecodingError.dataCorrupted(
@@ -55,6 +55,7 @@ extension NodeType: Codable {
 extension Node: Codable {
 
     enum CodingKeys: CodingKey {
+        case type
         case id
         case name
         case position
@@ -64,6 +65,7 @@ extension Node: Codable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(type, forKey: .type)
         try container.encode(id, forKey: .id)
         try container.encode(name, forKey: .name)
         try container.encode(position, forKey: .position)
@@ -73,6 +75,7 @@ extension Node: Codable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        type = try container.decode(NodeType.self, forKey: .type)
         id = try container.decode(String.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
         position = try container.decode(CGPoint.self, forKey: .position)

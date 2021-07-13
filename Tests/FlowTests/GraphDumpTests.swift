@@ -42,6 +42,8 @@ final class GraphDumpTests: XCTestCase {
         XCTAssertEqual(snapshot.graph.nodes[1].inputs[0].type, .input)
         XCTAssertEqual(snapshot.graph.nodes[2].inputs[0].type, .input)
 
+        XCTAssertEqual(snapshot.graph.nodes[3].type, .input("SUM"))
+
         XCTAssertEqual(snapshot.graph.edges[0].source.id, "R")
         XCTAssertEqual(snapshot.graph.edges[1].source.id, "G")
         XCTAssertEqual(snapshot.graph.edges[2].source.id, "B")

@@ -13,7 +13,7 @@ import CoreGraphics
 ///     kind: "io" | "output" | "input",
 ///     id: String
 /// }
-public enum NodeType {
+public enum NodeType: Hashable {
     case input(_ id: Callable.ID = Node.Function.bypass)
     case output(_ id: Callable.ID = Node.Function.bypass)
     case io(_ id: Callable.ID = Node.Function.bypass)
@@ -56,6 +56,11 @@ public struct Node: GeometryProperties, Identifiable {
         self.position = position
         self.inputs = inputs.enumerated().map { .input(id: $0, data: $1.data, name: $1.name, nodeID: self.id) }
         self.outputs = outputs.enumerated().map { .output(id: $0, data: $1.data, name: $1.name, nodeID: self.id) }
+    }
+
+    public mutating func set(_ position: CGPoint) -> Self {
+        self.position = position
+        return self
     }
 }
 

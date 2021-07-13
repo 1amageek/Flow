@@ -16,7 +16,7 @@ let graph: Graph = Graph(
         .sum(id: "SUM", name: "SUM", inputs: [.float(), .float(), .float()], outputType: .float(), position: CGPoint(x: 400, y: 400)),
         .output(id: "OUT", name: "OUT", outputs: [.float()], position: CGPoint(x: 650, y: 400)),
 
-        .input(id: "DATAA", name: "DATA A", inputs: [.floatArray([1, 2, 3, 4], name: "R")], position: CGPoint(x: 200, y: 900)),
+            .input(id: "DATAA", name: "DATA A", inputs: [.floatArray([1, 2, 3, 4], name: "R")], position: CGPoint(x: 200, y: 900)),
         .input(id: "DATAB", name: "DATA B", inputs: [.floatArray([1, 2, 3, 4], name: "R")], position: CGPoint(x: 200, y: 1100)),
         .product(id: "PRODUCT", name: "PRODUCT", inputs: [.floatArray(), .floatArray()], outputType: .float(), position: CGPoint(x: 400, y: 1000)),
 
@@ -59,9 +59,9 @@ struct FlowCanvasView: View {
                 ForEach(node.inputs) { port in
                     HStack(alignment: .center, spacing: 8) {
                         if case .bool(let value) = port.data {
-//                            Toggle(isOn: $graph[node.id][.input(port.id)].boolValue) {
-//
-//                            }
+                            //                            Toggle(isOn: $graph[node.id][.input(port.id)].boolValue) {
+                            //
+                            //                            }
                         } else {
                             TextField("0", text: $context.graph[node.id][.input(port.id)].text)
                                 .multilineTextAlignment(.trailing)
@@ -116,71 +116,93 @@ struct FlowCanvasView: View {
     }
 
     var body: some View {
-        CanvasView(context, nodeView: { node in
-            NodeView(node) { inputs, outputs in
-                VStack(spacing: 0) {
-                    Text(node.name)
-                        .bold()
-                        .padding(8)
-                    Divider()
-                    if case .input(_) = node.type {
-                        inputNode(node: node)
-                    } else if case .output(_) = node.type {
-                        outputNode(node: node)
-                    } else {
-                        HStack(spacing: 0) {
-                            VStack(alignment: .leading, spacing: portSpacing) {
-                                ForEach(inputs) { port in
-                                    HStack(alignment: .center, spacing: 8) {
-                                        portCircle
-                                            .port(port.address)
-                                        Text(port.name ?? "")
-                                        if let data = context.data(for: port.address) {
-                                            dataText(data.text, alignment: .leading)
+        ZStack {
+            CanvasView(context, nodeView: { node in
+                NodeView(node) { inputs, outputs in
+                    VStack(spacing: 0) {
+                        Text(node.name)
+                            .bold()
+                            .padding(8)
+                        Divider()
+                        if case .input(_) = node.type {
+                            inputNode(node: node)
+                        } else if case .output(_) = node.type {
+                            outputNode(node: node)
+                        } else {
+                            HStack(spacing: 0) {
+                                VStack(alignment: .leading, spacing: portSpacing) {
+                                    ForEach(inputs) { port in
+                                        HStack(alignment: .center, spacing: 8) {
+                                            portCircle
+                                                .port(port.address)
+                                            Text(port.name ?? "")
+                                            if let data = context.data(for: port.address) {
+                                                dataText(data.text, alignment: .leading)
+                                            }
                                         }
+                                        .frame(height: portHeight)
                                     }
-                                    .frame(height: portHeight)
+                                }
+                                Spacer()
+                                VStack(alignment: .trailing, spacing: portSpacing) {
+                                    ForEach(outputs) { port in
+                                        HStack(alignment: .center, spacing: 8) {
+                                            Text(port.name ?? "")
+                                            if let data = context.data(for: port.address) {
+                                                dataText(data.text, alignment: .trailing)
+                                            }
+                                            portCircle
+                                                .port(port.address)
+                                        }
+                                        .frame(height: portHeight)
+                                    }
                                 }
                             }
-                            Spacer()
-                            VStack(alignment: .trailing, spacing: portSpacing) {
-                                ForEach(outputs) { port in
-                                    HStack(alignment: .center, spacing: 8) {
-                                        Text(port.name ?? "")
-                                        if let data = context.data(for: port.address) {
-                                            dataText(data.text, alignment: .trailing)
-                                        }
-                                        portCircle
-                                            .port(port.address)
-                                    }
-                                    .frame(height: portHeight)
-                                }
-                            }
+                            .padding(8)
                         }
-                        .padding(8)
-                    }
 
+                    }
+                    .frame(width: 180)
+                    .background(Color(.systemGray4))
+                    .cornerRadius(8)
+                    .clipped()
+                    .shadow(radius: 8)
                 }
-                .frame(width: 180)
-                .background(Color(.systemGray4))
-                .cornerRadius(8)
-                .clipped()
-                .shadow(radius: 8)
+            }, edgeView: { edge in
+                if let start = context.position(with: edge.source),
+                   let end = context.position(with: edge.target) {
+                    EdgeShape(start: start, end: end)
+                        .stroke(Color(.systemGray), lineWidth: 2)
+                }
+            }, connectionView: { connection in
+                EdgeShape(start: connection.start, end: connection.end)
+                    .stroke(connection.isConnecting ? Color(.systemGreen) : Color(.systemBlue), lineWidth: 2)
+            }, shouldConnectNode: { _, edges, connection in
+                return !edges.contains(where: { $0.target == connection.startAddress || $0.target == connection.endAddress })
+            })
+                .background(Color(.secondarySystemGroupedBackground))
+                .ignoresSafeArea()
+
+            HStack {
+                Spacer()
+                VStack {
+                    List {
+                        Text("SUM")
+                            .onDrag {
+                                let node = Node.sum(id: UUID().uuidString, name: "+", inputs: [.float(), .float()], outputType: .float())
+                                return node.itemProvider
+                            }
+                        Text("PRODUCT")
+                            .onDrag {
+                                let node = Node.product(id: UUID().uuidString, name: "*", inputs: [.float(), .float()], outputType: .float())
+                                return node.itemProvider
+                            }
+                    }
+                    .frame(width: 160, height: 300)
+                    Spacer()
+                }
             }
-        }, edgeView: { edge in
-            if let start = context.position(with: edge.source),
-               let end = context.position(with: edge.target) {
-                EdgeShape(start: start, end: end)
-                    .stroke(Color(.systemGray), lineWidth: 2)
-            }
-        }, connectionView: { connection in
-            EdgeShape(start: connection.start, end: connection.end)
-                .stroke(connection.isConnecting ? Color(.systemGreen) : Color(.systemBlue), lineWidth: 2)
-        }, shouldConnectNode: { _, edges, connection in
-            return !edges.contains(where: { $0.target == connection.startAddress || $0.target == connection.endAddress })
-        })
-            .background(Color(.secondarySystemGroupedBackground))
-            .ignoresSafeArea()
+        }
     }
 }
 
