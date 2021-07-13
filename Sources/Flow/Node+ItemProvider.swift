@@ -27,7 +27,7 @@ extension Node {
         return provider
     }
 
-    static func fromItemProviders(_ itemProviders: [NSItemProvider], completion: @escaping ([Node]) -> Void) {
+    public static func fromItemProviders(_ itemProviders: [NSItemProvider], completion: @escaping ([Node]) -> Void) {
         let typeIdentifier = Self.draggableType.identifier
         let filteredProviders = itemProviders.filter {
             $0.hasItemConformingToTypeIdentifier(typeIdentifier)
