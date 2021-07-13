@@ -142,6 +142,34 @@ struct FlowCanvasView: View {
                                         }
                                         .frame(height: portHeight)
                                     }
+                                    HStack(spacing: 12) {
+                                        Button {
+                                            var node = node
+                                            let portCount = node.inputs.count
+                                            let inputs = (0...portCount).map({ _ in Interface(node.outputs.first!.data) })
+                                            context.graph[node.id] = node.setInputs(inputs)
+                                        } label: {
+                                            Image(systemName: "plus")
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fit)
+                                                .frame(width: 22, height: 22, alignment: .center)
+                                                .foregroundColor(Color(.systemGray))
+                                        }
+
+                                        Button {
+                                            var node = node
+                                            let portCount = node.inputs.count - 2
+                                            let inputs = (0...portCount).map({ _ in Interface(node.outputs.first!.data) })
+                                            context.graph[node.id] = node.setInputs(inputs)
+                                        } label: {
+                                            Image(systemName: "minus")
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fit)
+                                                .frame(width: 22, height: 22, alignment: .center)
+                                                .foregroundColor(Color(.systemGray))
+                                        }
+                                    }
+                                    .padding(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
                                 }
                                 Spacer()
                                 VStack(alignment: .trailing, spacing: portSpacing) {

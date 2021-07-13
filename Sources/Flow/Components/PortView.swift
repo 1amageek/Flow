@@ -28,27 +28,26 @@ public struct InputPortView<Content: View>: View {
         self.content = content
     }
 
+    func geometryDecide(proxy: GeometryProxy) {
+        if context.graph.nodes[id]?.inputs.exist(portIndex) ?? false {
+            let frame = proxy.frame(in: .named(id))
+            context.graph.nodes[id]?[.input(portIndex)].size = proxy.size
+            context.graph.nodes[id]?[.input(portIndex)].position = CGPoint(
+                x: frame.origin.x + proxy.size.width / 2,
+                y: frame.origin.y + proxy.size.height / 2
+            )
+        }
+    }
+
     public var body: some View {
         content()
             .background(GeometryReader { proxy in
                 Rectangle()
                     .fill(Color.clear)
-                    .onAppear {
-                        let frame = proxy.frame(in: .named(id))
-                        context.graph.nodes[id]?[.input(portIndex)].size = proxy.size
-                        context.graph.nodes[id]?[.input(portIndex)].position = CGPoint(
-                            x: frame.origin.x + proxy.size.width / 2,
-                            y: frame.origin.y + proxy.size.height / 2
-                        )
-                    }
-                    .onChange(of: proxy.frame(in: .named(id))) { newValue in
-                        let frame = proxy.frame(in: .named(id))
-                        context.graph.nodes[id]?[.input(portIndex)].size = proxy.size
-                        context.graph.nodes[id]?[.input(portIndex)].position = CGPoint(
-                            x: frame.origin.x + proxy.size.width / 2,
-                            y: frame.origin.y + proxy.size.height / 2
-                        )
-                    }
+                    .onAppear { geometryDecide(proxy: proxy) }
+                    .onChange(of: proxy.frame(in: .named(id))) { _ in geometryDecide(proxy: proxy) }
+                    .onChange(of: context.graph.nodes[id]?.inputs.count) { _ in geometryDecide(proxy: proxy) }
+                    .onChange(of: context.graph.nodes[id]?.outputs.count) { _ in geometryDecide(proxy: proxy) }
             })
             .modifier(JackModifier(id: id, portIndex: portIndex, onConnecting: { value in
                 if context.connecting != nil {
@@ -107,27 +106,26 @@ public struct OutputPortView<Content: View>: View {
         self.content = content
     }
 
+    func geometryDecide(proxy: GeometryProxy) {
+        if context.graph.nodes[id]?.outputs.exist(portIndex) ?? false {
+            let frame = proxy.frame(in: .named(id))
+            context.graph.nodes[id]?[.output(portIndex)].size = proxy.size
+            context.graph.nodes[id]?[.output(portIndex)].position = CGPoint(
+                x: frame.origin.x + proxy.size.width / 2,
+                y: frame.origin.y + proxy.size.height / 2
+            )
+        }
+    }
+
     public var body: some View {
         content()
             .background(GeometryReader { proxy in
                 Rectangle()
                     .fill(Color.clear)
-                    .onAppear {
-                        let frame = proxy.frame(in: .named(id))
-                        context.graph.nodes[id]?[.output(portIndex)].size = proxy.size
-                        context.graph.nodes[id]?[.output(portIndex)].position = CGPoint(
-                            x: frame.origin.x + proxy.size.width / 2,
-                            y: frame.origin.y + proxy.size.height / 2
-                        )
-                    }
-                    .onChange(of: proxy.frame(in: .named(id))) { newValue in
-                        let frame = proxy.frame(in: .named(id))
-                        context.graph.nodes[id]?[.output(portIndex)].size = proxy.size
-                        context.graph.nodes[id]?[.output(portIndex)].position = CGPoint(
-                            x: frame.origin.x + proxy.size.width / 2,
-                            y: frame.origin.y + proxy.size.height / 2
-                        )
-                    }
+                    .onAppear { geometryDecide(proxy: proxy) }
+                    .onChange(of: proxy.frame(in: .named(id))) { _ in geometryDecide(proxy: proxy) }
+                    .onChange(of: context.graph.nodes[id]?.inputs.count) { _ in geometryDecide(proxy: proxy) }
+                    .onChange(of: context.graph.nodes[id]?.outputs.count) { _ in geometryDecide(proxy: proxy) }
             })
             .modifier(JackModifier(id: id, portIndex: portIndex, onConnecting: { value in
                 if context.connecting != nil {

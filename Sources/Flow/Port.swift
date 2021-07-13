@@ -123,3 +123,8 @@ extension Port {
         }
     }
 }
+
+extension Array where Element == Port {
+
+    func exist(_ id: PortIndex) -> Bool { self.contains(where: { $0.id == id }) }
+}
