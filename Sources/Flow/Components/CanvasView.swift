@@ -17,7 +17,7 @@ extension EnvironmentValues {
 
 public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent: View>: View {
 
-    var graph: Graph
+    var context: Context
 
     var nodeView: (_ node: Node) -> NodeContent
 
@@ -25,38 +25,38 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
 
     var connectionView: (_ connection: Connection) -> ConnectionContent
 
-    var position: CGPoint { graph.canvas.position  }
+    var position: CGPoint { context.canvas.position  }
 
-    var offset: CGSize { graph.canvas.offset }
+    var offset: CGSize { context.canvas.offset }
 
-    var scale: CGFloat { graph.canvas.sacle  }
+    var scale: CGFloat { context.canvas.sacle  }
 
     @State var initialScale: CGFloat = 1
 
-    public init(_ graph: Graph,
+    public init(_ context: Context,
                 @ViewBuilder nodeView: @escaping (_ node: Node) -> NodeContent,
                 @ViewBuilder edgeView: @escaping (_ edge: Edge) -> EdgeContent,
                 @ViewBuilder connectionView: @escaping (_ connection: Connection) -> ConnectionContent,
                 shouldConnectNode: @escaping (_ nodes: [Node], _ edges: [Edge], _ connection: Connection) -> Bool = { _, _, _ in true }
     ) {
-        self.graph = graph
+        self.context = context
         self.nodeView = nodeView
         self.edgeView = edgeView
         self.connectionView = connectionView
-        if self.graph.shouldConnectNodeHandler == nil {
-            self.graph.shouldConnectNodeHandler = shouldConnectNode
+        if self.context.shouldConnectNodeHandler == nil {
+            self.context.shouldConnectNodeHandler = shouldConnectNode
         }
     }
 
     var dragGesture: some Gesture {
         DragGesture(minimumDistance: 0.15)
             .onChanged { value in
-                graph.canvas.offset = value.translation
+                context.canvas.offset = value.translation
             }
             .onEnded { value in
-                let position = graph.canvas.position
-                graph.canvas.offset = .zero
-                graph.canvas.position = CGPoint(
+                let position = context.canvas.position
+                context.canvas.offset = .zero
+                context.canvas.position = CGPoint(
                     x: position.x + value.translation.width,
                     y: position.y + value.translation.height
                 )
@@ -66,7 +66,7 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
     var magnificationGesture: some Gesture {
         MagnificationGesture()
             .onChanged { value in
-                graph.canvas.sacle = initialScale * value
+                context.canvas.sacle = initialScale * value
             }
             .onEnded { value in
                 initialScale = initialScale * value
@@ -76,21 +76,21 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
     public var body: some View {
         ZStack {
             ZStack {
-                ForEach(graph.nodes) { node in
+                ForEach(context.graph.nodes) { node in
                     nodeView(node)
                 }
-                ForEach(graph.edges) { edge in
+                ForEach(context.graph.edges) { edge in
                     edgeView(edge)
                 }
-                if let connnection = graph.connecting {
+                if let connnection = context.connecting {
                     connectionView(connnection)
                 }
             }
             .background(GeometryReader { proxy in
                 Rectangle()
                     .fill(Color.clear)
-                    .onAppear { graph.canvas.position = CGPoint(x: proxy.size.width / 2, y: proxy.size.height / 2) }
-                    .onChange(of: proxy.size ) { newValue in graph.canvas.position = CGPoint(x: newValue.width / 2, y: newValue.height / 2) }
+                    .onAppear { context.canvas.position = CGPoint(x: proxy.size.width / 2, y: proxy.size.height / 2) }
+                    .onChange(of: proxy.size ) { newValue in context.canvas.position = CGPoint(x: newValue.width / 2, y: newValue.height / 2) }
             })
             .coordinateSpace(name: CanvasCoordinateSpace.defaultValue)
             .position(position)
@@ -99,7 +99,7 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
         }
         .contentShape(Rectangle())
         .gesture(SimultaneousGesture(dragGesture, magnificationGesture))
-        .environmentObject(graph)
+        .environmentObject(context)
     }
 }
 

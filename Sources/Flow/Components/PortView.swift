@@ -11,7 +11,7 @@ public struct InputPortView<Content: View>: View {
 
     @Environment(\.canvasCoordinateSpace) var canvasCoordinateSpace: String
 
-    @EnvironmentObject var context: Graph
+    @EnvironmentObject var context: Context
 
     public var id: String
 
@@ -35,16 +35,16 @@ public struct InputPortView<Content: View>: View {
                     .fill(Color.clear)
                     .onAppear {
                         let frame = proxy.frame(in: .named(id))
-                        context.nodes[id]?[.input(portIndex)].size = proxy.size
-                        context.nodes[id]?[.input(portIndex)].position = CGPoint(
+                        context.graph.nodes[id]?[.input(portIndex)].size = proxy.size
+                        context.graph.nodes[id]?[.input(portIndex)].position = CGPoint(
                             x: frame.origin.x + proxy.size.width / 2,
                             y: frame.origin.y + proxy.size.height / 2
                         )
                     }
                     .onChange(of: proxy.frame(in: .named(id))) { newValue in
                         let frame = proxy.frame(in: .named(id))
-                        context.nodes[id]?[.input(portIndex)].size = proxy.size
-                        context.nodes[id]?[.input(portIndex)].position = CGPoint(
+                        context.graph.nodes[id]?[.input(portIndex)].size = proxy.size
+                        context.graph.nodes[id]?[.input(portIndex)].position = CGPoint(
                             x: frame.origin.x + proxy.size.width / 2,
                             y: frame.origin.y + proxy.size.height / 2
                         )
@@ -57,7 +57,7 @@ public struct InputPortView<Content: View>: View {
                 } else {
                     let address: Address = .input(id, index: portIndex)
                     if let edge = context.edges.filter({ $0.target == .input(id, index: portIndex) }).first {
-                        context.edges[edge.id] = nil
+                        context.graph.edges[edge.id] = nil
                         context.connecting = Connection(
                             id: id,
                             start: context.position(with: edge.source) ?? .zero,
@@ -79,7 +79,7 @@ public struct InputPortView<Content: View>: View {
                     connection.endAddress = address
                     if context.shouldConnect(connection) {
                         let edge = Edge(source: address, target: connection.startAddress)
-                        context.edges.append(edge)
+                        context.graph.edges.append(edge)
                     }
                 }
             }))
@@ -90,7 +90,7 @@ public struct OutputPortView<Content: View>: View {
 
     @Environment(\.canvasCoordinateSpace) var canvasCoordinateSpace: String
 
-    @EnvironmentObject var context: Graph
+    @EnvironmentObject var context: Context
 
     public var id: String
 
@@ -114,16 +114,16 @@ public struct OutputPortView<Content: View>: View {
                     .fill(Color.clear)
                     .onAppear {
                         let frame = proxy.frame(in: .named(id))
-                        context.nodes[id]?[.output(portIndex)].size = proxy.size
-                        context.nodes[id]?[.output(portIndex)].position = CGPoint(
+                        context.graph.nodes[id]?[.output(portIndex)].size = proxy.size
+                        context.graph.nodes[id]?[.output(portIndex)].position = CGPoint(
                             x: frame.origin.x + proxy.size.width / 2,
                             y: frame.origin.y + proxy.size.height / 2
                         )
                     }
                     .onChange(of: proxy.frame(in: .named(id))) { newValue in
                         let frame = proxy.frame(in: .named(id))
-                        context.nodes[id]?[.output(portIndex)].size = proxy.size
-                        context.nodes[id]?[.output(portIndex)].position = CGPoint(
+                        context.graph.nodes[id]?[.output(portIndex)].size = proxy.size
+                        context.graph.nodes[id]?[.output(portIndex)].position = CGPoint(
                             x: frame.origin.x + proxy.size.width / 2,
                             y: frame.origin.y + proxy.size.height / 2
                         )
@@ -148,7 +148,7 @@ public struct OutputPortView<Content: View>: View {
                     connection.endAddress = address
                     if context.shouldConnect(connection) {
                         let edge = Edge(source: connection.startAddress, target: address)
-                        context.edges.append(edge)
+                        context.graph.edges.append(edge)
                     }
                 }
             }))
@@ -159,7 +159,7 @@ struct JackModifier: ViewModifier {
 
     @Environment(\.canvasCoordinateSpace) var canvasCoordinateSpace: String
 
-    @EnvironmentObject var context: Graph
+    @EnvironmentObject var context: Context
 
     var id: String
 
