@@ -8,21 +8,9 @@
 import Foundation
 import CoreGraphics
 
-public protocol Callable {
-
-    typealias Input = [PortData]
-
-    typealias Output = [PortData]
-
-    typealias ID = String
-
-    var id: ID { get }
-
-    func callAsFunction(input: Input, output: Output, index: PortIndex) -> PortData
-
-}
-
 public final class Context: ObservableObject {
+
+    public static let functions: [Callable] = [Bypass(), Sum(), Product(), Average(), Varp()]
 
     @Published var canvas: Canvas = Canvas()
 
@@ -40,7 +28,7 @@ public final class Context: ObservableObject {
 
     public init(_ graph: Graph = Graph(nodes: [], edges: []), callableFunctions: [Callable] = []) {
         self.graph = graph
-        self.callableFunctions = callableFunctions
+        self.callableFunctions = Context.functions + callableFunctions
     }
 
     @discardableResult
@@ -96,36 +84,6 @@ public final class Context: ObservableObject {
     }
 
 }
-
-
-public struct SampleFunc: Callable {
-
-    public var id: ID { "SampleFunc" }
-
-    public func callAsFunction(input: Input, output: Output, index: PortIndex) -> PortData {
-        return PortData.bool(.success(true))
-    }
-
-    public init() {
-
-    }
-
-}
-
-public struct SampleFuncB: Callable {
-
-    public var id: ID { "SampleFunc" }
-
-    public func callAsFunction(input: Input, output: Output, index: PortIndex) -> PortData {
-        return PortData.bool(.success(true))
-    }
-
-    public init() {
-
-    }
-
-}
-
 
 extension Context {
 
@@ -236,7 +194,7 @@ extension Context {
                     return port.data
                 }
                 return data(for: address)
-            case (.io, .output): do {
+            case (.io(let typeID), .output): do {
                 let input = node.inputs.map { input -> PortData in
                     guard let address = connectedSourceAddress(node: node, inputPort: input) else {
                         return port.data
@@ -247,18 +205,24 @@ extension Context {
                 if let cache = self.dataStore[input] {
                     return cache[port.id]
                 }
-                let output = node(input)
+                guard let callable = self.callableFunctions[typeID] else {
+                    fatalError()
+                }
+                let output = callable(input: input, output: node.outputs.map({ $0.data }))
                 self.dataStore[input] = output
                 let data = output[port.id]
                 return data
             }
             case (.input, .input): return port.data
-            case (.input, .output): do {
+            case (.input(let typeID), .output): do {
                 let input = node.inputs.map { $0.data }
                 if let cache = self.dataStore[input] {
                     return cache[port.id]
                 }
-                let output = node(input)
+                guard let callable = self.callableFunctions[typeID] else {
+                    fatalError()
+                }
+                let output = callable(input: input, output: node.outputs.map({ $0.data }))
                 self.dataStore[input] = output
                 let data = output[port.id]
                 return data
@@ -268,12 +232,15 @@ extension Context {
                     return port.data
                 }
                 return data(for: address)
-            case (.output, .output): do {
+            case (.output(let typeID), .output): do {
                 let input = node.inputs.map { $0.data }
                 if let cache = self.dataStore[input] {
                     return cache[port.id]
                 }
-                let output = node(input)
+                guard let callable = self.callableFunctions[typeID] else {
+                    fatalError()
+                }
+                let output = callable(input: input, output: node.outputs.map({ $0.data }))
                 self.dataStore[input] = output
                 let data = output[port.id]
                 return data

@@ -13,12 +13,12 @@ let graph: Graph = Graph(
         .input(id: "R", name: "R", inputs: [.float(name: "R")], position: CGPoint(x: 200, y: 200)),
         .input(id: "G", name: "G", inputs: [.float(name: "B")], position: CGPoint(x: 200, y: 400)),
         .input(id: "B", name: "B", inputs: [.float(name: "B")], position: CGPoint(x: 200, y: 600)),
-        .sum(portData: .float(0), id: "SUM", name: "SUM", inputs: [.float(), .float(), .float()], position: CGPoint(x: 400, y: 400)),
+        .sum(id: "SUM", name: "SUM", inputs: [.float(), .float(), .float()], outputType: .float(), position: CGPoint(x: 400, y: 400)),
         .output(id: "OUT", name: "OUT", outputs: [.float()], position: CGPoint(x: 650, y: 400)),
 
         .input(id: "DATAA", name: "DATA A", inputs: [.floatArray([1, 2, 3, 4], name: "R")], position: CGPoint(x: 200, y: 900)),
         .input(id: "DATAB", name: "DATA B", inputs: [.floatArray([1, 2, 3, 4], name: "R")], position: CGPoint(x: 200, y: 1100)),
-        .product(portData: .floatArray(), id: "PRODUCT", name: "PRODUCT", inputs: [.floatArray(), .floatArray()], position: CGPoint(x: 400, y: 1000)),
+        .product(id: "PRODUCT", name: "PRODUCT", inputs: [.floatArray(), .floatArray()], outputType: .float(), position: CGPoint(x: 400, y: 1000)),
 
     ],
     edges: [
@@ -181,9 +181,6 @@ struct FlowCanvasView: View {
         })
             .background(Color(.secondarySystemGroupedBackground))
             .ignoresSafeArea()
-            .onTapGesture(count: 2) {
-                context.graph.add(.sum(portData: .float(), id: UUID().uuidString, name: "SUM", inputs: [.float(), .float()]))
-            }
     }
 }
 
