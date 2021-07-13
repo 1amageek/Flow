@@ -62,6 +62,16 @@ public struct Node: GeometryProperties, Identifiable {
         self.position = position
         return self
     }
+
+    public mutating func setInputs(_ inputs: [Interface]) -> Self {
+        self.inputs = inputs.enumerated().map { .input(id: $0, data: $1.data, name: $1.name, nodeID: self.id) }
+        return self
+    }
+
+    public mutating func setOutputs(_ outputs: [Interface]) -> Self {
+        self.outputs = outputs.enumerated().map { .output(id: $0, data: $1.data, name: $1.name, nodeID: self.id) }
+        return self
+    }
 }
 
 extension Node {
