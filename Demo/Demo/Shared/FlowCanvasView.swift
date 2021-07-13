@@ -33,7 +33,7 @@ let graph: Graph = Graph(
 
 struct FlowCanvasView: View {
 
-    @ObservedObject public var context: Context = Context(graph, callableFunctions: [SampleFunc(), SampleFuncB()])
+    @ObservedObject public var context: Context = Context(graph, callableFunctions: [])
 
     let portSpacing: CGFloat = 24
 
@@ -119,7 +119,7 @@ struct FlowCanvasView: View {
         CanvasView(context, nodeView: { node in
             NodeView(node) { inputs, outputs in
                 VStack(spacing: 0) {
-                    Text(node.name ?? "")
+                    Text(node.name)
                         .bold()
                         .padding(8)
                     Divider()

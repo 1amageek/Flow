@@ -22,36 +22,9 @@ public protocol Callable {
 
 extension Callable {
 
-    func callAsFunction(input: Input, output: Output) -> [PortData] {
+    func callAsFunction(_ input: Input, _ output: Output) -> [PortData] {
         return output.enumerated().map { index, _ in
             return self(input: input, output: output, index: index)
         }
-    }
-}
-
-
-public struct SampleFunc: Callable {
-
-    public var id: ID { "SampleFunc" }
-
-    public func callAsFunction(input: Input, output: Output, index: PortIndex) -> PortData {
-        return PortData.bool(.success(true))
-    }
-
-    public init() {
-
-    }
-}
-
-public struct SampleFuncB: Callable {
-
-    public var id: ID { "SampleFunc" }
-
-    public func callAsFunction(input: Input, output: Output, index: PortIndex) -> PortData {
-        return PortData.bool(.success(true))
-    }
-
-    public init() {
-
     }
 }

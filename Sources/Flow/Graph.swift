@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct Graph {
+public struct Graph: Codable {
 
     public var nodes: [Node] = []
 
@@ -43,7 +43,7 @@ public struct Graph {
         return self.from(snapshot: snapshot)
     }
 
-    public static func from(snapshot: Snapshot) -> Graph { Graph(nodes: snapshot.nodes, edges: snapshot.edges) }
+    public static func from(snapshot: Snapshot) -> Graph { snapshot.graph }
 
     public mutating func add(_ node: Node) {
         self.nodes.append(node)
@@ -54,7 +54,7 @@ public struct Graph {
     }
 
     public func dump() throws -> Data {
-        let snapshot: Snapshot = Snapshot(nodes: nodes, edges: edges)
+        let snapshot: Snapshot = Snapshot(self)
         return try JSONEncoder().encode(snapshot)
     }
 }
@@ -63,13 +63,10 @@ extension Graph {
     
     public struct Snapshot: Codable {
 
-        public var nodes: [Node]
+        public var graph: Graph
 
-        public var edges: [Edge]
-
-        public init(nodes: [Node] = [], edges: [Edge] = []) {
-            self.nodes = nodes
-            self.edges = edges
+        public init(_ graph: Graph) {
+            self.graph = graph
         }
     }
 }
@@ -84,18 +81,18 @@ extension Graph.Snapshot: CustomDebugStringConvertible {
             }).joined(separator: "\n   ")
         }
 
-        let nodesDescription: String = nodes.map { node in
+        let nodesDescription: String = graph.nodes.map { node in
             return "[\(node.type), id: \(node.id), name: \(node.name), position: \(node.position)]\n   \(portDescription(node.inputs))\n   \(portDescription(node.outputs)) "
         }.joined(separator: "\n")
 
-        let edgesDescription: String = edges.map { edge in
+        let edgesDescription: String = graph.edges.map { edge in
             return "[\(edge.id), target: \(edge.target), source: \(edge.source)]"
         }.joined(separator: "\n")
 
         return
 """
 **
-Graph Snapshot (Nodes count: \(nodes.count) Edges count: \(edges.count))
+Graph Snapshot (Nodes count: \(graph.nodes.count) Edges count: \(graph.edges.count))
 NODES
 \(nodesDescription)
 EDGES

@@ -43,13 +43,6 @@ public final class Context: ObservableObject {
         return self
     }
 
-    public class func from(data: Data) throws -> Graph {
-        let snapshot = try JSONDecoder().decode(Graph.Snapshot.self, from: data)
-        return self.from(snapshot: snapshot)
-    }
-
-    public class func from(snapshot: Graph.Snapshot) -> Graph { Graph(nodes: snapshot.nodes, edges: snapshot.edges) }
-
     /// Get the calculation results for a port at an arbitrary address.
     /// - Parameter address: Address of the port you want to get.
     /// - Returns: Calculated data
@@ -79,7 +72,7 @@ public final class Context: ObservableObject {
     }
 
     public func dump() throws -> Data {
-        let snapshot: Graph.Snapshot = Graph.Snapshot(nodes: nodes, edges: edges)
+        let snapshot: Graph.Snapshot = Graph.Snapshot(self.graph)
         return try JSONEncoder().encode(snapshot)
     }
 
@@ -208,7 +201,7 @@ extension Context {
                 guard let callable = self.callableFunctions[typeID] else {
                     fatalError()
                 }
-                let output = callable(input: input, output: node.outputs.map({ $0.data }))
+                let output = callable(input, node.outputs.map({ $0.data }))
                 self.dataStore[input] = output
                 let data = output[port.id]
                 return data
@@ -222,7 +215,7 @@ extension Context {
                 guard let callable = self.callableFunctions[typeID] else {
                     fatalError()
                 }
-                let output = callable(input: input, output: node.outputs.map({ $0.data }))
+                let output = callable(input, node.outputs.map({ $0.data }))
                 self.dataStore[input] = output
                 let data = output[port.id]
                 return data
@@ -240,7 +233,7 @@ extension Context {
                 guard let callable = self.callableFunctions[typeID] else {
                     fatalError()
                 }
-                let output = callable(input: input, output: node.outputs.map({ $0.data }))
+                let output = callable(input, node.outputs.map({ $0.data }))
                 self.dataStore[input] = output
                 let data = output[port.id]
                 return data

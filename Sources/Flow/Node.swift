@@ -109,6 +109,46 @@ extension Node {
     ) -> Node {
         Node(type: .io(type), id: id, name: name, inputs: inputs, outputs: outputs, position: position)
     }
+
+    public static func sum(
+        id: String,
+        name: String,
+        inputs: [Interface] = [],
+        outputType: PortData,
+        position: CGPoint = .zero
+    ) -> Node {
+        Node(type: .io(Function.sum), id: id, name: name, inputs: inputs, outputs: [Interface(outputType)], position: position)
+    }
+
+    public static func product(
+        id: String,
+        name: String,
+        inputs: [Interface] = [],
+        outputType: PortData,
+        position: CGPoint = .zero
+    ) -> Node {
+        Node(type: .io(Function.product), id: id, name: name, inputs: inputs, outputs: [Interface(outputType)], position: position)
+    }
+
+    public static func average(
+        id: String,
+        name: String,
+        inputs: [Interface] = [],
+        outputType: PortData,
+        position: CGPoint = .zero
+    ) -> Node {
+        Node(type: .io(Function.average), id: id, name: name, inputs: inputs, outputs: [Interface(outputType)], position: position)
+    }
+
+    public static func varp(
+        id: String,
+        name: String,
+        inputs: [Interface] = [],
+        outputType: PortData,
+        position: CGPoint = .zero
+    ) -> Node {
+        Node(type: .io(Function.varp), id: id, name: name, inputs: inputs, outputs: [Interface(outputType)], position: position)
+    }
 }
 
 extension Node {

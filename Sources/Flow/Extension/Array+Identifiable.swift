@@ -28,14 +28,13 @@ extension Array where Element: Identifiable {
 
 extension Array where Element == Callable {
 
-    subscript(nodeTypeID: Element.ID) -> Element? {
+    subscript(typeID: Element.ID) -> Element? {
         get {
-            print("wwwwww", nodeTypeID)
-            guard let index = self.firstIndex(where: { $0.id == nodeTypeID }) else { return nil }
+            guard let index = self.firstIndex(where: { $0.id == typeID }) else { return nil }
             return self[index]
         }
         set {
-            if let index = self.firstIndex(where: { $0.id == nodeTypeID }) {
+            if let index = self.firstIndex(where: { $0.id == typeID }) {
                 if let newValue = newValue {
                     self[index] = newValue
                 } else {
