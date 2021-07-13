@@ -33,14 +33,14 @@ extension NodeType: Codable {
         let key = container.allKeys.first
         switch key {
             case .input:
-                let type = try container.decode(String?.self, forKey: .input)
-                self = .input(type)
+                let id = try container.decode(String.self, forKey: .input)
+                self = .input(id)
             case .output:
-                let type = try container.decode(String?.self, forKey: .output)
-                self = .output(type)
+                let id = try container.decode(String.self, forKey: .output)
+                self = .output(id)
             case .io:
-                let type = try container.decode(String?.self, forKey: .io)
-                self = .io(type)
+                let id = try container.decode(String.self, forKey: .io)
+                self = .io(id)
             default:
                 throw DecodingError.dataCorrupted(
                     DecodingError.Context(

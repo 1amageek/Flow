@@ -9,7 +9,7 @@ import SwiftUI
 
 public struct EdgeView: View {
 
-    @EnvironmentObject var context: Graph
+    @EnvironmentObject var context: Context
 
     var edge: Edge
 

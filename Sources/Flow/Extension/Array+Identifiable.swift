@@ -25,3 +25,22 @@ extension Array where Element: Identifiable {
         }
     }
 }
+
+extension Array where Element == Callable {
+
+    subscript(typeID: Element.ID) -> Element? {
+        get {
+            guard let index = self.firstIndex(where: { $0.id == typeID }) else { return nil }
+            return self[index]
+        }
+        set {
+            if let index = self.firstIndex(where: { $0.id == typeID }) {
+                if let newValue = newValue {
+                    self[index] = newValue
+                } else {
+                    self.remove(at: index)
+                }
+            }
+        }
+    }
+}

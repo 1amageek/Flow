@@ -14,9 +14,9 @@ import CoreGraphics
 ///     id: String
 /// }
 public enum NodeType {
-    case input(_ type: String? = nil)
-    case output(_ type: String? = nil)
-    case io(_ type: String? = nil)
+    case input(_ id: Callable.ID = Node.Function.bypass)
+    case output(_ id: Callable.ID = Node.Function.bypass)
+    case io(_ id: Callable.ID = Node.Function.bypass)
 }
 
 public enum NodeError: Error {
@@ -26,13 +26,7 @@ public enum NodeError: Error {
 
 public struct Node: GeometryProperties, Identifiable {
 
-    public typealias Input = [PortData]
-
-    public typealias Output = [PortData]
-
-    public typealias Execution = (Input) -> Output
-
-    public var type: NodeType = .io()
+    public var type: NodeType = .io(Node.Function.bypass)
 
     public var id: String
 
@@ -48,16 +42,13 @@ public struct Node: GeometryProperties, Identifiable {
 
     public var outputs: [Port] = []
 
-    public var execution: Execution = { input in input }
-
     public init(
         type: NodeType = .io(),
         id: String,
         name: String = "",
         inputs: [Interface] = [],
         outputs: [Interface] = [],
-        position: CGPoint = .zero,
-        execution: @escaping Execution = { input in input }
+        position: CGPoint = .zero
     ) {
         self.type = type
         self.id = id
@@ -65,11 +56,6 @@ public struct Node: GeometryProperties, Identifiable {
         self.position = position
         self.inputs = inputs.enumerated().map { .input(id: $0, data: $1.data, name: $1.name, nodeID: self.id) }
         self.outputs = outputs.enumerated().map { .output(id: $0, data: $1.data, name: $1.name, nodeID: self.id) }
-        self.execution = execution
-    }
-
-    public func callAsFunction(_ input: Input) -> Output {
-        return execution(input)
     }
 }
 
@@ -94,7 +80,7 @@ extension Node {
 extension Node {
 
     public static func input(
-        _ type: String? = nil,
+        _ type: Callable.ID = Node.Function.bypass,
         id: String,
         name: String,
         inputs: [Interface] = [],
@@ -104,7 +90,7 @@ extension Node {
     }
 
     public static func output(
-        _ type: String? = nil,
+        _ type: Callable.ID = Node.Function.bypass,
         id: String,
         name: String,
         outputs: [Interface] = [],
@@ -114,7 +100,7 @@ extension Node {
     }
 
     public static func io(
-        _ type: String? = nil,
+        _ type: Callable.ID = Node.Function.bypass,
         id: String,
         name: String,
         inputs: [Interface] = [],
@@ -122,6 +108,46 @@ extension Node {
         position: CGPoint = .zero
     ) -> Node {
         Node(type: .io(type), id: id, name: name, inputs: inputs, outputs: outputs, position: position)
+    }
+
+    public static func sum(
+        id: String,
+        name: String,
+        inputs: [Interface] = [],
+        outputType: PortData,
+        position: CGPoint = .zero
+    ) -> Node {
+        Node(type: .io(Function.sum), id: id, name: name, inputs: inputs, outputs: [Interface(outputType)], position: position)
+    }
+
+    public static func product(
+        id: String,
+        name: String,
+        inputs: [Interface] = [],
+        outputType: PortData,
+        position: CGPoint = .zero
+    ) -> Node {
+        Node(type: .io(Function.product), id: id, name: name, inputs: inputs, outputs: [Interface(outputType)], position: position)
+    }
+
+    public static func average(
+        id: String,
+        name: String,
+        inputs: [Interface] = [],
+        outputType: PortData,
+        position: CGPoint = .zero
+    ) -> Node {
+        Node(type: .io(Function.average), id: id, name: name, inputs: inputs, outputs: [Interface(outputType)], position: position)
+    }
+
+    public static func varp(
+        id: String,
+        name: String,
+        inputs: [Interface] = [],
+        outputType: PortData,
+        position: CGPoint = .zero
+    ) -> Node {
+        Node(type: .io(Function.varp), id: id, name: name, inputs: inputs, outputs: [Interface(outputType)], position: position)
     }
 }
 
