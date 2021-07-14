@@ -48,6 +48,16 @@ public struct Port: Identifiable, Hashable, GeometryProperties {
         self.nodeID = nodeID
     }
 
+    public mutating func set(_ position: CGPoint) -> Self {
+        self.position = position
+        return self
+    }
+
+    public mutating func set(_ data: PortData) -> Self {
+        self.data = data
+        return self
+    }
+
     static func input(id: Int, data: PortData, name: String? = nil, nodeID: Node.ID) -> Port {
         Port(type: .input, id: id, data: data, name: name, nodeID: nodeID)
     }

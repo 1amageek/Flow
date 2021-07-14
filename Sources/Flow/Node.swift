@@ -64,12 +64,24 @@ public struct Node: GeometryProperties, Identifiable {
     }
 
     public mutating func setInputs(_ inputs: [Interface]) -> Self {
-        self.inputs = inputs.enumerated().map { .input(id: $0, data: $1.data, name: $1.name, nodeID: self.id) }
+        self.inputs = inputs.enumerated().map { index, interface in
+            var port = Port.input(id: index, data: interface.data, name: interface.name, nodeID: self.id)
+            if let input = self.inputs[index] {
+                return port.set(input.position)
+            }
+            return port
+        }
         return self
     }
 
     public mutating func setOutputs(_ outputs: [Interface]) -> Self {
-        self.outputs = outputs.enumerated().map { .output(id: $0, data: $1.data, name: $1.name, nodeID: self.id) }
+        self.outputs = outputs.enumerated().map { index, interface in
+            var port = Port.output(id: index, data: interface.data, name: interface.name, nodeID: self.id)
+            if let input = self.outputs[index] {
+                return port.set(input.position)
+            }
+            return port
+        }
         return self
     }
 }
