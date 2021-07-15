@@ -106,6 +106,7 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
             .offset(offset)
             .scaleEffect(scale)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .contentShape(Rectangle())
         .gesture(SimultaneousGesture(dragGesture, magnificationGesture))
         .environmentObject(context)
