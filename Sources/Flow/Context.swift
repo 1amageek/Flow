@@ -6,15 +6,15 @@
 //
 
 import Foundation
-import CoreGraphics
+import SwiftUI
 
 public final class Context: ObservableObject {
 
     public static let functions: [Callable] = [Bypass(), Sum(), Product(), Average(), Varp()]
 
-    @Published var canvas: Canvas = Canvas()
+    @Binding public var graph: Graph
 
-    @Published public var graph: Graph
+    @Published var canvas: Canvas = Canvas()
 
     @Published public var focusNode: Node?
 
@@ -26,15 +26,9 @@ public final class Context: ObservableObject {
 
     var shouldConnectNodeHandler: ((_ nodes: [Node], _ edges: [Edge], _ connection: Connection) -> Bool)!
 
-    public init(_ graph: Graph = Graph(nodes: [], edges: []), callableFunctions: [Callable] = []) {
-        self.graph = graph
+    public init(_ graph: Binding<Graph>, callableFunctions: [Callable] = []) {
+        self._graph = graph
         self.callableFunctions = Context.functions + callableFunctions
-    }
-
-    @discardableResult
-    public func set(graph: Graph) -> Self {
-        self.graph = graph
-        return self
     }
 
     @discardableResult

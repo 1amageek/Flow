@@ -33,7 +33,11 @@ let graph: Graph = Graph(
 
 struct FlowCanvasView: View {
 
-    @ObservedObject public var context: Context = Context(graph, callableFunctions: [])
+    @ObservedObject public var context: Context
+
+    init(_ graph: Binding<Graph>) {
+        self._context = ObservedObject(initialValue: Context(graph, callableFunctions: []))
+    }
 
     let portSpacing: CGFloat = 24
 
@@ -234,8 +238,8 @@ struct FlowCanvasView: View {
     }
 }
 
-struct FlowCanvasView_Previews: PreviewProvider {
-    static var previews: some View {
-        FlowCanvasView()
-    }
-}
+//struct FlowCanvasView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        FlowCanvasView()
+//    }
+//}

@@ -6,13 +6,20 @@
 //
 
 import SwiftUI
+import Flow
 
 @main
 struct DemoApp: App {
-
+    
     var body: some Scene {
-        WindowGroup {
-            FlowCanvasView()
+//                WindowGroup {
+//                    FlowCanvasView()
+//                }
+        DocumentGroup(newDocument: Graph()) { file in
+            FlowCanvasView(file.$document)
         }
+//        DocumentGroup(newDocument: TextFile()) { file in
+//            ContentView(document: file.$document)
+//        }
     }
 }
