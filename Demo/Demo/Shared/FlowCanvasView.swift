@@ -35,8 +35,11 @@ struct FlowCanvasView: View {
 
     @ObservedObject public var context: Context
 
+    @Binding var graph: Graph
+
     init(_ graph: Binding<Graph>) {
-        self._context = ObservedObject(initialValue: Context(graph, callableFunctions: []))
+        self._graph = graph
+        self._context = ObservedObject(initialValue: Context(graph.wrappedValue, callableFunctions: []))
     }
 
     let portSpacing: CGFloat = 24
@@ -234,6 +237,9 @@ struct FlowCanvasView: View {
                     Spacer()
                 }
             }
+        }
+        .onDisappear {
+            self.graph = context.graph
         }
     }
 }

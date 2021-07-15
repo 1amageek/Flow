@@ -12,9 +12,9 @@ public final class Context: ObservableObject {
 
     public static let functions: [Callable] = [Bypass(), Sum(), Product(), Average(), Varp()]
 
-    @Binding public var graph: Graph
-
     @Published var canvas: Canvas = Canvas()
+
+    @Published public var graph: Graph
 
     @Published public var focusNode: Node?
 
@@ -26,8 +26,8 @@ public final class Context: ObservableObject {
 
     var shouldConnectNodeHandler: ((_ nodes: [Node], _ edges: [Edge], _ connection: Connection) -> Bool)!
 
-    public init(_ graph: Binding<Graph>, callableFunctions: [Callable] = []) {
-        self._graph = graph
+    public init(_ graph: Graph, callableFunctions: [Callable] = []) {
+        self.graph = graph
         self.callableFunctions = Context.functions + callableFunctions
     }
 
