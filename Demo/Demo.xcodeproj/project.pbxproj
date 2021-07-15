@@ -21,6 +21,7 @@
 		126A81532680992500578B2C /* FlowCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowCanvasView.swift; sourceTree = "<group>"; };
 		126A81552680992600578B2C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		126A81582680992600578B2C /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		12B9681326A02754007C5F79 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +65,7 @@
 		126A81502680992500578B2C /* Demo */ = {
 			isa = PBXGroup;
 			children = (
+				12B9681326A02754007C5F79 /* Info.plist */,
 				125DBDB02691ADE4001C0F99 /* Demo.entitlements */,
 				125DBD9F26918627001C0F99 /* Shared */,
 				126A81552680992600578B2C /* Assets.xcassets */,
@@ -296,6 +298,7 @@
 				DEVELOPMENT_TEAM = 88ACA86N96;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Demo/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -329,6 +332,7 @@
 				DEVELOPMENT_TEAM = 88ACA86N96;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Demo/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
