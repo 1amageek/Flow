@@ -10,7 +10,7 @@ import UniformTypeIdentifiers
 
 extension Node {
 
-    public static let draggableType = UTType(exportedAs: "inc.stamp.flow.node")
+    public static let draggableType = UTType.node
 
     public var itemProvider: NSItemProvider {
         let provider = NSItemProvider()
