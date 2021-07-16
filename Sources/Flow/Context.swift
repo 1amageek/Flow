@@ -268,7 +268,7 @@ extension Context {
     }
 
     func visibleEdges(completion: @escaping ([Edge]) -> Void) {
-        let nodes = graph.nodes
+        let nodes = cache.nodes ?? []
         let edges = graph.edges
         let cache = cache.edges
         var task: DispatchWorkItem? = nil
