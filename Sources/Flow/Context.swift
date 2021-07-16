@@ -20,7 +20,11 @@ public final class Context: ObservableObject {
 
     @Published public var connecting: Connection?
 
-    var cache: Cache = Cache()
+    @Published var cache: Cache = Cache()
+
+    var visibleNodesTask: DispatchWorkItem?
+
+    var visibleEdgesTask: DispatchWorkItem?
 
     public var callableFunctions: [Callable]
 
@@ -235,5 +239,52 @@ extension Context {
                 return data
             }
         }
+    }
+}
+
+extension Context {
+
+    func visibleNodes(completion: @escaping ([Node]) -> Void) {
+        let visibleFrame = canvas.visibleFrame
+        let nodes = graph.nodes
+        let cache = cache.nodes
+        var task: DispatchWorkItem? = nil
+        task = DispatchWorkItem {
+            var visibleNodes: [Node] = []
+            for node in nodes {
+                guard !(task?.isCancelled ?? false) else { break }
+                if visibleFrame.intersects(node.frame) {
+                    visibleNodes.append(node)
+                }
+            }
+            if cache != visibleNodes {
+                DispatchQueue.main.async {
+                    completion(visibleNodes)
+                }
+            }
+        }
+        DispatchQueue.global(qos: .background).async(execute: task!)
+    }
+
+    func visibleEdges(completion: @escaping ([Edge]) -> Void) {
+        let nodes = graph.nodes
+        let edges = graph.edges
+        let cache = cache.edges
+        var task: DispatchWorkItem? = nil
+        task = DispatchWorkItem {
+            var visibleEdges: [Edge] = []
+            for edge in edges {
+                guard !(task?.isCancelled ?? false) else { break }
+                if nodes.contains(where: { $0.id == edge.source.id }) && nodes.contains(where: { $0.id == edge.target.id }) {
+                    visibleEdges.append(edge)
+                }
+            }
+            if cache != visibleEdges {
+                DispatchQueue.main.async {
+                    completion(visibleEdges)
+                }
+            }
+        }
+        DispatchQueue.global(qos: .background).async(execute: task!)
     }
 }

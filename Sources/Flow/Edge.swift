@@ -55,3 +55,5 @@ public struct Edge: Identifiable {
         self.target = target
     }
 }
+
+extension Edge: Equatable { }

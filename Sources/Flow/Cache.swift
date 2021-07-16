@@ -10,7 +10,7 @@ import Foundation
 extension Context {
 
     struct Cache {
-        var nodes: [Node] = []
-        var edges: [Edge] = []
+        var nodes: [Node]?
+        var edges: [Edge]?
     }
 }

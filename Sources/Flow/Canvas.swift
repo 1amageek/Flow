@@ -18,7 +18,7 @@ struct Canvas: Codable {
 
     var frame: CGRect { CGRect(origin: CGPoint(x: -offset.width, y: -offset.height), size: size) }
 
-    var visbleFrame: CGRect {
+    var visibleFrame: CGRect {
         if scale == 1 { return CGRect(origin: CGPoint(x: -offset.width, y: -offset.height), size: size) }
         let width = size.width / scale
         let height = size.height / scale

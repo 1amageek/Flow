@@ -86,6 +86,8 @@ public struct Node: GeometryProperties, Identifiable {
     }
 }
 
+extension Node: Equatable { }
+
 extension Node {
 
     public subscript(port: Address.Port) -> Port {

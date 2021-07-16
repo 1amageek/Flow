@@ -92,23 +92,40 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
     var visibleNodes: [Node] {
         if context.canvas.size == .zero { return [] }
         if case .dragging(_) = dragState {
-            return context.cache.nodes
+            return context.cache.nodes ?? []
         }
-        let visibleNodes = context.graph.nodes.filter { context.canvas.visbleFrame.intersects($0.frame) }
-        context.cache.nodes = visibleNodes
-        return visibleNodes
+        if let cache = context.cache.nodes {
+            context.visibleNodesTask?.cancel()
+            context.visibleNodes { nodes in
+                self.context.cache.nodes = nodes
+            }
+            return cache
+        } else {
+            let visibleNodes = context.graph.nodes.filter { context.canvas.visibleFrame.intersects($0.frame) }
+            context.cache.nodes = visibleNodes
+            return visibleNodes
+        }
     }
 
     var visibleEdges: [Edge] {
         if context.canvas.size == .zero { return [] }
         if case .dragging(_) = dragState {
-            return context.cache.edges
+            return context.cache.edges ?? []
         }
-        let visibleEdges = context.graph.edges.filter { edge -> Bool in
-            return context.cache.nodes.contains(where: { $0.id == edge.source.id }) && context.cache.nodes.contains(where: { $0.id == edge.target.id })
+        if let cache = context.cache.edges {
+            context.visibleEdgesTask?.cancel()
+            context.visibleEdges { edges in
+                self.context.cache.edges = edges
+            }
+            return cache
+        } else {
+            let nodes = context.cache.nodes ?? []
+            let visibleEdges = context.graph.edges.filter { edge -> Bool in
+                return nodes.contains(where: { $0.id == edge.source.id }) && nodes.contains(where: { $0.id == edge.target.id })
+            }
+            context.cache.edges = visibleEdges
+            return visibleEdges
         }
-        context.cache.edges = visibleEdges
-        return visibleEdges
     }
 
     public var body: some View {
