@@ -44,7 +44,7 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
         )
     }
 
-    var scale: CGFloat { context.canvas.sacle  }
+    var scale: CGFloat { context.canvas.scale  }
 
     @State var initialScale: CGFloat = 1
 
@@ -82,7 +82,7 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
     var magnificationGesture: some Gesture {
         MagnificationGesture()
             .onChanged { value in
-                context.canvas.sacle = initialScale * value
+                context.canvas.scale = initialScale * value
             }
             .onEnded { value in
                 initialScale = initialScale * value
@@ -91,7 +91,7 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
 
     var visibleNodes: [Node] {
         if context.canvas.size == .zero { return [] }
-        return context.graph.nodes.filter { context.canvas.frame.intersects($0.frame) }
+        return context.graph.nodes.filter { context.canvas.visbleFrame.intersects($0.frame) }
     }
 
     var visibleEdges: [Edge] {
@@ -99,15 +99,7 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
         return context.graph.edges.filter { edge -> Bool in
             guard let start: CGPoint = context.position(with: edge.source) else { return false }
             guard let end: CGPoint = context.position(with: edge.target) else { return false }
-            let minX = min(start.x, end.x)
-            let minY = min(start.y, end.y)
-            let maxX = max(start.x, end.x)
-            let maxY = max(start.y, end.y)
-            let width = maxX - minX
-            let height = maxY - minY
-            let frame: CGRect = CGRect(x: minX, y: minY, width: width, height: height)
-            return context.canvas.frame.intersects(frame)
-        }
+            return context.canvas.visbleFrame.contains(start) && context.canvas.visbleFrame.contains(end)        }
     }
 
     public var body: some View {
