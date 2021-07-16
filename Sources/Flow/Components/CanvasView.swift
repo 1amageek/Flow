@@ -97,8 +97,8 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
     var visibleEdges: [Edge] {
         if context.canvas.size == .zero { return [] }
         return context.graph.edges.filter { edge -> Bool in
-            let start: CGPoint = context.position(with: edge.source)!
-            let end: CGPoint = context.position(with: edge.target)!
+            guard let start: CGPoint = context.position(with: edge.source) else { return false }
+            guard let end: CGPoint = context.position(with: edge.target) else { return false }
             let minX = min(start.x, end.x)
             let minY = min(start.y, end.y)
             let maxX = max(start.x, end.x)
