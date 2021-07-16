@@ -252,11 +252,12 @@ extension Context {
         task = DispatchWorkItem {
             var visibleNodes: [Node] = []
             for node in nodes {
-                guard !(task?.isCancelled ?? false) else { break }
+                if task!.isCancelled { break }
                 if visibleFrame.intersects(node.frame) {
                     visibleNodes.append(node)
                 }
             }
+            if task!.isCancelled { return }
             if cache != visibleNodes {
                 DispatchQueue.main.async {
                     completion(visibleNodes)
@@ -274,11 +275,12 @@ extension Context {
         task = DispatchWorkItem {
             var visibleEdges: [Edge] = []
             for edge in edges {
-                guard !(task?.isCancelled ?? false) else { break }
+                if task!.isCancelled { break }
                 if nodes.contains(where: { $0.id == edge.source.id }) && nodes.contains(where: { $0.id == edge.target.id }) {
                     visibleEdges.append(edge)
                 }
             }
+            if task!.isCancelled { return }
             if cache != visibleEdges {
                 DispatchQueue.main.async {
                     completion(visibleEdges)
