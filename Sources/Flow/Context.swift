@@ -26,6 +26,8 @@ public final class Context: ObservableObject {
 
     var visibleEdgesTask: DispatchWorkItem?
 
+    let taskQueue: DispatchQueue = DispatchQueue(label: "inc.stamp.flow.queue")
+
     public var callableFunctions: [Callable]
 
     let dataStore: DataStore = DataStore()
@@ -264,7 +266,7 @@ extension Context {
                 }
             }
         }
-        DispatchQueue.global(qos: .background).async(execute: task!)
+        taskQueue.async(execute: task!)
     }
 
     func visibleEdges(completion: @escaping ([Edge]) -> Void) {
@@ -287,6 +289,6 @@ extension Context {
                 }
             }
         }
-        DispatchQueue.global(qos: .background).async(execute: task!)
+        taskQueue.async(execute: task!)
     }
 }
