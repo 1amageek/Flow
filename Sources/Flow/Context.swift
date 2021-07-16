@@ -246,7 +246,7 @@ extension Context {
 
 extension Context {
 
-    func visibleNodes(completion: @escaping ([Node]) -> Void) {
+    func visibleNodes(completion: @escaping ([Node]) -> Void) -> DispatchWorkItem {
         let visibleFrame = canvas.visibleFrame
         let nodes = graph.nodes
         let cache = cache.nodes
@@ -267,9 +267,10 @@ extension Context {
             }
         }
         taskQueue.async(execute: task!)
+        return task!
     }
 
-    func visibleEdges(completion: @escaping ([Edge]) -> Void) {
+    func visibleEdges(completion: @escaping ([Edge]) -> Void) -> DispatchWorkItem {
         let nodes = cache.nodes ?? []
         let edges = graph.edges
         let cache = cache.edges
@@ -290,5 +291,6 @@ extension Context {
             }
         }
         taskQueue.async(execute: task!)
+        return task!
     }
 }

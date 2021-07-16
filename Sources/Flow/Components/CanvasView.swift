@@ -96,7 +96,7 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
         }
         if let cache = context.cache.nodes {
             context.visibleNodesTask?.cancel()
-            context.visibleNodes { nodes in
+            context.visibleNodesTask = context.visibleNodes { nodes in
                 self.context.cache.nodes = nodes
             }
             return cache
@@ -114,7 +114,7 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
         }
         if let cache = context.cache.edges {
             context.visibleEdgesTask?.cancel()
-            context.visibleEdges { edges in
+            context.visibleEdgesTask = context.visibleEdges { edges in
                 self.context.cache.edges = edges
             }
             return cache
