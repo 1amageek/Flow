@@ -89,13 +89,34 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
             }
     }
 
+    var visibleNodes: [Node] {
+        if context.canvas.size == .zero { return [] }
+        return context.graph.nodes.filter { context.canvas.frame.intersects($0.frame) }
+    }
+
+    var visibleEdges: [Edge] {
+        if context.canvas.size == .zero { return [] }
+        return context.graph.edges.filter { edge -> Bool in
+            let start: CGPoint = context.position(with: edge.source)!
+            let end: CGPoint = context.position(with: edge.target)!
+            let minX = min(start.x, end.x)
+            let minY = min(start.y, end.y)
+            let maxX = max(start.x, end.x)
+            let maxY = max(start.y, end.y)
+            let width = maxX - minX
+            let height = maxY - minY
+            let frame: CGRect = CGRect(x: minX, y: minY, width: width, height: height)
+            return context.canvas.frame.intersects(frame)
+        }
+    }
+
     public var body: some View {
         ZStack {
             ZStack {
-                ForEach(context.graph.nodes) { node in
+                ForEach(visibleNodes) { node in
                     nodeView(node)
                 }
-                ForEach(context.graph.edges) { edge in
+                ForEach(visibleEdges) { edge in
                     edgeView(edge)
                 }
                 if let connnection = context.connecting {
@@ -107,6 +128,12 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
             .scaleEffect(scale)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(GeometryReader { proxy in
+            Rectangle()
+                .fill(Color.clear)
+                .onAppear { context.canvas.size = proxy.size }
+                .onChange(of: proxy.size ) { newValue in context.canvas.size = newValue }
+        })
         .contentShape(Rectangle())
         .gesture(SimultaneousGesture(dragGesture, magnificationGesture))
         .environmentObject(context)
