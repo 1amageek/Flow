@@ -20,6 +20,8 @@ public final class Context: ObservableObject {
 
     @Published public var connecting: Connection?
 
+    var cache: Cache = Cache()
+
     public var callableFunctions: [Callable]
 
     let dataStore: DataStore = DataStore()

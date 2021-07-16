@@ -91,15 +91,24 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
 
     var visibleNodes: [Node] {
         if context.canvas.size == .zero { return [] }
-        return context.graph.nodes.filter { context.canvas.visbleFrame.intersects($0.frame) }
+        if case .dragging(_) = dragState {
+            return context.cache.nodes
+        }
+        let visibleNodes = context.graph.nodes.filter { context.canvas.visbleFrame.intersects($0.frame) }
+        context.cache.nodes = visibleNodes
+        return visibleNodes
     }
 
     var visibleEdges: [Edge] {
         if context.canvas.size == .zero { return [] }
-        return context.graph.edges.filter { edge -> Bool in
-            guard let start: CGPoint = context.position(with: edge.source) else { return false }
-            guard let end: CGPoint = context.position(with: edge.target) else { return false }
-            return context.canvas.visbleFrame.contains(start) && context.canvas.visbleFrame.contains(end)        }
+        if case .dragging(_) = dragState {
+            return context.cache.edges
+        }
+        let visibleEdges = context.graph.edges.filter { edge -> Bool in
+            return context.cache.nodes.contains(where: { $0.id == edge.source.id }) && context.cache.nodes.contains(where: { $0.id == edge.target.id })
+        }
+        context.cache.edges = visibleEdges
+        return visibleEdges
     }
 
     public var body: some View {
