@@ -60,6 +60,17 @@ struct FlowCanvasView: View {
             .frame(maxWidth: 130, alignment: alignment)
     }
 
+    func text(_ nodeID: String, address: Address.Port) -> Binding<String> {
+        if let port = $context.graph[nodeID].wrappedValue?[address] {
+            return Binding {
+                return port.text
+            } set: { newValue in
+                context.graph[nodeID]?[address]?.text = newValue
+            }
+        }
+        return .constant("")
+    }
+
     func inputNode(node: Node) -> some View {
         HStack(spacing: 0) {
             VStack(alignment: .leading, spacing: portSpacing) {
@@ -70,7 +81,7 @@ struct FlowCanvasView: View {
                             //
                             //                            }
                         } else {
-                            TextField("0", text: $context.graph[node.id][.input(port.id)].text)
+                            TextField("0", text: text(node.id, address: .input(port.id)))
                                 .multilineTextAlignment(.trailing)
                                 .padding(EdgeInsets(top: 2, leading: 6, bottom: 2, trailing: 6))
                                 .frame(maxWidth: 100)

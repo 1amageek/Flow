@@ -48,11 +48,13 @@ public final class Context: ObservableObject {
     /// Get the calculation results for a port at an arbitrary address.
     /// - Parameter address: Address of the port you want to get.
     /// - Returns: Calculated data
-    public func data(for address: Address) -> PortData {
+    public func data(for address: Address) -> PortData? {
         guard let node: Node = nodes[address.id] else {
-            fatalError("[FLOW][WARNNING] address [\(address.id):\(address.port)] There are no nodes connected to this address.")
+            return nil
         }
-        let port: Port = node[address.port]
+        guard let port: Port = node[address.port] else {
+            return nil
+        }
         return data(node: node, port: port)
     }
 
@@ -181,7 +183,7 @@ extension Context {
 
     func connectedSourceNodes(node: Node, inputPort: Port) -> [Node] {
         let connectedEdge = self.edges.filter { $0.target ==  inputPort.address }
-        return connectedEdge.map { self.graph[$0.source.id] }
+        return connectedEdge.compactMap { self.graph[$0.source.id] }
     }
 
     func connectedSourceAddress(node: Node, inputPort: Port) -> Address? {
@@ -189,7 +191,7 @@ extension Context {
         return connectedEdge.source
     }
 
-    func data(node: Node, port: Port) -> PortData {
+    func data(node: Node, port: Port) -> PortData? {
         switch (node.type, port.type) {
             case (.io, .input):
                 guard let address = connectedSourceAddress(node: node, inputPort: port) else {
@@ -197,7 +199,7 @@ extension Context {
                 }
                 return data(for: address)
             case (.io(let typeID), .output): do {
-                let input = node.inputs.map { input -> PortData in
+                let input = node.inputs.compactMap { input -> PortData? in
                     guard let address = connectedSourceAddress(node: node, inputPort: input) else {
                         return port.data
                     }

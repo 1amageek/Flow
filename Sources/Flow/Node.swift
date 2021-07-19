@@ -90,17 +90,31 @@ extension Node: Equatable { }
 
 extension Node {
 
-    public subscript(port: Address.Port) -> Port {
+    public subscript(port: Address.Port) -> Port? {
         get {
             switch port {
-                case .input(let index): return inputs[index]
-                case .output(let index): return outputs[index]
+                case .input(let index):
+                    if index < inputs.count {
+                        return inputs[index]
+                    }
+                    return nil
+                case .output(let index):
+                    if index < outputs.count {
+                        return outputs[index]
+                    }
+                    return nil
             }
         }
         set {
             switch port {
-                case .input(let index): inputs[index] = newValue
-                case .output(let index): outputs[index] = newValue
+                case .input(let index):
+                    if index < inputs.count {
+                        inputs[index] = newValue
+                    }
+                case .output(let index):
+                    if index < outputs.count {
+                        outputs[index] = newValue
+                    }
             }
         }
     }

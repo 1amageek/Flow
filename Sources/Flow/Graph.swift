@@ -13,20 +13,24 @@ public struct Graph: Codable {
 
     public var edges: [Edge] = []
 
-    public subscript(nodeID: String) -> Node {
+    public subscript(nodeID: String) -> Node? {
         get {
-            let index = self.nodes.firstIndex(where: { $0.id == nodeID })!
+            guard let index = self.nodes.firstIndex(where: { $0.id == nodeID }) else { return nil }
             return nodes[index]
         }
         set {
-            let index = self.nodes.firstIndex(where: { $0.id == nodeID })!
-            nodes[index] = newValue
+            guard let index = self.nodes.firstIndex(where: { $0.id == nodeID }) else { return }
+            if let value = newValue {
+                nodes[index] = value
+            } else {
+                nodes.remove(at: index)
+            }
         }
     }
 
-    public subscript(address: Address) -> Port {
-        let node = nodes[address.id]!
-        let port = node[address.port]
+    public subscript(address: Address) -> Port? {
+        guard let node = nodes[address.id] else { return nil }
+        guard let port = node[address.port] else { return nil }
         return port
     }
 
