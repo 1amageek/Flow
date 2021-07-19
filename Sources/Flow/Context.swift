@@ -35,7 +35,7 @@ public final class Context: ObservableObject {
     var shouldConnectNodeHandler: ((_ nodes: [Node], _ edges: [Edge], _ connection: Connection) -> Bool)!
 
     public init(_ graph: Graph, callableFunctions: [Callable] = []) {
-        self.graph = graph
+        self.graph = Self.prepare(graph)
         self.callableFunctions = Context.functions + callableFunctions
     }
 
@@ -78,6 +78,13 @@ public final class Context: ObservableObject {
         return try JSONEncoder().encode(snapshot)
     }
 
+    private static func prepare(_ graph: Graph) -> Graph {
+        let nodes = graph.nodes
+        let edges = graph.edges.filter { edge in
+            return nodes.contains(where: { $0.id == edge.source.id }) && nodes.contains(where: { $0.id == edge.target.id })
+        }
+        return Graph(nodes: nodes, edges: edges)
+    }
 }
 
 extension Context {
@@ -279,7 +286,7 @@ extension Context {
             var visibleEdges: [Edge] = []
             for edge in edges {
                 if task!.isCancelled { break }
-                if nodes.contains(where: { $0.id == edge.source.id }) && nodes.contains(where: { $0.id == edge.target.id }) {
+                if nodes.contains(where: { $0.id == edge.source.id }) || nodes.contains(where: { $0.id == edge.target.id }) {
                     visibleEdges.append(edge)
                 }
             }
