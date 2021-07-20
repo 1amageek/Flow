@@ -67,14 +67,6 @@ public final class Context: ObservableObject {
         )
     }
 
-    public func add(_ node: Node) {
-        self.graph.nodes.append(node)
-    }
-
-    public func delete(_ node: Node) {
-        self.graph.nodes[node.id] = nil
-    }
-
     public func dump() throws -> Data {
         let snapshot: Graph.Snapshot = Graph.Snapshot(self.graph)
         return try JSONEncoder().encode(snapshot)

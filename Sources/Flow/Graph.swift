@@ -55,6 +55,9 @@ public struct Graph: Codable {
 
     public mutating func delete(_ node: Node) {
         self.nodes[node.id] = nil
+        self.edges = self.edges.filter { edge in
+            return edge.source.id != node.id && edge.target.id != node.id
+        }
     }
 
     public func dump() throws -> Data {
