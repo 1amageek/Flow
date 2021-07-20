@@ -149,14 +149,26 @@ public struct Product: Callable {
 
         switch portData {
             case .bool(_):
-                let result = input.compactMap({ $0.boolValue }).reduce(true) { $0 && $1 }
-                return .bool(result)
+                let inputs = input.compactMap({ $0.boolValue })
+                if inputs.count > 0 {
+                    let result = inputs.reduce(true) { $0 && $1 }
+                    return .bool(result)
+                }
+                return .bool(false)
             case .int(_):
-                let result = input.compactMap({ $0.intValue }).reduce(1, *)
-                return .int(result)
+                let inputs = input.compactMap({ $0.intValue })
+                if inputs.count > 0 {
+                    let result = inputs.reduce(1, *)
+                    return .int(result)
+                }
+                return .int(0)
             case .float(_):
-                let result = input.compactMap({ $0.floatValue }).reduce(1, *)
-                return .float(result)
+                let inputs = input.compactMap({ $0.floatValue })
+                if inputs.count > 0 {
+                    let result = inputs.reduce(1, *)
+                    return .float(result)
+                }
+                return .float(0)
             case .string(_):
                 return .string(.failure(.convertError))
             case .boolArray(_):
