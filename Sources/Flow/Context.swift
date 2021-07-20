@@ -12,7 +12,7 @@ public final class Context: ObservableObject {
 
     public static let functions: [Callable] = [Bypass(), Sum(), Product(), Average(), Varp()]
 
-    @Published var canvas: Canvas = Canvas()
+    @Published public var canvas: Canvas = Canvas()
 
     @Published public var graph: Graph
 
