@@ -8,15 +8,15 @@
 import Foundation
 import CoreGraphics
 
-struct Canvas: Codable {
+public struct Canvas: Codable {
 
-    var scale: CGFloat = 1
+    public var scale: CGFloat = 1
 
-    var offset: CGSize = .zero
+    public var offset: CGSize = .zero
 
-    var size: CGSize = .zero
+    public var size: CGSize = .zero
 
-    var frame: CGRect { CGRect(origin: CGPoint(x: -offset.width, y: -offset.height), size: size) }
+    public var frame: CGRect { CGRect(origin: CGPoint(x: -offset.width, y: -offset.height), size: size) }
 
     var visibleFrame: CGRect {
         if scale == 1 { return CGRect(origin: CGPoint(x: -offset.width, y: -offset.height), size: size) }
