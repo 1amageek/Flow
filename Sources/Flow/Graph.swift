@@ -81,7 +81,7 @@ extension Graph.Snapshot: CustomDebugStringConvertible {
 
         func portDescription(_ ports: [Port]) -> String {
             return ports.map({ port in
-                return "[\(port.type), id: \(port.id), data: \(port.data.text), name: \(port.name ?? ""), position: \(port.position)]"
+                return "[\(port.type), id: \(port.id), data: \(port.data), name: \(port.name ?? ""), position: \(port.position)]"
             }).joined(separator: "\n   ")
         }
 

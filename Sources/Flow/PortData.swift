@@ -106,24 +106,6 @@ public enum PortData: Hashable {
         return .stringArray(.success(value))
     }
 
-    public var text: String {
-        switch self {
-            case .bool(let value):
-                guard let value = try? value?.get() else { return "" }
-                return "\(value)"
-            case .int(let value):
-                guard let value = try? value?.get() else { return "" }
-                return "\(value)"
-            case .float(let value):
-                guard let value = try? value?.get() else { return "" }
-                return "\(value)"
-            case .string(let value):
-                guard let value = try? value?.get() else { return "" }
-                return value
-            default: return "Array"
-        }
-    }
-
     public var boolValue: Bool? {
         switch self {
             case .bool(let value):
