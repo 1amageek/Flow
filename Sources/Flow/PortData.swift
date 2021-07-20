@@ -37,6 +37,35 @@ public enum PortData: Hashable {
         }
     }
 
+    public var exists: Bool {
+        switch self {
+            case .bool(let value):
+                guard let _ = try? value?.get() else { return false }
+                return true
+            case .int(let value):
+                guard let _ = try? value?.get() else { return false }
+                return true
+            case .float(let value):
+                guard let _ = try? value?.get() else { return false }
+                return true
+            case .string(let value):
+                guard let _ = try? value?.get() else { return false }
+                return true
+            case .boolArray(let value):
+                guard let _ = try? value?.get() else { return false }
+                return true
+            case .intArray(let value):
+                guard let _ = try? value?.get() else { return false }
+                return true
+            case .floatArray(let value):
+                guard let _ = try? value?.get() else { return false }
+                return true
+            case .stringArray(let value):
+                guard let _ = try? value?.get() else { return false }
+                return true
+        }
+    }
+
     public static func bool(_ value: Bool? = nil, error: NodeError? = nil) -> Self {
         if let error = error { return .bool(.failure(error)) }
         return .bool(.success(value))
@@ -308,4 +337,53 @@ public enum PortData: Hashable {
                 return value
         }
     }
+}
+
+extension PortData: CustomDebugStringConvertible {
+
+    public var debugDescription: String {
+        switch self {
+            case .bool(let value):
+                guard let value = try? value?.get() else {
+                    return "Bool(nil)"
+                }
+                return "Bool(\(value))"
+            case .int(let value):
+                guard let value = try? value?.get() else {
+                    return "Int(nil)"
+                }
+                return "Int(\(value))"
+            case .float(let value):
+                guard let value = try? value?.get() else {
+                    return "Float(nil)"
+                }
+                return "Float(\(value))"
+            case .string(let value):
+                guard let value = try? value?.get() else {
+                    return "String(nil)"
+                }
+                return "String(\(value))"
+            case .boolArray(let value):
+                guard let value = try? value?.get() else {
+                    return "[Bool](nil)"
+                }
+                return "[Bool](\(value))"
+            case .intArray(let value):
+                guard let value = try? value?.get() else {
+                    return "[Int](nil)"
+                }
+                return "[Int](\(value))"
+            case .floatArray(let value):
+                guard let value = try? value?.get() else {
+                    return "[Float](nil)"
+                }
+                return "[Float](\(value))"
+            case .stringArray(let value):
+                guard let value = try? value?.get() else {
+                    return "[String](nil)"
+                }
+                return "[String](\(value))"
+        }
+    }
+
 }

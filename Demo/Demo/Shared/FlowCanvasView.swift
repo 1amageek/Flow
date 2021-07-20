@@ -61,7 +61,7 @@ struct FlowCanvasView: View {
     }
 
     func value(_ nodeID: String, address: Address.Port) -> Binding<Float> {
-        if let port = $context.graph[nodeID].wrappedValue?[address] {
+        if let port = context.graph[nodeID]?[address] {
             return Binding {
                 return port.floatValue ?? 0
             } set: { newValue in
@@ -170,6 +170,12 @@ struct FlowCanvasView: View {
                                         HStack(alignment: .center, spacing: 8) {
                                             portCircle
                                                 .port(port.address)
+                                            TextField("0", value: value(node.id, address: .input(port.id)), formatter: NumberFormatter())
+                                                .multilineTextAlignment(.trailing)
+                                                .padding(EdgeInsets(top: 2, leading: 6, bottom: 2, trailing: 6))
+                                                .frame(minWidth: 40, maxWidth: 60)
+                                                .background(Color(.systemGray3))
+                                                .cornerRadius(8)
                                             Text(port.name ?? "")
                                             if let data = context.data(for: port.address) {
                                                 dataText(data.text, alignment: .leading)
@@ -252,7 +258,7 @@ struct FlowCanvasView: View {
                     List {
                         Text("SUM")
                             .onDrag {
-                                let node = Node.sum(id: UUID().uuidString, name: "+", inputs: [.float(), .float()], outputType: .float())
+                                let node = Node.sum(id: UUID().uuidString, name: "+", inputs: [.float(10), .float()], outputType: .float())
                                 return node.itemProvider
                             }
                         Text("PRODUCT")

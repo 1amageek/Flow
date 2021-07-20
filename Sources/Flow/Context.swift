@@ -198,10 +198,13 @@ extension Context {
                     return port.data
                 }
                 return data(for: address)
-            case (.io(let typeID), .output): do {
+            case (.io(let typeID), .output):
                 let input = node.inputs.compactMap { input -> PortData? in
+                    if input.data.exists {
+                        return input.data
+                    }
                     guard let address = connectedSourceAddress(node: node, inputPort: input) else {
-                        return port.data
+                        return input.data
                     }
                     let data = self.data(for: address)
                     return data
@@ -216,9 +219,8 @@ extension Context {
                 self.dataStore[input] = output
                 let data = output[port.id]
                 return data
-            }
             case (.input, .input): return port.data
-            case (.input(let typeID), .output): do {
+            case (.input(let typeID), .output):
                 let input = node.inputs.map { $0.data }
                 if let cache = self.dataStore[input] {
                     return cache[port.id]
@@ -230,13 +232,12 @@ extension Context {
                 self.dataStore[input] = output
                 let data = output[port.id]
                 return data
-            }
             case (.output, .input):
                 guard let address = connectedSourceAddress(node: node, inputPort: port) else {
                     return port.data
                 }
                 return data(for: address)
-            case (.output(let typeID), .output): do {
+            case (.output(let typeID), .output):
                 let input = node.inputs.map { $0.data }
                 if let cache = self.dataStore[input] {
                     return cache[port.id]
@@ -248,7 +249,6 @@ extension Context {
                 self.dataStore[input] = output
                 let data = output[port.id]
                 return data
-            }
         }
     }
 }

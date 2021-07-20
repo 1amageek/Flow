@@ -110,7 +110,6 @@ extension Port {
     public var intValue: Int? {
         get { self.data.intValue }
         set {
-
             switch self.data {
                 case .bool(_):
                     if newValue == 1 {
@@ -144,7 +143,6 @@ extension Port {
     public var floatValue: Float? {
         get { self.data.floatValue }
         set {
-
             switch self.data {
                 case .bool(_):
                     if newValue == 1 {
@@ -178,7 +176,6 @@ extension Port {
     public var stringValue: String? {
         get { self.data.stringValue }
         set {
-
             switch self.data {
                 case .bool(_):
                     if newValue == "true" || newValue == "TRUE" {
