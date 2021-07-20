@@ -108,8 +108,8 @@ public enum PortData: Hashable {
                 return value != 0
             case .string(let value):
                 guard let value = try? value?.get() else { return nil }
-                if value == "true" { return true }
-                if value == "false" { return false }
+                if value == "true" || value == "TRUE" { return true }
+                if value == "false" || value == "FALSE" { return false }
                 return nil
             default: return nil
         }

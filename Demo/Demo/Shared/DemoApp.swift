@@ -13,7 +13,7 @@ struct DemoApp: App {
     
     var body: some Scene {
 //                WindowGroup {
-//                    FlowCanvasView()
+//                    FlowCanvasView(.constant(graph))
 //                }
         DocumentGroup(newDocument: Graph()) { file in
             FlowCanvasView(file.$document)

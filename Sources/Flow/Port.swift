@@ -107,27 +107,103 @@ public struct Interface {
 
 extension Port {
 
-    public var text: String {
-        get { self.data.text }
+    public var intValue: Int? {
+        get { self.data.intValue }
         set {
+
             switch self.data {
                 case .bool(_):
-                    if newValue == "true" {
+                    if newValue == 1 {
                         self.data = .bool(true)
                         return
                     }
-                    if newValue == "false" {
+                    if newValue == 0 {
                         self.data = .bool(false)
                         return
                     }
+                    self.data = .bool(.success(nil))
                 case .int(_):
-                    guard let value = Int(newValue) else { return }
-                    self.data = .int(value)
+                    self.data = .int(newValue)
                 case .float(_):
-                    guard let value = Float(newValue) else { return }
-                    self.data = .float(value)
+                    if let value = newValue {
+                        self.data = .float(Float(value))
+                    } else {
+                        self.data = .float(.success(nil))
+                    }
                 case .string(_):
-                    return self.data = .string(newValue)
+                    if let value = newValue {
+                        self.data = .string(String(value))
+                    } else {
+                        self.data = .string(.success(nil))
+                    }
+                default: fatalError()
+            }
+        }
+    }
+
+    public var floatValue: Float? {
+        get { self.data.floatValue }
+        set {
+
+            switch self.data {
+                case .bool(_):
+                    if newValue == 1 {
+                        self.data = .bool(true)
+                        return
+                    }
+                    if newValue == 0 {
+                        self.data = .bool(false)
+                        return
+                    }
+                    self.data = .bool(.success(nil))
+                case .int(_):
+                    if let value = newValue {
+                        self.data = .int(Int(value))
+                    } else {
+                        self.data = .int(.success(nil))
+                    }
+                case .float(_):
+                    self.data = .float(newValue)
+                case .string(_):
+                    if let value = newValue {
+                        self.data = .string(String(value))
+                    } else {
+                        self.data = .string(.success(nil))
+                    }
+                default: fatalError()
+            }
+        }
+    }
+
+    public var stringValue: String? {
+        get { self.data.stringValue }
+        set {
+
+            switch self.data {
+                case .bool(_):
+                    if newValue == "true" || newValue == "TRUE" {
+                        self.data = .bool(true)
+                        return
+                    }
+                    if newValue == "false" || newValue == "FALSE" {
+                        self.data = .bool(false)
+                        return
+                    }
+                    self.data = .bool(.success(nil))
+                case .int(_):
+                    if let value = newValue {
+                        self.data = .int(Int(value))
+                    } else {
+                        self.data = .int(.success(nil))
+                    }
+                case .float(_):
+                    if let value = newValue {
+                        self.data = .float(Float(value))
+                    } else {
+                        self.data = .float(.success(nil))
+                    }
+                case .string(_):
+                    self.data = .string(newValue)
                 default: fatalError()
             }
         }

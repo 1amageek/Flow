@@ -60,15 +60,15 @@ struct FlowCanvasView: View {
             .frame(maxWidth: 130, alignment: alignment)
     }
 
-    func text(_ nodeID: String, address: Address.Port) -> Binding<String> {
+    func value(_ nodeID: String, address: Address.Port) -> Binding<Float> {
         if let port = $context.graph[nodeID].wrappedValue?[address] {
             return Binding {
-                return port.text
+                return port.floatValue ?? 0
             } set: { newValue in
-                context.graph[nodeID]?[address]?.text = newValue
+                context.graph[nodeID]?[address]?.floatValue = newValue
             }
         }
-        return .constant("")
+        return .constant(0)
     }
 
     func inputNode(node: Node) -> some View {
@@ -81,7 +81,7 @@ struct FlowCanvasView: View {
                             //
                             //                            }
                         } else {
-                            TextField("0", text: text(node.id, address: .input(port.id)))
+                            TextField("0", value: value(node.id, address: .input(port.id)), formatter: NumberFormatter())
                                 .multilineTextAlignment(.trailing)
                                 .padding(EdgeInsets(top: 2, leading: 6, bottom: 2, trailing: 6))
                                 .frame(maxWidth: 100)
@@ -138,9 +138,26 @@ struct FlowCanvasView: View {
             CanvasView(context, nodeView: { node in
                 NodeView(node) { inputs, outputs in
                     VStack(spacing: 0) {
-                        Text(node.name)
-                            .bold()
-                            .padding(8)
+                        HStack {
+                            Text(node.name)
+                                .bold()
+                                .padding(8)
+                            Menu {
+                                Button("Delete") {
+                                    context.graph.delete(node)
+                                }
+                            } label: {
+                                Image(systemName: "ellipsis")
+                                    .aspectRatio(1, contentMode: .fill)
+                    //                .resizable()
+                                    .frame(width: 24, height: 24)
+                                    .foregroundColor(Color(.label))
+                                    .ignoresSafeArea()
+                            }
+                            .ignoresSafeArea()
+                        }
+                        .ignoresSafeArea()
+                        .frame(height: 40, alignment: .center)
                         Divider()
                         if case .input(_) = node.type {
                             inputNode(node: node)
