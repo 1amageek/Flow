@@ -150,21 +150,21 @@ public struct Product: Callable {
         switch portData {
             case .bool(_):
                 let inputs = input.compactMap({ $0.boolValue })
-                if inputs.count > 0 {
+                if inputs.count > 1 {
                     let result = inputs.reduce(true) { $0 && $1 }
                     return .bool(result)
                 }
                 return .bool(false)
             case .int(_):
                 let inputs = input.compactMap({ $0.intValue })
-                if inputs.count > 0 {
+                if inputs.count > 1 {
                     let result = inputs.reduce(1, *)
                     return .int(result)
                 }
                 return .int(0)
             case .float(_):
                 let inputs = input.compactMap({ $0.floatValue })
-                if inputs.count > 0 {
+                if inputs.count > 1 {
                     let result = inputs.reduce(1, *)
                     return .float(result)
                 }

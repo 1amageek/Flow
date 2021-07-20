@@ -99,9 +99,6 @@ struct FlowCanvasView: View {
             VStack(alignment: .trailing, spacing: portSpacing) {
                 ForEach(node.outputs) { port in
                     HStack(alignment: .center, spacing: 8) {
-                        if let data = context.data(for: port.address) {
-                            dataText(data.text, alignment: .trailing)
-                        }
                         portCircle
                             .port(.output(node.id, index: port.id))
                     }
@@ -118,9 +115,6 @@ struct FlowCanvasView: View {
                     HStack(alignment: .center, spacing: 8) {
                         portCircle
                             .port(.input(node.id, index: port.id))
-                        if let data = context.data(for: port.address) {
-                            dataText(data.text, alignment: .leading)
-                        }
                         Text(port.name ?? "")
                             .lineLimit(1)
                             .frame(maxWidth: 100, alignment: .leading)
@@ -177,9 +171,6 @@ struct FlowCanvasView: View {
                                                 .background(Color(.systemGray3))
                                                 .cornerRadius(8)
                                             Text(port.name ?? "")
-                                            if let data = context.data(for: port.address) {
-                                                dataText(data.text, alignment: .leading)
-                                            }
                                         }
                                         .frame(height: portHeight)
                                     }
@@ -217,9 +208,6 @@ struct FlowCanvasView: View {
                                     ForEach(outputs) { port in
                                         HStack(alignment: .center, spacing: 8) {
                                             Text(port.name ?? "")
-                                            if let data = context.data(for: port.address) {
-                                                dataText(data.text, alignment: .trailing)
-                                            }
                                             portCircle
                                                 .port(port.address)
                                         }
