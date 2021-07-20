@@ -107,6 +107,35 @@ public struct Interface {
 
 extension Port {
 
+    public var boolValue: Bool? {
+        get { self.data.boolValue }
+        set {
+            switch self.data {
+                case .bool(_):
+                    self.data = .bool(newValue)
+                case .int(_):
+                    if let value = newValue {
+                        self.data = .int(value ? 1 : 0)
+                    } else {
+                        self.data = .int(.success(nil))
+                    }
+                case .float(_):
+                    if let value = newValue {
+                        self.data = .float(value ? 1 : 0)
+                    } else {
+                        self.data = .float(.success(nil))
+                    }
+                case .string(_):
+                    if let value = newValue {
+                        self.data = .string(String(value))
+                    } else {
+                        self.data = .string(.success(nil))
+                    }
+                default: fatalError()
+            }
+        }
+    }
+
     public var intValue: Int? {
         get { self.data.intValue }
         set {
