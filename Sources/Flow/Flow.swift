@@ -11,5 +11,7 @@ public struct Flow: Codable {
 
     public var graphs: [Graph] = []
 
-
+    public init(graphs: [Graph]) {
+        self.graphs = graphs
+    }
 }

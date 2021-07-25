@@ -10,8 +10,6 @@ import SwiftUI
 
 public final class Context: ObservableObject {
 
-    public static let functions: [Callable] = [Bypass(), Sum(), Product(), Average(), Varp()]
-
     @Published public var canvas: Canvas = Canvas()
 
     @Published public var graph: Graph
@@ -28,21 +26,15 @@ public final class Context: ObservableObject {
 
     let taskQueue: DispatchQueue = DispatchQueue(label: "inc.stamp.flow.queue")
 
-    public var callableFunctions: [Callable]
+    public var callableFunctions: CallableFunctions
 
     let dataStore: DataStore = DataStore()
 
     var shouldConnectNodeHandler: ((_ nodes: [Node], _ edges: [Edge], _ connection: Connection) -> Bool)!
 
-    public init(_ graph: Graph, callableFunctions: [Callable] = []) {
+    public init(_ graph: Graph, callableFunctions: CallableFunctions) {
         self.graph = Self.prepare(graph)
-        self.callableFunctions = Context.functions + callableFunctions
-    }
-
-    @discardableResult
-    public func set(callableFunctions: [Callable]) -> Self {
         self.callableFunctions = callableFunctions
-        return self
     }
 
     /// Get the calculation results for a port at an arbitrary address.

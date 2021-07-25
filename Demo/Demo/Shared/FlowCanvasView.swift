@@ -39,8 +39,12 @@ struct FlowCanvasView: View {
 
     init(_ graph: Binding<Graph>) {
         self._graph = graph
-        self._context = ObservedObject(initialValue: Context(graph.wrappedValue, callableFunctions: []))
-    }
+        self._context = ObservedObject(
+            initialValue: Context(
+                graph.wrappedValue,
+                callableFunctions: CallableFunctions(flow: Flow(graphs: []), addtionalFunctions: [])
+            ))
+            }
 
     let portSpacing: CGFloat = 24
 
