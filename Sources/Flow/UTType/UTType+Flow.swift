@@ -10,6 +10,8 @@ import UniformTypeIdentifiers
 
 extension UTType {
 
+    public static let flow = UTType(exportedAs: "inc.stamp.flow")
+
     public static let graph = UTType(exportedAs: "inc.stamp.flow.graph")
 
     public static let node = UTType(exportedAs: "inc.stamp.flow.node")

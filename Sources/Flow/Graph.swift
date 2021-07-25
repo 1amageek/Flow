@@ -7,7 +7,9 @@
 
 import SwiftUI
 
-public struct Graph: Codable {
+public struct Graph: Identifiable, Codable {
+
+    public var id: String
 
     public var nodes: [Node] = []
 
@@ -35,9 +37,11 @@ public struct Graph: Codable {
     }
 
     public init(
+        id: String = UUID().uuidString,
         nodes: [Node] = [],
         edges: [Edge] = []
     ) {
+        self.id = id
         self.nodes = nodes
         self.edges = edges
     }

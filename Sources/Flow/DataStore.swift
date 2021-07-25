@@ -19,42 +19,43 @@ class DataStore {
     }
 }
 
-final class Cache<Key: Hashable, Value> {
+extension DataStore {
+    final class Cache<Key: Hashable, Value> {
 
-    private let wrapped: NSCache<WrappedKey, Entry> = {
-        let cache = NSCache<WrappedKey, Entry>()
-        cache.countLimit = 100
-        return cache
-    }()
+        private let wrapped: NSCache<WrappedKey, Entry> = {
+            let cache = NSCache<WrappedKey, Entry>()
+            cache.countLimit = 100
+            return cache
+        }()
 
-    func insert(_ value: Value, forKey key: Key) {
-        let entry = Entry(value: value)
-        wrapped.setObject(entry, forKey: WrappedKey(key))
-    }
+        func insert(_ value: Value, forKey key: Key) {
+            let entry = Entry(value: value)
+            wrapped.setObject(entry, forKey: WrappedKey(key))
+        }
 
-    func value(forKey key: Key) -> Value? {
-        let entry = wrapped.object(forKey: WrappedKey(key))
-        return entry?.value
-    }
+        func value(forKey key: Key) -> Value? {
+            let entry = wrapped.object(forKey: WrappedKey(key))
+            return entry?.value
+        }
 
-    func removeValue(forKey key: Key) {
-        wrapped.removeObject(forKey: WrappedKey(key))
-    }
+        func removeValue(forKey key: Key) {
+            wrapped.removeObject(forKey: WrappedKey(key))
+        }
 
-    subscript(key: Key) -> Value? {
-        get { return value(forKey: key) }
-        set {
-            guard let value = newValue else {
-                removeValue(forKey: key)
-                return
+        subscript(key: Key) -> Value? {
+            get { return value(forKey: key) }
+            set {
+                guard let value = newValue else {
+                    removeValue(forKey: key)
+                    return
+                }
+                insert(value, forKey: key)
             }
-
-            insert(value, forKey: key)
         }
     }
 }
 
-private extension Cache {
+extension DataStore.Cache {
 
     final class WrappedKey: NSObject {
 
