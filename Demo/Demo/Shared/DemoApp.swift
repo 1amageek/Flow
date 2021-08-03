@@ -10,16 +10,17 @@ import Flow
 
 @main
 struct DemoApp: App {
+
+    @StateObject var store = FlowDocument()
     
     var body: some Scene {
-//                WindowGroup {
-//                    FlowCanvasView(.constant(graph))
-//                }
-        DocumentGroup(newDocument: Graph()) { file in
-            FlowCanvasView(file.$document)
+        WindowGroup {
+            ContentView().environmentObject(store)
         }
-//        DocumentGroup(newDocument: TextFile()) { file in
-//            ContentView(document: file.$document)
+
+//        DocumentGroup(newDocument: { FlowDocument() }) { configuration in
+//            ContentView()
 //        }
+
     }
 }

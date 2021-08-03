@@ -33,18 +33,7 @@ let graph: Graph = Graph(
 
 struct FlowCanvasView: View {
 
-    @ObservedObject public var context: Context
-
-    @Binding var graph: Graph
-
-    init(_ graph: Binding<Graph>) {
-        self._graph = graph
-        self._context = ObservedObject(
-            initialValue: Context(
-                graph.wrappedValue,
-                callableFunctions: CallableFunctions(flow: Flow(graphs: []), addtionalFunctions: [])
-            ))
-            }
+    @EnvironmentObject var context: FlowDocument
 
     let portSpacing: CGFloat = 24
 
@@ -65,11 +54,11 @@ struct FlowCanvasView: View {
     }
 
     func value(_ nodeID: String, address: Address.Port) -> Binding<Float> {
-        if let port = context.graph[nodeID]?[address] {
+        if let port = context.graph?[nodeID]?[address] {
             return Binding {
                 return port.floatValue ?? 0
             } set: { newValue in
-                context.graph[nodeID]?[address]?.floatValue = newValue
+                context.graph?[nodeID]?[address]?.floatValue = newValue
             }
         }
         return .constant(0)
@@ -142,12 +131,12 @@ struct FlowCanvasView: View {
                                 .padding(8)
                             Menu {
                                 Button("Delete") {
-                                    context.graph.delete(node)
+                                    context.graph?.delete(node)
                                 }
                             } label: {
                                 Image(systemName: "ellipsis")
                                     .aspectRatio(1, contentMode: .fill)
-                    //                .resizable()
+                                //                .resizable()
                                     .frame(width: 24, height: 24)
                                     .foregroundColor(Color(.label))
                                     .ignoresSafeArea()
@@ -183,7 +172,7 @@ struct FlowCanvasView: View {
                                             var node = node
                                             let portCount = node.inputs.count
                                             let inputs = (0...portCount).map({ _ in Interface(node.outputs.first!.data) })
-                                            context.graph[node.id] = node.setInputs(inputs)
+                                            context.graph?[node.id] = node.setInputs(inputs)
                                         } label: {
                                             Image(systemName: "plus")
                                                 .resizable()
@@ -191,12 +180,12 @@ struct FlowCanvasView: View {
                                                 .frame(width: 22, height: 22, alignment: .center)
                                                 .foregroundColor(Color(.systemGray))
                                         }
-
+                                        
                                         Button {
                                             var node = node
                                             let portCount = node.inputs.count - 2
                                             let inputs = (0...portCount).map({ _ in Interface(node.outputs.first!.data) })
-                                            context.graph[node.id] = node.setInputs(inputs)
+                                            context.graph?[node.id] = node.setInputs(inputs)
                                         } label: {
                                             Image(systemName: "minus")
                                                 .resizable()
@@ -221,7 +210,7 @@ struct FlowCanvasView: View {
                             }
                             .padding(8)
                         }
-
+                        
                     }
                     .frame(width: 180)
                     .background(Color(.systemGray4))
@@ -258,14 +247,17 @@ struct FlowCanvasView: View {
                                 let node = Node.product(id: UUID().uuidString, name: "*", inputs: [.float(), .float()], outputType: .float())
                                 return node.itemProvider
                             }
+
+                        Button("Show Graph") {
+                            print(context.graph)
+                        }
                     }
                     .frame(width: 160, height: 300)
                     Spacer()
                 }
             }
-        }
-        .onDisappear {
-            self.graph = context.graph
+        }.onAppear {
+            print(context.selectedGraph)
         }
     }
 }
