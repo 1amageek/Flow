@@ -45,13 +45,19 @@ public struct NodeView<Content: View>: View {
         self.content = content
     }
 
+    func geometryDecide(proxy: GeometryProxy) {
+        DispatchQueue.main.async {
+            context.graph?.nodes[id]?.size = proxy.size
+        }
+    }
+
     public var body: some View {
         content(node.inputs, node.outputs)
             .background(GeometryReader { proxy in
                 Rectangle()
                     .fill(Color.clear)
-                    .onAppear { context.graph?.nodes[id]?.size = proxy.size }
-                    .onChange(of: proxy.size ) { newValue in context.graph?.nodes[id]?.size = newValue }
+                    .onAppear { geometryDecide(proxy: proxy) }
+                    .onChange(of: proxy.size ) { _ in geometryDecide(proxy: proxy) }
             })
             .coordinateSpace(name: id)
             .position(position)

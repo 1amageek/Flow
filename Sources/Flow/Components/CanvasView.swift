@@ -130,6 +130,12 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
         }
     }
 
+    func geometryDecide(proxy: GeometryProxy) {
+        DispatchQueue.main.async {
+            context.canvas.size = proxy.size
+        }
+    }
+
     public var body: some View {
         ZStack {
             ZStack {
@@ -151,8 +157,8 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
         .background(GeometryReader { proxy in
             Rectangle()
                 .fill(Color.clear)
-                .onAppear { context.canvas.size = proxy.size }
-                .onChange(of: proxy.size ) { newValue in context.canvas.size = newValue }
+                .onAppear { geometryDecide(proxy: proxy) }
+                .onChange(of: proxy.size ) { _ in geometryDecide(proxy: proxy) }
         })
         .contentShape(Rectangle())
         .gesture(SimultaneousGesture(dragGesture, magnificationGesture))

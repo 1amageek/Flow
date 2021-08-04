@@ -29,13 +29,15 @@ public struct InputPortView<Content: View>: View {
     }
 
     func geometryDecide(proxy: GeometryProxy) {
-        if context.graph?.nodes[id]?.inputs.exist(portIndex) ?? false {
-            let frame = proxy.frame(in: .named(id))
-            context.graph?.nodes[id]?[.input(portIndex)]?.size = proxy.size
-            context.graph?.nodes[id]?[.input(portIndex)]?.position = CGPoint(
-                x: frame.origin.x + proxy.size.width / 2,
-                y: frame.origin.y + proxy.size.height / 2
-            )
+        DispatchQueue.main.async {
+            if context.graph?.nodes[id]?.inputs.exist(portIndex) ?? false {
+                let frame = proxy.frame(in: .named(id))
+                context.graph?.nodes[id]?[.input(portIndex)]?.size = proxy.size
+                context.graph?.nodes[id]?[.input(portIndex)]?.position = CGPoint(
+                    x: frame.origin.x + proxy.size.width / 2,
+                    y: frame.origin.y + proxy.size.height / 2
+                )
+            }
         }
     }
 
@@ -107,13 +109,15 @@ public struct OutputPortView<Content: View>: View {
     }
 
     func geometryDecide(proxy: GeometryProxy) {
-        if context.graph?.nodes[id]?.outputs.exist(portIndex) ?? false {
-            let frame = proxy.frame(in: .named(id))
-            context.graph?.nodes[id]?[.output(portIndex)]?.size = proxy.size
-            context.graph?.nodes[id]?[.output(portIndex)]?.position = CGPoint(
-                x: frame.origin.x + proxy.size.width / 2,
-                y: frame.origin.y + proxy.size.height / 2
-            )
+        DispatchQueue.main.async {
+            if context.graph?.nodes[id]?.outputs.exist(portIndex) ?? false {
+                let frame = proxy.frame(in: .named(id))
+                context.graph?.nodes[id]?[.output(portIndex)]?.size = proxy.size
+                context.graph?.nodes[id]?[.output(portIndex)]?.position = CGPoint(
+                    x: frame.origin.x + proxy.size.width / 2,
+                    y: frame.origin.y + proxy.size.height / 2
+                )
+            }
         }
     }
 
