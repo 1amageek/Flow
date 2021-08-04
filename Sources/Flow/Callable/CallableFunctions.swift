@@ -26,6 +26,30 @@ extension Node {
     }
 }
 
+final public class CallableFunctions: CallableFunctionsProtocol {
+
+    public static let functions: [Callable] = [Bypass(), Sum(), Product(), Average(), Varp()]
+
+    let cluster: Cluster
+
+    let addtionalFunctions: [Callable]
+
+    var anyCallables: [AnyCallable] { cluster.graphs.map({ AnyCallable(graph: $0, delegate: self) }) }
+
+    public init(cluster: Cluster, addtionalFunctions: [Callable]) {
+        self.cluster = cluster
+        self.addtionalFunctions = addtionalFunctions
+    }
+
+    public var graphs: [Graph] { cluster.graphs }
+
+    public var callableFunctions: [Callable] { anyCallables + addtionalFunctions + Self.functions }
+
+    public subscript(id: Callable.ID) -> Callable? {
+        guard let index = callableFunctions.firstIndex(where: { $0.id == id }) else { return nil }
+        return callableFunctions[index]
+    }
+}
 
 public struct Bypass: Callable {
 

@@ -11,7 +11,7 @@ public struct NodeView<Content: View>: View {
 
     @Environment(\.canvasCoordinateSpace) var canvasCoordinateSpace: String
 
-    @EnvironmentObject var context: Context
+    @EnvironmentObject var context: FlowDocument
 
     var node: Node
 
@@ -19,19 +19,19 @@ public struct NodeView<Content: View>: View {
 
     var cornerRadius: CGFloat = 12
 
-    var position: CGPoint { context.graph.nodes[id]?.position ?? .zero  }
+    var position: CGPoint { context.graph?.nodes[id]?.position ?? .zero  }
 
-    var offset: CGSize { context.graph.nodes[id]?.offset ?? .zero  }
+    var offset: CGSize { context.graph?.nodes[id]?.offset ?? .zero  }
 
     var gesture: some Gesture {
         DragGesture(minimumDistance: 0.2)
             .onChanged { value in
-                context.graph.nodes[id]?.offset = value.translation
+                context.graph?.nodes[id]?.offset = value.translation
             }
             .onEnded { value in
                 let position = context.nodes[id]?.position ?? .zero
-                context.graph.nodes[id]?.offset = .zero
-                context.graph.nodes[id]?.position = CGPoint(
+                context.graph?.nodes[id]?.offset = .zero
+                context.graph?.nodes[id]?.position = CGPoint(
                     x: position.x + value.translation.width,
                     y: position.y + value.translation.height
                 )
@@ -45,13 +45,19 @@ public struct NodeView<Content: View>: View {
         self.content = content
     }
 
+    func geometryDecide(proxy: GeometryProxy) {
+        DispatchQueue.main.async {
+            context.graph?.nodes[id]?.size = proxy.size
+        }
+    }
+
     public var body: some View {
         content(node.inputs, node.outputs)
             .background(GeometryReader { proxy in
                 Rectangle()
                     .fill(Color.clear)
-                    .onAppear { context.graph.nodes[id]?.size = proxy.size }
-                    .onChange(of: proxy.size ) { newValue in context.graph.nodes[id]?.size = newValue }
+                    .onAppear { geometryDecide(proxy: proxy) }
+                    .onChange(of: proxy.size ) { _ in geometryDecide(proxy: proxy) }
             })
             .coordinateSpace(name: id)
             .position(position)

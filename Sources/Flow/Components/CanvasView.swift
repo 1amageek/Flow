@@ -12,7 +12,7 @@ private struct CanvasCoordinateSpace: EnvironmentKey {
 }
 
 extension EnvironmentValues {
-    var canvasCoordinateSpace: String { self[CanvasCoordinateSpace] }
+    var canvasCoordinateSpace: String { self[CanvasCoordinateSpace.self] }
 }
 
 public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent: View>: View {
@@ -29,7 +29,7 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
         }
     }
 
-    var context: Context
+    var context: FlowDocument
 
     var nodeView: (_ node: Node) -> NodeContent
 
@@ -50,7 +50,7 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
 
     @State var dragState: DragState = .none
 
-    public init(_ context: Context,
+    public init(_ context: FlowDocument,
                 @ViewBuilder nodeView: @escaping (_ node: Node) -> NodeContent,
                 @ViewBuilder edgeView: @escaping (_ edge: Edge) -> EdgeContent,
                 @ViewBuilder connectionView: @escaping (_ connection: Connection) -> ConnectionContent,
@@ -101,7 +101,8 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
             }
             return cache
         } else {
-            let visibleNodes = context.graph.nodes.filter { context.canvas.visibleFrame.intersects($0.frame) }
+            guard let graph = context.graph else { return [] }
+            let visibleNodes = graph.nodes.filter { context.canvas.visibleFrame.intersects($0.frame) }
             context.cache.nodes = visibleNodes
             return visibleNodes
         }
@@ -120,11 +121,18 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
             return cache
         } else {
             let nodes = context.cache.nodes ?? []
-            let visibleEdges = context.graph.edges.filter { edge -> Bool in
+            guard let graph = context.graph else { return [] }
+            let visibleEdges = graph.edges.filter { edge -> Bool in
                 return nodes.contains(where: { $0.id == edge.source.id }) && nodes.contains(where: { $0.id == edge.target.id })
             }
             context.cache.edges = visibleEdges
             return visibleEdges
+        }
+    }
+
+    func geometryDecide(proxy: GeometryProxy) {
+        DispatchQueue.main.async {
+            context.canvas.size = proxy.size
         }
     }
 
@@ -149,8 +157,8 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
         .background(GeometryReader { proxy in
             Rectangle()
                 .fill(Color.clear)
-                .onAppear { context.canvas.size = proxy.size }
-                .onChange(of: proxy.size ) { newValue in context.canvas.size = newValue }
+                .onAppear { geometryDecide(proxy: proxy) }
+                .onChange(of: proxy.size ) { _ in geometryDecide(proxy: proxy) }
         })
         .contentShape(Rectangle())
         .gesture(SimultaneousGesture(dragGesture, magnificationGesture))
@@ -160,7 +168,7 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
                 nodes.forEach { node in
                     var node = node
                     let position = CGPoint(x: location.x - context.canvas.offset.width, y: location.y - context.canvas.offset.height)
-                    context.graph.add(node.set(position))
+                    context.graph?.add(node.set(position))
                 }
             }
             return true

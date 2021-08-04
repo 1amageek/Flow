@@ -30,3 +30,113 @@ extension Callable {
         }
     }
 }
+
+public protocol CallableFunctionsProtocol {
+
+    subscript(id: Callable.ID) -> Callable? { get }
+}
+
+public struct AnyCallable: Callable {
+
+    public var id: ID { graph.id }
+
+    public var graph: Graph
+
+    public var delegate: CallableFunctionsProtocol
+
+    public init(graph: Graph, delegate: CallableFunctionsProtocol) {
+        self.graph = graph
+        self.delegate = delegate
+    }
+
+    public func callAsFunction(input: Input, output: Output, index: PortIndex) -> PortData {
+        let node = ouputNodes[index]
+        let port = node.outputs.first!
+        return data(node: node, port: port)!
+    }
+}
+
+extension AnyCallable {
+
+    var nodes: [Node] { graph.nodes }
+
+    var edges: [Edge] { graph.edges }
+
+    var ouputNodes: [Node] {
+        nodes.filter { node in
+            if case .output(_) = node.type {
+                return true
+            }
+            return false
+        }
+    }
+
+    func connectedSourceNodes(node: Node, inputPort: Port) -> [Node] {
+        let connectedEdge = self.edges.filter { $0.target ==  inputPort.address }
+        return connectedEdge.compactMap { self.graph[$0.source.id] }
+    }
+
+    func connectedSourceAddress(node: Node, inputPort: Port) -> Address? {
+        guard let connectedEdge = self.edges.filter({ $0.target ==  inputPort.address }).first else { return nil }
+        return connectedEdge.source
+    }
+
+    func data(for address: Address) -> PortData? {
+        guard let node: Node = nodes[address.id] else {
+            return nil
+        }
+        guard let port: Port = node[address.port] else {
+            return nil
+        }
+        return data(node: node, port: port)
+    }
+
+    func data(node: Node, port: Port) -> PortData? {
+        switch (node.type, port.type) {
+            case (.io, .input):
+                guard let address = connectedSourceAddress(node: node, inputPort: port) else {
+                    return port.data
+                }
+                return data(for: address)
+            case (.io(let typeID), .output):
+                let input = node.inputs.compactMap { input -> PortData? in
+                    if input.data.exists {
+                        return input.data
+                    }
+                    guard let address = connectedSourceAddress(node: node, inputPort: input) else {
+                        return input.data
+                    }
+                    let data = self.data(for: address)
+                    return data
+                }
+                guard let callable = delegate[typeID] else {
+                    fatalError()
+                }
+                let output = callable(input, node.outputs.map({ $0.data }))
+                let data = output[port.id]
+                return data
+            case (.input, .input): return port.data
+            case (.input(let typeID), .output):
+                let input = node.inputs.map { $0.data }
+                guard let callable = delegate[typeID] else {
+                    fatalError()
+                }
+                let output = callable(input, node.outputs.map({ $0.data }))
+                let data = output[port.id]
+                return data
+            case (.output, .input):
+                guard let address = connectedSourceAddress(node: node, inputPort: port) else {
+                    return port.data
+                }
+                return data(for: address)
+            case (.output(let typeID), .output):
+                let input = node.inputs.map { $0.data }
+                guard let callable = delegate[typeID] else {
+                    fatalError()
+                }
+                let output = callable(input, node.outputs.map({ $0.data }))
+                let data = output[port.id]
+                return data
+        }
+    }
+}

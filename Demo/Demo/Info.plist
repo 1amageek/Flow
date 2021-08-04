@@ -23,7 +23,7 @@
 			<string>Default</string>
 			<key>LSItemContentTypes</key>
 			<array>
-				<string>inc.stamp.flow</string>
+				<string>inc.stamp.flow.cluster</string>
 			</array>
 		</dict>
 	</array>
@@ -62,12 +62,12 @@
 			<key>UTTypeIconFiles</key>
 			<array/>
 			<key>UTTypeIdentifier</key>
-			<string>inc.stamp.flow</string>
+			<string>inc.stamp.flow.cluster</string>
 			<key>UTTypeTagSpecification</key>
 			<dict>
 				<key>public.filename-extension</key>
 				<array>
-					<string>flow</string>
+					<string>cluster</string>
 				</array>
 			</dict>
 		</dict>
@@ -107,12 +107,12 @@
 			<key>UTTypeIconFiles</key>
 			<array/>
 			<key>UTTypeIdentifier</key>
-			<string>inc.stamp.flow</string>
+			<string>inc.stamp.flow.cluster</string>
 			<key>UTTypeTagSpecification</key>
 			<dict>
 				<key>public.filename-extension</key>
 				<array>
-					<string>flow</string>
+					<string>cluster</string>
 				</array>
 			</dict>
 		</dict>

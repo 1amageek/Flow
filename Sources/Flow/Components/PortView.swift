@@ -11,7 +11,7 @@ public struct InputPortView<Content: View>: View {
 
     @Environment(\.canvasCoordinateSpace) var canvasCoordinateSpace: String
 
-    @EnvironmentObject var context: Context
+    @EnvironmentObject var context: FlowDocument
 
     public var id: String
 
@@ -29,13 +29,15 @@ public struct InputPortView<Content: View>: View {
     }
 
     func geometryDecide(proxy: GeometryProxy) {
-        if context.graph.nodes[id]?.inputs.exist(portIndex) ?? false {
-            let frame = proxy.frame(in: .named(id))
-            context.graph.nodes[id]?[.input(portIndex)]?.size = proxy.size
-            context.graph.nodes[id]?[.input(portIndex)]?.position = CGPoint(
-                x: frame.origin.x + proxy.size.width / 2,
-                y: frame.origin.y + proxy.size.height / 2
-            )
+        DispatchQueue.main.async {
+            if context.graph?.nodes[id]?.inputs.exist(portIndex) ?? false {
+                let frame = proxy.frame(in: .named(id))
+                context.graph?.nodes[id]?[.input(portIndex)]?.size = proxy.size
+                context.graph?.nodes[id]?[.input(portIndex)]?.position = CGPoint(
+                    x: frame.origin.x + proxy.size.width / 2,
+                    y: frame.origin.y + proxy.size.height / 2
+                )
+            }
         }
     }
 
@@ -46,8 +48,8 @@ public struct InputPortView<Content: View>: View {
                     .fill(Color.clear)
                     .onAppear { geometryDecide(proxy: proxy) }
                     .onChange(of: proxy.frame(in: .named(id))) { _ in geometryDecide(proxy: proxy) }
-                    .onChange(of: context.graph.nodes[id]?.inputs.count) { _ in geometryDecide(proxy: proxy) }
-                    .onChange(of: context.graph.nodes[id]?.outputs.count) { _ in geometryDecide(proxy: proxy) }
+                    .onChange(of: context.graph?.nodes[id]?.inputs.count) { _ in geometryDecide(proxy: proxy) }
+                    .onChange(of: context.graph?.nodes[id]?.outputs.count) { _ in geometryDecide(proxy: proxy) }
             })
             .modifier(JackModifier(id: id, portIndex: portIndex, onConnecting: { value in
                 if context.connecting != nil {
@@ -56,7 +58,7 @@ public struct InputPortView<Content: View>: View {
                 } else {
                     let address: Address = .input(id, index: portIndex)
                     if let edge = context.edges.filter({ $0.target == .input(id, index: portIndex) }).first {
-                        context.graph.edges[edge.id] = nil
+                        context.graph?.edges[edge.id] = nil
                         context.connecting = Connection(
                             id: id,
                             start: context.position(with: edge.source) ?? .zero,
@@ -78,7 +80,7 @@ public struct InputPortView<Content: View>: View {
                     connection.endAddress = address
                     if context.shouldConnect(connection) {
                         let edge = Edge(source: address, target: connection.startAddress)
-                        context.graph.edges.append(edge)
+                        context.graph?.edges.append(edge)
                     }
                 }
             }))
@@ -89,7 +91,7 @@ public struct OutputPortView<Content: View>: View {
 
     @Environment(\.canvasCoordinateSpace) var canvasCoordinateSpace: String
 
-    @EnvironmentObject var context: Context
+    @EnvironmentObject var context: FlowDocument
 
     public var id: String
 
@@ -107,13 +109,15 @@ public struct OutputPortView<Content: View>: View {
     }
 
     func geometryDecide(proxy: GeometryProxy) {
-        if context.graph.nodes[id]?.outputs.exist(portIndex) ?? false {
-            let frame = proxy.frame(in: .named(id))
-            context.graph.nodes[id]?[.output(portIndex)]?.size = proxy.size
-            context.graph.nodes[id]?[.output(portIndex)]?.position = CGPoint(
-                x: frame.origin.x + proxy.size.width / 2,
-                y: frame.origin.y + proxy.size.height / 2
-            )
+        DispatchQueue.main.async {
+            if context.graph?.nodes[id]?.outputs.exist(portIndex) ?? false {
+                let frame = proxy.frame(in: .named(id))
+                context.graph?.nodes[id]?[.output(portIndex)]?.size = proxy.size
+                context.graph?.nodes[id]?[.output(portIndex)]?.position = CGPoint(
+                    x: frame.origin.x + proxy.size.width / 2,
+                    y: frame.origin.y + proxy.size.height / 2
+                )
+            }
         }
     }
 
@@ -124,8 +128,8 @@ public struct OutputPortView<Content: View>: View {
                     .fill(Color.clear)
                     .onAppear { geometryDecide(proxy: proxy) }
                     .onChange(of: proxy.frame(in: .named(id))) { _ in geometryDecide(proxy: proxy) }
-                    .onChange(of: context.graph.nodes[id]?.inputs.count) { _ in geometryDecide(proxy: proxy) }
-                    .onChange(of: context.graph.nodes[id]?.outputs.count) { _ in geometryDecide(proxy: proxy) }
+                    .onChange(of: context.graph?.nodes[id]?.inputs.count) { _ in geometryDecide(proxy: proxy) }
+                    .onChange(of: context.graph?.nodes[id]?.outputs.count) { _ in geometryDecide(proxy: proxy) }
             })
             .modifier(JackModifier(id: id, portIndex: portIndex, onConnecting: { value in
                 if context.connecting != nil {
@@ -146,7 +150,7 @@ public struct OutputPortView<Content: View>: View {
                     connection.endAddress = address
                     if context.shouldConnect(connection) {
                         let edge = Edge(source: connection.startAddress, target: address)
-                        context.graph.edges.append(edge)
+                        context.graph?.edges.append(edge)
                     }
                 }
             }))
@@ -157,7 +161,7 @@ struct JackModifier: ViewModifier {
 
     @Environment(\.canvasCoordinateSpace) var canvasCoordinateSpace: String
 
-    @EnvironmentObject var context: Context
+    @EnvironmentObject var context: FlowDocument
 
     var id: String
 
