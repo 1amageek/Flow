@@ -74,7 +74,7 @@ struct FlowCanvasView: View {
                             //
                             //                            }
                         } else {
-                            TextField("0", value: value(node.id, address: .input(port.id)), formatter: NumberFormatter())
+                            TextField(data(context.data(for: port.address)), value: value(node.id, address: .input(port.id)), formatter: NumberFormatter())
                                 .multilineTextAlignment(.trailing)
                                 .padding(EdgeInsets(top: 2, leading: 6, bottom: 2, trailing: 6))
                                 .frame(maxWidth: 100)
@@ -101,6 +101,11 @@ struct FlowCanvasView: View {
         .padding(8)
     }
 
+    func data(_ portData: PortData?) -> String {
+        guard let value = portData?.floatValue else { return "0" }
+        return "\(value)"
+    }
+
     func outputNode(node: Node) -> some View {
         HStack(spacing: 0) {
             VStack(alignment: .leading, spacing: portSpacing) {
@@ -108,9 +113,15 @@ struct FlowCanvasView: View {
                     HStack(alignment: .center, spacing: 8) {
                         portCircle
                             .port(.input(node.id, index: port.id))
-                        Text(port.name ?? "")
+                        Text(data(context.data(for: port.address)))
                             .lineLimit(1)
                             .frame(maxWidth: 100, alignment: .leading)
+                        TextField(data(context.data(for: port.address)), value: value(node.id, address: .output(port.id)), formatter: NumberFormatter())
+                            .multilineTextAlignment(.trailing)
+                            .padding(EdgeInsets(top: 2, leading: 6, bottom: 2, trailing: 6))
+                            .frame(maxWidth: 100)
+                            .background(Color(.systemGray3))
+                            .cornerRadius(8)
                     }
                     .frame(height: portHeight)
                 }

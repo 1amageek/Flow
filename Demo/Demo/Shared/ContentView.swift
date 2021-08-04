@@ -13,20 +13,18 @@ struct ContentView: View {
     @EnvironmentObject var document: FlowDocument
 
     var body: some View {
-//        NavigationView {
-//            List(selection: $document.selectedGraph) {
-//                ForEach(document.flow.graphs) { graph in
-//                    Text(graph.id)
-//                        .tag(graph.id)
-//                }
-//            }
-//            .onAppear {
-//                print(document)
-//            }
-//
-//            FlowCanvasView()
-//        }
-        FlowCanvasView()
+        NavigationView {
+            List(selection: $document.selectedGraph) {
+                ForEach(document.flow.graphs) { graph in
+                    NavigationLink(tag: graph.id, selection: $document.selectedGraph, destination: {
+                        FlowCanvasView()
+                    }) {
+                        Text(graph.id)
+                    }
+                }
+            }
+            Text("aaa")
+        }
     }
 }
 

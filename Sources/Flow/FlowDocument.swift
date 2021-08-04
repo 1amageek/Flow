@@ -25,7 +25,6 @@ public final class FlowDocument: ObservableObject {
     public init(flow: Flow = .placeholder, addtionalFunctions: [Callable] = []) {
         self.flow = flow
         self.callableFunctions = CallableFunctions(flow: flow, addtionalFunctions: addtionalFunctions)
-        self.selectedGraph = flow.graphs.first?.id
     }
 
     var visibleNodesTask: DispatchWorkItem?
