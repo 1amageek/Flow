@@ -50,6 +50,26 @@ public struct Graph: Identifiable, Codable {
         self.edges = edges
     }
 
+    public var inputs: [Interface] {
+        let inputs = nodes.filter { node in
+            if case .input(_) = node.type { return true }
+            return false
+        }
+        return inputs.map { node in
+            return Interface(node.inputs.first!.data, name: node.name)
+        }
+    }
+
+    public var outputs: [Interface] {
+        let outputs = nodes.filter { node in
+            if case .output(_) = node.type { return true }
+            return false
+        }
+        return outputs.map { node in
+            return Interface(node.outputs.first!.data, name: node.name)
+        }
+    }
+
     public static func from(data: Data) throws -> Graph {
         let snapshot = try JSONDecoder().decode(Graph.Snapshot.self, from: data)
         return self.from(snapshot: snapshot)
