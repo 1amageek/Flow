@@ -26,7 +26,7 @@ extension FlowDocument: ReferenceFileDocument {
 
     public convenience init(configuration: ReadConfiguration) throws {
         let data = configuration.file.regularFileContents!
-        self.init()
-        self.cluster = try JSONDecoder().decode(Cluster.self, from: data)
+        let cluster = try JSONDecoder().decode(Cluster.self, from: data)
+        self.init(cluster: cluster, addtionalFunctions: [])
     }
 }
