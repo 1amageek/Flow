@@ -15,7 +15,7 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             List(selection: $document.selectedGraph) {
-                ForEach(document.flow.graphs) { graph in
+                ForEach(document.cluster.graphs) { graph in
                     NavigationLink(tag: graph.id, selection: $document.selectedGraph, destination: {
                         FlowCanvasView()
                     }) {

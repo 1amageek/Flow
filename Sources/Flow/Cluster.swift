@@ -1,13 +1,13 @@
 //
-//  Flow.swift
-//  Flow
+//  Cluster.swift
+//  Cluster
 //
 //  Created by nori on 2021/07/25.
 //
 
 import SwiftUI
 
-public struct Flow: Codable {
+public struct Cluster: Codable {
 
     public var graphs: [Graph] = []
 
@@ -17,6 +17,6 @@ public struct Flow: Codable {
 }
 
 
-extension Flow {
-    public static var placeholder: Self { Flow(graphs: [Graph.placeholder]) }
+extension Cluster {
+    public static var placeholder: Self { Cluster(graphs: [Graph.placeholder]) }
 }

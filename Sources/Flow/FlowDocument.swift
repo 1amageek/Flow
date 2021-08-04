@@ -12,7 +12,7 @@ public final class FlowDocument: ObservableObject {
 
     @Published public var canvas: Canvas = Canvas()
 
-    @Published public var flow: Flow
+    @Published public var cluster: Cluster
 
     @Published public var selectedGraph: Graph.ID?
 
@@ -22,9 +22,9 @@ public final class FlowDocument: ObservableObject {
 
     @Published var cache: Cache = Cache()
 
-    public init(flow: Flow = .placeholder, addtionalFunctions: [Callable] = []) {
-        self.flow = flow
-        self.callableFunctions = CallableFunctions(flow: flow, addtionalFunctions: addtionalFunctions)
+    public init(cluster: Cluster = .placeholder, addtionalFunctions: [Callable] = []) {
+        self.cluster = cluster
+        self.callableFunctions = CallableFunctions(cluster: cluster, addtionalFunctions: addtionalFunctions)
     }
 
     var visibleNodesTask: DispatchWorkItem?
@@ -92,8 +92,8 @@ extension FlowDocument {
 extension FlowDocument {
 
     var graphs: [Graph] {
-        get { flow.graphs }
-        set { flow.graphs = newValue }
+        get { cluster.graphs }
+        set { cluster.graphs = newValue }
     }
 
     var nodes: [Node] { graph?.nodes ?? [] }

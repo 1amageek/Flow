@@ -10,7 +10,7 @@ import UniformTypeIdentifiers
 
 extension UTType {
 
-    public static let flow = UTType(exportedAs: "inc.stamp.flow")
+    public static let cluster = UTType(exportedAs: "inc.stamp.flow.cluster")
 
     public static let graph = UTType(exportedAs: "inc.stamp.flow.graph")
 

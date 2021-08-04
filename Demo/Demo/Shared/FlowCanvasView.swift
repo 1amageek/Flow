@@ -260,7 +260,7 @@ struct FlowCanvasView: View {
                             }
 
                         Button("Show Graph") {
-                            print(context.graph)
+                            print(context.graph ?? "")
                         }
                     }
                     .frame(width: 160, height: 300)
