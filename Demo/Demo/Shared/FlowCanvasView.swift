@@ -69,7 +69,7 @@ struct FlowCanvasView: View {
             VStack(alignment: .leading, spacing: portSpacing) {
                 ForEach(node.inputs) { port in
                     HStack(alignment: .center, spacing: 8) {
-                        if case .bool(let value) = port.data {
+                        if case .bool(_) = port.data {
                             //                            Toggle(isOn: $graph[node.id][.input(port.id)].boolValue) {
                             //
                             //                            }
@@ -256,8 +256,6 @@ struct FlowCanvasView: View {
                     Spacer()
                 }
             }
-        }.onAppear {
-            print(context.selectedGraph)
         }
     }
 }

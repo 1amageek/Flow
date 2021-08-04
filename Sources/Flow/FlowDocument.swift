@@ -22,12 +22,10 @@ public final class FlowDocument: ObservableObject {
 
     @Published var cache: Cache = Cache()
 
-    public init() {
-        let graph: Graph = .placeholder
-        let flow = Flow(graphs: [graph])
+    public init(flow: Flow = .placeholder, addtionalFunctions: [Callable] = []) {
         self.flow = flow
-        self.callableFunctions = CallableFunctions(flow: flow, addtionalFunctions: [])
-        self.selectedGraph = graph.id
+        self.callableFunctions = CallableFunctions(flow: flow, addtionalFunctions: addtionalFunctions)
+        self.selectedGraph = flow.graphs.first?.id
     }
 
     var visibleNodesTask: DispatchWorkItem?

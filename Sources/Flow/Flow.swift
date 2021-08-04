@@ -15,3 +15,8 @@ public struct Flow: Codable {
         self.graphs = graphs
     }
 }
+
+
+extension Flow {
+    public static var placeholder: Self { Flow(graphs: [Graph.placeholder]) }
+}
