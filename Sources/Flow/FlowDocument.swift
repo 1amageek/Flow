@@ -22,7 +22,7 @@ public final class FlowDocument: ObservableObject {
 
     @Published var cache: Cache = Cache()
 
-    public init(cluster: Cluster = .placeholder, addtionalFunctions: [Callable] = []) {
+    public init(cluster: Cluster = Cluster(), addtionalFunctions: [Callable] = []) {
         self.cluster = cluster
         self.callableFunctions = CallableFunctions(cluster: cluster, addtionalFunctions: addtionalFunctions)
     }
@@ -46,6 +46,11 @@ public final class FlowDocument: ObservableObject {
             guard let id = selectedGraph else { return }
             graphs[id] = newValue
         }
+    }
+
+    public var graphs: [Graph] {
+        get { cluster.graphs }
+        set { cluster.graphs = newValue }
     }
 
     let dataStore: DataStore = DataStore()
@@ -90,11 +95,6 @@ extension FlowDocument {
 
 /// Process required to draw the port.
 extension FlowDocument {
-
-    var graphs: [Graph] {
-        get { cluster.graphs }
-        set { cluster.graphs = newValue }
-    }
 
     var nodes: [Node] { graph?.nodes ?? [] }
 

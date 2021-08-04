@@ -23,7 +23,13 @@ struct ContentView: View {
                     }
                 }
             }
-            Text("aaa")
+            .navigationBarItems(trailing: Button(action: {
+                document.graphs.append(Graph())
+            }, label: {
+                Image(systemName: "plus")
+            }))
+
+            Text("Empty ..")
         }
     }
 }

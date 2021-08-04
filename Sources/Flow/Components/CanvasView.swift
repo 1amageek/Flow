@@ -162,7 +162,6 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
         })
         .contentShape(Rectangle())
         .gesture(SimultaneousGesture(dragGesture, magnificationGesture))
-        .environmentObject(context)
         .onDrop(of: [Node.draggableType], isTargeted: nil) { providers, location in
             Node.fromItemProviders(providers) { nodes in
                 nodes.forEach { node in
