@@ -22,6 +22,12 @@ public final class FlowDocument: ObservableObject {
 
     @Published var cache: Cache = Cache()
 
+    private static var filename = "database.json"
+
+    private static var applicationSupportDirectory: URL { FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first! }
+
+    private static var databaseFileUrl: URL { applicationSupportDirectory.appendingPathComponent(filename) }
+
     public init(cluster: Cluster = Cluster(), addtionalFunctions: [Callable] = []) {
         self.cluster = cluster
         self.callableFunctions = CallableFunctions(cluster: cluster, addtionalFunctions: addtionalFunctions)
@@ -37,9 +43,7 @@ public final class FlowDocument: ObservableObject {
 
     public var graph: Graph? {
         get {
-            guard let id = selectedGraph else {
-                return nil
-            }
+            guard let id = selectedGraph else { return nil }
             return graphs[id]
         }
         set {
@@ -79,6 +83,47 @@ public final class FlowDocument: ObservableObject {
         )
     }
 
+    public class func local() -> FlowDocument {
+        if let data = FileManager.default.contents(atPath: databaseFileUrl.path) {
+            let cluster = loadData(from: data)
+            return FlowDocument(cluster: cluster)
+        } else {
+            if let bundledDatabaseUrl = Bundle.main.url(forResource: "database", withExtension: "json") {
+                if let data = FileManager.default.contents(atPath: bundledDatabaseUrl.path) {
+                    let cluster = loadData(from: data)
+                    return FlowDocument(cluster: cluster)
+                }
+            }
+        }
+        return FlowDocument()
+    }
+
+    private static func loadData(from storeFileData: Data) -> Cluster {
+        do {
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
+            return try decoder.decode(Cluster.self, from: storeFileData)
+        } catch {
+            print(error)
+            return Cluster()
+        }
+    }
+
+    public func save() {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        encoder.outputFormatting = .prettyPrinted
+        do {
+            let data = try encoder.encode(cluster)
+            if FileManager.default.fileExists(atPath: Self.databaseFileUrl.path) {
+                try FileManager.default.removeItem(at: Self.databaseFileUrl)
+            }
+            try data.write(to: Self.databaseFileUrl)
+        } catch {
+            print(error)
+        }
+    }
+
     private static func prepare(_ graph: Graph) -> Graph {
         let nodes = graph.nodes
         let edges = graph.edges.filter { edge in
@@ -90,15 +135,96 @@ public final class FlowDocument: ObservableObject {
 
 extension FlowDocument {
 
+    public func add(graph: Graph, undoManager: UndoManager? = nil) {
+        graphs.append(graph)
+        undoManager?.registerUndo(withTarget: self) { doc in
+            doc.delete(graph: graph, undoManager: undoManager)
+        }
+    }
+
+    public func delete(graph: Graph, undoManager: UndoManager? = nil) {
+        let old = graph
+        graphs[graph.id] = nil
+        undoManager?.registerUndo(withTarget: self) { doc in
+            doc.add(graph: old, undoManager: undoManager)
+        }
+    }
+
+    public func replace(graph: Graph, undoManager: UndoManager? = nil) {
+        let old = graph
+        graphs[graph.id] = graph
+        undoManager?.registerUndo(withTarget: self) { doc in
+            doc.replace(graph: old, undoManager: undoManager)
+        }
+    }
+
+    public func add(node: Node, undoManager: UndoManager? = nil) {
+        let old = node
+        nodes.append(node)
+        undoManager?.registerUndo(withTarget: self) { doc in
+            doc.delete(node: old, undoManager: undoManager)
+        }
+    }
+
+    public func delete(node: Node, undoManager: UndoManager? = nil) {
+        let old = node
+        nodes[node.id] = nil
+        undoManager?.registerUndo(withTarget: self) { doc in
+            doc.add(node: old, undoManager: undoManager)
+        }
+    }
+
+    public func replace(node: Node, undoManager: UndoManager? = nil) {
+        let old = node
+        nodes[node.id] = node
+        undoManager?.registerUndo(withTarget: self) { doc in
+            doc.replace(node: old, undoManager: undoManager)
+        }
+    }
+
+    public func add(edge: Edge, undoManager: UndoManager? = nil) {
+        let old = edge
+        edges.append(edge)
+        undoManager?.registerUndo(withTarget: self) { doc in
+            doc.delete(edge: old, undoManager: undoManager)
+        }
+    }
+
+    public func delete(edge: Edge, undoManager: UndoManager? = nil) {
+        let old = edge
+        edges[edge.id] = nil
+        undoManager?.registerUndo(withTarget: self) { doc in
+            doc.add(edge: old, undoManager: undoManager)
+        }
+    }
+
+    public func replace(edge: Edge, undoManager: UndoManager? = nil) {
+        let old = edge
+        edges[edge.id] = edge
+        undoManager?.registerUndo(withTarget: self) { doc in
+            doc.replace(edge: old, undoManager: undoManager)
+        }
+    }
+}
+
+
+extension FlowDocument {
+
     func shouldConnect( _ connection: Connection) -> Bool { shouldConnectNodeHandler(self.nodes, self.edges, connection) }
 }
 
 /// Process required to draw the port.
 extension FlowDocument {
 
-    var nodes: [Node] { graph?.nodes ?? [] }
+    var nodes: [Node] {
+        get { graph?.nodes ?? [] }
+        set { graph?.nodes = newValue }
+    }
 
-    var edges: [Edge] { graph?.edges ?? [] }
+    var edges: [Edge] {
+        get { graph?.edges ?? [] }
+        set { graph?.edges = newValue }
+    }
 
     func port(with address: Address) -> Port? {
         guard let node = nodes[address.id] else { return nil }

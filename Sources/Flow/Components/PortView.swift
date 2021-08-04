@@ -13,6 +13,8 @@ public struct InputPortView<Content: View>: View {
 
     @EnvironmentObject var context: FlowDocument
 
+    @Environment(\.undoManager) var undoManager
+
     public var id: String
 
     public var portIndex: PortIndex
@@ -80,7 +82,7 @@ public struct InputPortView<Content: View>: View {
                     connection.endAddress = address
                     if context.shouldConnect(connection) {
                         let edge = Edge(source: address, target: connection.startAddress)
-                        context.graph?.edges.append(edge)
+                        context.add(edge: edge, undoManager: undoManager)
                     }
                 }
             }))
@@ -92,6 +94,8 @@ public struct OutputPortView<Content: View>: View {
     @Environment(\.canvasCoordinateSpace) var canvasCoordinateSpace: String
 
     @EnvironmentObject var context: FlowDocument
+
+    @Environment(\.undoManager) var undoManager
 
     public var id: String
 
@@ -150,7 +154,7 @@ public struct OutputPortView<Content: View>: View {
                     connection.endAddress = address
                     if context.shouldConnect(connection) {
                         let edge = Edge(source: connection.startAddress, target: address)
-                        context.graph?.edges.append(edge)
+                        context.add(edge: edge, undoManager: undoManager)
                     }
                 }
             }))

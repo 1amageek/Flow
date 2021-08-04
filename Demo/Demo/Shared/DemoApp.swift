@@ -11,15 +11,15 @@ import Flow
 @main
 struct DemoApp: App {
 
-    @StateObject var store = FlowDocument()
+    @StateObject var store = FlowDocument.local()
     
     var body: some Scene {
         WindowGroup {
             ContentView().environmentObject(store)
         }
 
-//        DocumentGroup(newDocument: { FlowDocument() }) { configuration in
-//            ContentView()
+//        DocumentGroup(newDocument: { FlowDocument() }) { configuration -> ContentView in
+//            return ContentView()
 //        }
 
     }

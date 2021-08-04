@@ -29,6 +29,8 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
         }
     }
 
+    @Environment(\.undoManager) var undoManager: UndoManager?
+
     var context: FlowDocument
 
     var nodeView: (_ node: Node) -> NodeContent
@@ -167,7 +169,7 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
                 nodes.forEach { node in
                     var node = node
                     let position = CGPoint(x: location.x - context.canvas.offset.width, y: location.y - context.canvas.offset.height)
-                    context.graph?.add(node.set(position))
+                    context.add(node: node.set(position), undoManager: undoManager)
                 }
             }
             return true
