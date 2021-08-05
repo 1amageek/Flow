@@ -130,7 +130,16 @@ extension AnyCallable {
                 }
                 return data(for: address)
             case (.output(let typeID), .output):
-                let input = node.inputs.map { $0.data }
+                let input = node.inputs.compactMap { input -> PortData? in
+                    if input.data.exists {
+                        return input.data
+                    }
+                    guard let address = connectedSourceAddress(node: node, inputPort: input) else {
+                        return input.data
+                    }
+                    let data = self.data(for: address)
+                    return data
+                }
                 guard let callable = delegate[typeID] else {
                     fatalError()
                 }
