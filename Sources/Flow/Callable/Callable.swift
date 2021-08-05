@@ -62,6 +62,15 @@ extension AnyCallable {
 
     var edges: [Edge] { graph.edges }
 
+    var inputNodes: [Node] {
+        nodes.filter { node in
+            if case .input(_) = node.type {
+                return true
+            }
+            return false
+        }
+    }
+
     var ouputNodes: [Node] {
         nodes.filter { node in
             if case .output(_) = node.type {
@@ -117,11 +126,12 @@ extension AnyCallable {
                 return data
             case (.input, .input): return port.data
             case (.input(let typeID), .output):
-                let input = fromOutside
+                let index = inputNodes.firstIndex(of: node)!
+                let input = fromOutside[index]
                 guard let callable = delegate[typeID] else {
                     fatalError()
                 }
-                let output = callable(input, node.outputs.map({ $0.data }))
+                let output = callable([input], node.outputs.map({ $0.data }))
                 let data = output[port.id]
                 return data
             case (.output, .input):
