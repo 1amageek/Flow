@@ -16,7 +16,7 @@ class DataStore {
     subscript(_ input: [PortData]) -> [PortData]? {
         get {
             print("get", input.hashValue, cache[input.hashValue])
-            cache[input.hashValue]
+            return cache[input.hashValue]
         }
         set {
             print("set", input.hashValue, newValue)
