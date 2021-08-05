@@ -14,6 +14,7 @@ extension NodeType: Codable {
         case input
         case output
         case io
+        case reference
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -25,6 +26,8 @@ extension NodeType: Codable {
                 try container.encode(type, forKey: .output)
             case .io(let type):
                 try container.encode(type, forKey: .io)
+            case .reference(let type):
+                try container.encode(type, forKey: .reference)
         }
     }
 
@@ -41,6 +44,9 @@ extension NodeType: Codable {
             case .io:
                 let id = try container.decode(Callable.ID.self, forKey: .io)
                 self = .io(id)
+            case .reference:
+                let id = try container.decode(Callable.ID.self, forKey: .reference)
+                self = .reference(id)
             default:
                 throw DecodingError.dataCorrupted(
                     DecodingError.Context(

@@ -318,12 +318,12 @@ extension FlowDocument {
 
     func data(node: Node, port: Port) -> PortData? {
         switch (node.type, port.type) {
-            case (.io, .input):
+            case (.io, .input), (.reference, .input):
                 guard let address = connectedSourceAddress(node: node, inputPort: port) else {
                     return port.data
                 }
                 return data(for: address)
-            case (.io(let typeID), .output):
+            case (.io(let typeID), .output), (.reference(let typeID), .output):
                 let input = node.inputs.compactMap { input -> PortData? in
                     if input.data.exists {
                         return input.data

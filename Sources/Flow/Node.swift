@@ -17,6 +17,7 @@ public enum NodeType: Hashable {
     case input(_ id: Callable.ID = Node.Function.bypass)
     case output(_ id: Callable.ID = Node.Function.bypass)
     case io(_ id: Callable.ID = Node.Function.bypass)
+    case reference(_ id: Callable.ID)
 }
 
 public enum NodeError: Error {
@@ -173,6 +174,17 @@ extension Node {
         position: CGPoint = .zero
     ) -> Node {
         Node(type: .io(type), id: id, name: name, inputs: inputs, outputs: outputs, position: position)
+    }
+
+    public static func reference(
+        _ type: Callable.ID,
+        id: String,
+        name: String,
+        inputs: [Interface] = [],
+        outputs: [Interface] = [],
+        position: CGPoint = .zero
+    ) -> Node {
+        Node(type: .reference(type), id: id, name: name, inputs: inputs, outputs: outputs, position: position)
     }
 
     public static func sum(
