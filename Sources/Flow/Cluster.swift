@@ -32,6 +32,9 @@ extension Cluster: CustomDebugStringConvertible {
                     debugDescriptions.append("    [Output: \(port.id)] name: \(port.name ?? ""), data: \(port.data)")
                 }
             }
+            graph.edges.forEach { edge in
+                debugDescriptions.append("  [Edge: \(edge.id)] source: \(edge.source), target: \(edge.target)")
+            }
         }
         return debugDescriptions.joined(separator: "\n")
     }
