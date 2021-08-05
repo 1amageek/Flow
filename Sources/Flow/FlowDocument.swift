@@ -340,14 +340,13 @@ extension FlowDocument {
                     return data
                 }
                 let key: DataStore.Key = .init(id: node.id, input: input)
-//                if let cache = self.dataStore[key] {
-//                    return cache[port.id]
-//                }
+                if let cache = self.dataStore[key] {
+                    return cache[port.id]
+                }
                 guard let callable = self.callableFunctions[typeID] else {
                     fatalError()
                 }
                 let output = callable(input, node.outputs.map({ $0.data }))
-                print("doc io", node.id, node.type, input, output)
                 self.dataStore[key] = output
                 let data = output[port.id]
                 return data
@@ -355,9 +354,9 @@ extension FlowDocument {
             case (.input(let typeID), .output):
                 let input = node.inputs.map { $0.data }
                 let key: DataStore.Key = .init(id: node.id, input: input)
-//                if let cache = self.dataStore[key] {
-//                    return cache[port.id]
-//                }
+                if let cache = self.dataStore[key] {
+                    return cache[port.id]
+                }
                 guard let callable = self.callableFunctions[typeID] else {
                     fatalError()
                 }
@@ -373,9 +372,9 @@ extension FlowDocument {
             case (.output(let typeID), .output):
                 let input = node.inputs.map { $0.data }
                 let key: DataStore.Key = .init(id: node.id, input: input)
-//                if let cache = self.dataStore[key] {
-//                    return cache[port.id]
-//                }
+                if let cache = self.dataStore[key] {
+                    return cache[port.id]
+                }
                 guard let callable = self.callableFunctions[typeID] else {
                     fatalError()
                 }

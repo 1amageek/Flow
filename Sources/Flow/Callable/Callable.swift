@@ -119,7 +119,6 @@ extension AnyCallable {
                     fatalError()
                 }
                 let output = callable(input, node.outputs.map({ $0.data }))
-                print("cal io", node.id, node.type, input, output)
                 let data = output[port.id]
                 return data
             case (.input, .input): return port.data
@@ -149,7 +148,6 @@ extension AnyCallable {
                     fatalError()
                 }
                 let output = callable(input, node.outputs.map({ $0.data }))
-                print("cal out", node.id, node.type, input, output)
                 let data = output[port.id]
                 return data
         }
