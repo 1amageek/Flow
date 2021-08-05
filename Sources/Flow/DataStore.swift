@@ -14,8 +14,14 @@ class DataStore {
     var cache: Cache<Int, [PortData]> = Cache()
 
     subscript(_ input: [PortData]) -> [PortData]? {
-        get { cache[input.hashValue] }
-        set { cache[input.hashValue] = newValue }
+        get {
+            print("get", input.hashValue, cache[input.hashValue])
+            cache[input.hashValue]
+        }
+        set {
+            print("set", input.hashValue, newValue)
+            cache[input.hashValue] = newValue
+        }
     }
 }
 
