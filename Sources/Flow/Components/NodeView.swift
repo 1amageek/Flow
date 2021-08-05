@@ -13,6 +13,8 @@ public struct NodeView<Content: View>: View {
 
     @EnvironmentObject var context: FlowDocument
 
+    @Environment(\.undoManager) var undoManager
+
     var node: Node
 
     var id: Node.ID { node.id }

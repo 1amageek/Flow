@@ -30,14 +30,15 @@ final public class CallableFunctions: CallableFunctionsProtocol {
 
     public static let functions: [Callable] = [Bypass(), Sum(), Product(), Average(), Varp()]
 
-    let cluster: Cluster
+    weak var document: FlowDocument!
+
+    var cluster: Cluster { document!.cluster }
 
     let addtionalFunctions: [Callable]
 
     var anyCallables: [AnyCallable] { cluster.graphs.map({ AnyCallable(graph: $0, delegate: self) }) }
 
-    public init(cluster: Cluster, addtionalFunctions: [Callable]) {
-        self.cluster = cluster
+    public init(_ addtionalFunctions: [Callable]) {
         self.addtionalFunctions = addtionalFunctions
     }
 

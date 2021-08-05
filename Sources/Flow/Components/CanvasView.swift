@@ -138,6 +138,22 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
         }
     }
 
+    func updateReferenceNode() {
+        guard let graph = context.graph else { return }
+        DispatchQueue.main.async {
+            context.graphs.forEach { targetGraph in
+                if graph != targetGraph {
+                    targetGraph.nodes.forEach { targetNode in
+                        if targetNode.id == graph.id {
+                            let newNode = Node.reference(graph.id, id: graph.id, name: graph.name, inputs: graph.inputs, outputs: graph.outputs, position: targetNode.position)
+                            context[targetGraph.id]![targetNode.id] = newNode
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public var body: some View {
         ZStack {
             ZStack {
@@ -164,6 +180,7 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
         })
         .contentShape(Rectangle())
         .gesture(SimultaneousGesture(dragGesture, magnificationGesture))
+        .onChange(of: context.graph) { _ in updateReferenceNode() }
         .onDrop(of: [Node.draggableType], isTargeted: nil) { providers, location in
             Node.fromItemProviders(providers) { nodes in
                 nodes.forEach { node in
@@ -174,6 +191,7 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
             }
             return true
         }
+        .onDisappear { context.dataStore.cache.clear() }
     }
 }
 

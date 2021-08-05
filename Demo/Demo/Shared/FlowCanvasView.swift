@@ -259,8 +259,8 @@ struct FlowCanvasView: View {
                                 return node.itemProvider
                             }
 
-                        Button("Show Graph") {
-                            print(context.graph ?? "")
+                        Button("Show Cluster") {
+                            print(context.cluster)
                         }
                     }
                     .frame(width: 160, height: 300)

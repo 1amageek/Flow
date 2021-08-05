@@ -16,3 +16,26 @@ public struct Cluster: Codable {
     }
 }
 
+
+extension Cluster: CustomDebugStringConvertible {
+
+    public var debugDescription: String {
+        var debugDescriptions: [String] = []
+        graphs.forEach { graph in
+            debugDescriptions.append("[Graph: \(graph.id)] name: \(graph.name)")
+            graph.nodes.forEach { node in
+                debugDescriptions.append("  [Node: \(node.id)] name: \(node.name), type: \(node.type)")
+                node.inputs.forEach { port in
+                    debugDescriptions.append("    [Input: \(port.id)] name: \(port.name ?? ""), data: \(port.data)")
+                }
+                node.outputs.forEach { port in
+                    debugDescriptions.append("    [Output: \(port.id)] name: \(port.name ?? ""), data: \(port.data)")
+                }
+            }
+            graph.edges.forEach { edge in
+                debugDescriptions.append("  [Edge: \(edge.id)] source: \(edge.source), target: \(edge.target)")
+            }
+        }
+        return debugDescriptions.joined(separator: "\n")
+    }
+}
