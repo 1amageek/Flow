@@ -109,9 +109,6 @@ extension AnyCallable {
                 return data(for: address, input: fromOutside)
             case (.io(let typeID), .output), (.reference(let typeID), .output):
                 let input = node.inputs.compactMap { input -> PortData? in
-                    if input.data.exists {
-                        return input.data
-                    }
                     guard let address = connectedSourceAddress(node: node, inputPort: input) else {
                         return input.data
                     }
@@ -142,9 +139,6 @@ extension AnyCallable {
                 return data(for: address, input: fromOutside)
             case (.output(let typeID), .output):
                 let input = node.inputs.compactMap { input -> PortData? in
-                    if input.data.exists {
-                        return input.data
-                    }
                     guard let address = connectedSourceAddress(node: node, inputPort: input) else {
                         return input.data
                     }
