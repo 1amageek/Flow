@@ -154,6 +154,7 @@ extension AnyCallable {
                     fatalError()
                 }
                 let output = callable(input, node.outputs.map({ $0.data }))
+                print("cal out", node.id, node.type, input, output)
                 let data = output[port.id]
                 return data
         }
