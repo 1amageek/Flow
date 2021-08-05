@@ -47,6 +47,10 @@ extension DataStore {
             wrapped.removeObject(forKey: WrappedKey(key))
         }
 
+        func clear() {
+            wrapped.removeAllObjects()
+        }
+
         subscript(key: Key) -> Value? {
             get { return value(forKey: key) }
             set {

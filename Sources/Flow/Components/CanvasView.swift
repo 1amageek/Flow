@@ -191,6 +191,7 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
             }
             return true
         }
+        .onDisappear { context.dataStore.cache.clear() }
     }
 }
 
