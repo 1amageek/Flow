@@ -93,43 +93,51 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
 
     var visibleNodes: [Node] {
         if context.canvas.size == .zero { return [] }
-        if case .dragging(_) = dragState {
-            return context.cache.nodes ?? []
-        }
-        if let cache = context.cache.nodes {
-            context.visibleNodesTask?.cancel()
-            context.visibleNodesTask = context.visibleNodes { nodes in
-                self.context.cache.nodes = nodes
-            }
-            return cache
-        } else {
-            guard let graph = context.graph else { return [] }
-            let visibleNodes = graph.nodes.filter { context.canvas.visibleFrame.intersects($0.frame) }
-            context.cache.nodes = visibleNodes
-            return visibleNodes
-        }
+        guard let graph = context.graph else { return [] }
+        return graph.nodes.filter { context.canvas.visibleFrame.intersects($0.frame) }
+        // TODO: Performance
+//        if case .dragging(_) = dragState {
+//            return context.cache.nodes ?? []
+//        }
+//        if let cache = context.cache.nodes {
+//            context.visibleNodesTask?.cancel()
+//            context.visibleNodesTask = context.visibleNodes { nodes in
+//                self.context.cache.nodes = nodes
+//            }
+//            return cache
+//        } else {
+//            guard let graph = context.graph else { return [] }
+//            let visibleNodes = graph.nodes.filter { context.canvas.visibleFrame.intersects($0.frame) }
+//            context.cache.nodes = visibleNodes
+//            return visibleNodes
+//        }
     }
 
     var visibleEdges: [Edge] {
         if context.canvas.size == .zero { return [] }
-        if case .dragging(_) = dragState {
-            return context.cache.edges ?? []
+        guard let graph = context.graph else { return [] }
+        return graph.edges.filter { edge -> Bool in
+            return graph.nodes.contains(where: { $0.id == edge.source.id }) && graph.nodes.contains(where: { $0.id == edge.target.id })
         }
-        if let cache = context.cache.edges {
-            context.visibleEdgesTask?.cancel()
-            context.visibleEdgesTask = context.visibleEdges { edges in
-                self.context.cache.edges = edges
-            }
-            return cache
-        } else {
-            let nodes = context.cache.nodes ?? []
-            guard let graph = context.graph else { return [] }
-            let visibleEdges = graph.edges.filter { edge -> Bool in
-                return nodes.contains(where: { $0.id == edge.source.id }) && nodes.contains(where: { $0.id == edge.target.id })
-            }
-            context.cache.edges = visibleEdges
-            return visibleEdges
-        }
+        // TODO: Performance
+//        if case .dragging(_) = dragState {
+//            return context.cache.edges ?? []
+//        }
+//        if let cache = context.cache.edges {
+//            context.visibleEdgesTask?.cancel()
+//            context.visibleEdgesTask = context.visibleEdges { edges in
+//                self.context.cache.edges = edges
+//            }
+//            return cache
+//        } else {
+//            let nodes = context.cache.nodes ?? []
+//            guard let graph = context.graph else { return [] }
+//            let visibleEdges = graph.edges.filter { edge -> Bool in
+//                return nodes.contains(where: { $0.id == edge.source.id }) && nodes.contains(where: { $0.id == edge.target.id })
+//            }
+//            context.cache.edges = visibleEdges
+//            return visibleEdges
+//        }
     }
 
     func geometryDecide(proxy: GeometryProxy) {
@@ -156,20 +164,22 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
 
     public var body: some View {
         ZStack {
-            ZStack {
-                ForEach(visibleNodes) { node in
-                    nodeView(node)
+            if context.canvas.size != .zero {
+                ZStack {
+                    ForEach(visibleNodes) { node in
+                        nodeView(node)
+                    }
+                    ForEach(visibleEdges) { edge in
+                        edgeView(edge)
+                    }
+                    if let connnection = context.connecting {
+                        connectionView(connnection)
+                    }
                 }
-                ForEach(visibleEdges) { edge in
-                    edgeView(edge)
-                }
-                if let connnection = context.connecting {
-                    connectionView(connnection)
-                }
+                .coordinateSpace(name: CanvasCoordinateSpace.defaultValue)
+                .offset(offset)
+                .scaleEffect(scale)
             }
-            .coordinateSpace(name: CanvasCoordinateSpace.defaultValue)
-            .offset(offset)
-            .scaleEffect(scale)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(GeometryReader { proxy in
