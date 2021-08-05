@@ -145,7 +145,9 @@ public struct CanvasView<NodeContent: View, EdgeContent: View, ConnectionContent
                 targetGraph.nodes.forEach { targetNode in
                     if targetNode.id == graph.id {
                         let newNode = Node.reference(graph.id, id: graph.id, name: graph.name, inputs: graph.inputs, outputs: graph.outputs, position: targetNode.position)
-                        context[targetGraph.id]![targetNode.id] = newNode
+                        DispatchQueue.main.async {
+                            context[targetGraph.id]![targetNode.id] = newNode
+                        }
                     }
                 }
             }

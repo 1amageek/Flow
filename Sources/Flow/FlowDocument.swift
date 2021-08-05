@@ -347,6 +347,7 @@ extension FlowDocument {
                     fatalError()
                 }
                 let output = callable(input, node.outputs.map({ $0.data }))
+                print(node.id, node.type, input, output)
                 self.dataStore[key] = output
                 let data = output[port.id]
                 return data
