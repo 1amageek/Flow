@@ -13,6 +13,8 @@ public struct NodeView<Content: View>: View {
 
     @EnvironmentObject var context: FlowDocument
 
+    @Environment(\.undoManager) var undoManager
+
     var node: Node
 
     var id: Node.ID { node.id }
@@ -64,6 +66,13 @@ public struct NodeView<Content: View>: View {
             .offset(offset)
             .gesture(gesture)
             .onTapGesture { context.focusNode = context.nodes[id] }
+            .onAppear {
+                if case .reference(_) = node.type {
+                    let graph = context.graphs[node.id]
+                    let node = Node.reference(graph.id, id: graph.id, name: graph.name, inputs: graph.inputs, outputs: graph.outputs)
+                    context.replace(node: node, undoManager: undoManager)
+                }
+            }
     }
 }
 
