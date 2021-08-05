@@ -69,7 +69,7 @@ public struct NodeView<Content: View>: View {
             .onAppear {
                 if case .reference(_) = node.type {
                     if let graph = context.graphs[node.id] {
-                        let newNode = Node.reference(graph.id, id: graph.id, name: graph.name, inputs: graph.inputs, outputs: graph.outputs)
+                        let newNode = Node.reference(graph.id, id: graph.id, name: graph.name, inputs: graph.inputs, outputs: graph.outputs, position: node.position)
                         context.replace(node: newNode, undoManager: undoManager)
                     } else {
                         context.delete(node: node, undoManager: undoManager)
