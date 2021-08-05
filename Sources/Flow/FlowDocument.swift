@@ -57,6 +57,11 @@ public final class FlowDocument: ObservableObject {
         set { cluster.graphs = newValue }
     }
 
+    public subscript(id: Graph.ID) -> Graph? {
+        get { graphs[id] }
+        set { graphs[id] = newValue }
+    }
+
     let dataStore: DataStore = DataStore()
 
     var shouldConnectNodeHandler: ((_ nodes: [Node], _ edges: [Edge], _ connection: Connection) -> Bool)!

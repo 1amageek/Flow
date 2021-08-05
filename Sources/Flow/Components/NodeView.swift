@@ -66,16 +66,6 @@ public struct NodeView<Content: View>: View {
             .offset(offset)
             .gesture(gesture)
             .onTapGesture { context.focusNode = context.nodes[id] }
-            .onAppear {
-                if case .reference(_) = node.type {
-                    if let graph = context.graphs[node.id] {
-                        let newNode = Node.reference(graph.id, id: graph.id, name: graph.name, inputs: graph.inputs, outputs: graph.outputs, position: node.position)
-                        context.replace(node: newNode, undoManager: undoManager)
-                    } else {
-                        context.delete(node: node, undoManager: undoManager)
-                    }
-                }
-            }
     }
 }
 

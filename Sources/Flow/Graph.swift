@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct Graph: Identifiable, Codable {
+public struct Graph: Identifiable, Codable, Equatable {
 
     public var id: String
 
