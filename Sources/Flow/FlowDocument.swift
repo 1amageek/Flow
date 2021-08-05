@@ -339,27 +339,29 @@ extension FlowDocument {
                     let data = self.data(for: address)
                     return data
                 }
-                if let cache = self.dataStore[input] {
+                let key: DataStore.Key = .init(id: node.id, input: input)
+                if let cache = self.dataStore[key] {
                     return cache[port.id]
                 }
                 guard let callable = self.callableFunctions[typeID] else {
                     fatalError()
                 }
                 let output = callable(input, node.outputs.map({ $0.data }))
-                self.dataStore[input] = output
+                self.dataStore[key] = output
                 let data = output[port.id]
                 return data
             case (.input, .input): return port.data
             case (.input(let typeID), .output):
                 let input = node.inputs.map { $0.data }
-                if let cache = self.dataStore[input] {
+                let key: DataStore.Key = .init(id: node.id, input: input)
+                if let cache = self.dataStore[key] {
                     return cache[port.id]
                 }
                 guard let callable = self.callableFunctions[typeID] else {
                     fatalError()
                 }
                 let output = callable(input, node.outputs.map({ $0.data }))
-                self.dataStore[input] = output
+                self.dataStore[key] = output
                 let data = output[port.id]
                 return data
             case (.output, .input):
@@ -369,14 +371,15 @@ extension FlowDocument {
                 return data(for: address)
             case (.output(let typeID), .output):
                 let input = node.inputs.map { $0.data }
-                if let cache = self.dataStore[input] {
+                let key: DataStore.Key = .init(id: node.id, input: input)
+                if let cache = self.dataStore[key] {
                     return cache[port.id]
                 }
                 guard let callable = self.callableFunctions[typeID] else {
                     fatalError()
                 }
                 let output = callable(input, node.outputs.map({ $0.data }))
-                self.dataStore[input] = output
+                self.dataStore[key] = output
                 let data = output[port.id]
                 return data
         }

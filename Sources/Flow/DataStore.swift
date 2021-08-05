@@ -11,11 +11,16 @@ class DataStore {
 
     init() { }
 
-    var cache: Cache<Int, [PortData]> = Cache()
+    var cache: Cache<Key, [PortData]> = Cache()
 
-    subscript(_ input: [PortData]) -> [PortData]? {
-        get { cache[input.hashValue] }
-        set { cache[input.hashValue] = newValue }
+    subscript(_ input: Key) -> [PortData]? {
+        get { cache[input] }
+        set { cache[input] = newValue }
+    }
+
+    struct Key: Hashable {
+        var id: Node.ID
+        var input: [PortData]
     }
 }
 
