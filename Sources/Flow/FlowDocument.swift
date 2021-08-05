@@ -30,7 +30,8 @@ public final class FlowDocument: ObservableObject {
 
     public init(cluster: Cluster = Cluster(), addtionalFunctions: [Callable] = []) {
         self.cluster = cluster
-        self.callableFunctions = CallableFunctions(cluster: cluster, addtionalFunctions: addtionalFunctions)
+        self.callableFunctions = CallableFunctions(addtionalFunctions)
+        self.callableFunctions.document = self
     }
 
     var visibleNodesTask: DispatchWorkItem?
